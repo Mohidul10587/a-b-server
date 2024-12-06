@@ -246,7 +246,7 @@ const getAllProductsForOfferPage = (req, res) => __awaiter(void 0, void 0, void 
     try {
         const result = yield product_model_1.default.find()
             .select("_id photo title price subCategory ")
-            .populate("brand", "title")
+            .populate("writer", "title")
             .populate("category", "categoryName");
         const products = result.reverse();
         res.status(200).json(products);
