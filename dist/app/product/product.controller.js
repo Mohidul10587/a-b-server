@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.getAllProductsForAdmin = exports.getAllProducts = exports.createProduct = void 0;
+exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.updateProduct = exports.createProduct = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
 // import cloudinary from "../shared/cloudinary.config";
@@ -27,23 +27,8 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
         const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
-        const attachedFiles = (files === null || files === void 0 ? void 0 : files.attachedFiles) || [];
         const photoUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(photoFile);
         const metaImage = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(metaImageFile);
-        const attachedFilesUrls = [];
-        // for (const file of attachedFiles) {
-        //   const result = await new Promise<CloudinaryUploadResult>(
-        //     (resolve, reject) => {
-        //       cloudinary.uploader
-        //         .upload_stream({ resource_type: "image" }, (error, result) => {
-        //           if (error) reject(error);
-        //           else resolve(result as CloudinaryUploadResult);
-        //         })
-        //         .end(file.buffer);
-        //     }
-        //   );
-        //   attachedFilesUrls.push(result.secure_url);
-        // }
         const tagsArray = tags.split(",").map((tag) => tag.trim());
         const newProduct = yield product_model_1.default.create({
             title,
@@ -76,7 +61,6 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             tags: tagsArray,
             photo: photoUrl ? photoUrl : "",
             metaImage: metaImage ? metaImage : "",
-            attachedFiles: attachedFilesUrls,
         });
         res.status(201).json(newProduct);
     }
@@ -86,153 +70,60 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createProduct = createProduct;
-// export const updateProduct = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const productId = req.params.productId;
-//     const {
-//       title,
-//       slug,
-//       description,
-//       shortDescription,
-//       category,
-//       subCategory,
-//       infoSectionsData,
-//       price,
-//       unprice,
-//       stockStatus,
-//       writer,
-//       photo,
-//       featured,
-//       sele,
-//       condition,
-//       warranty,
-//       youtubeVideo,
-//       shippingInside,
-//       shippingOutside,
-//       metaTitle,
-//       metaDescription,
-//       tags,
-//       metaImage,
-//     } = req.body;
-//     let existingImagesArray = JSON.parse(req.body.attachedFiles);
-//     const files = req.files as {
-//       photo?: Express.Multer.File[];
-//       metaImage?: Express.Multer.File[];
-//       attachedFiles?: Express.Multer.File[];
-//     };
-//     const photoFile = files?.photo?.[0];
-//     // Upload photo if     provided
-//     let photoUrl = "";
-//     if (photoFile) {
-//       const result = await new Promise<CloudinaryUploadResult>(
-//         (resolve, reject) => {
-//           cloudinary.uploader
-//             .upload_stream({ resource_type: "image" }, (error, result) => {
-//               if (error) reject(error);
-//               else resolve(result as CloudinaryUploadResult);
-//             })
-//             .end(photoFile.buffer);
-//         }
-//       );
-//       photoUrl = result.secure_url;
-//     }
-//     const newMetaImageFile = files?.metaImage?.[0];
-//     // Upload metaImage if provided
-//     let newMetaImage = "";
-//     if (newMetaImageFile) {
-//       const result = await new Promise<CloudinaryUploadResult>(
-//         (resolve, reject) => {
-//           cloudinary.uploader
-//             .upload_stream({ resource_type: "image" }, (error, result) => {
-//               if (error) reject(error);
-//               else resolve(result as CloudinaryUploadResult);
-//             })
-//             .end(newMetaImageFile.buffer);
-//         }
-//       );
-//       newMetaImage = result.secure_url;
-//     }
-//     let secureUrlArray: string[] = [];
-//     // Upload new attached files and get their URLs
-//     if (files && files.attachedFiles && files.attachedFiles.length > 0) {
-//       // Upload images and collect secure URLs in the same order
-//       await Promise.all(
-//         files.attachedFiles.map(async (file) => {
-//           try {
-//             const result = await uploadToCloudinary(file.buffer);
-//             secureUrlArray.push(result.secure_url);
-//           } catch (error) {
-//             console.error("Error uploading image:", error);
-//             throw new Error("Error uploading image");
-//           }
-//         })
-//       );
-//       // Update the existingImagesArray array with the secure URLs
-//       let urlIndex = 0;
-//       for (let i = 0; i < existingImagesArray.length; i++) {
-//         if (existingImagesArray[i] === "" && urlIndex < secureUrlArray.length) {
-//           existingImagesArray[i] = secureUrlArray[urlIndex];
-//           urlIndex++;
-//         }
-//       }
-//       // If there are more URLs than empty slots, append the remaining URLs
-//       if (urlIndex < secureUrlArray.length) {
-//         existingImagesArray = existingImagesArray.concat(
-//           secureUrlArray.slice(urlIndex)
-//         );
-//       }
-//     }
-//     const tagsArray = tags.split(",").map((tag: string) => tag.trim());
-//     const updatedData: any = {
-//       title,
-//       slug,
-//       description,
-//       shortDescription,
-//       price,
-//       unprice,
-//       category,
-//       subCategory,
-//       infoSectionsData: JSON.parse(infoSectionsData),
-//       stockStatus,
-//       writer,
-//       photo,
-//       featured,
-//       sele,
-//       condition,
-//       warranty,
-//       youtubeVideo,
-//       shippingInside,
-//       shippingOutside,
-//       attachedFiles: existingImagesArray, // Ensure the attachedFiles field is updated
-//       metaTitle,
-//       metaDescription,
-//       tags: tagsArray,
-//       metaImage,
-//     };
-//     if (photoUrl) {
-//       updatedData.photo = photoUrl;
-//     }
-//     if (newMetaImage) {
-//       updatedData.metaImage = newMetaImage;
-//     }
-//     const updatedProduct = await Product.findByIdAndUpdate(
-//       productId,
-//       updatedData,
-//       { new: true }
-//     );
-//     if (!updatedProduct) {
-//       res.status(404).json({ message: "Product not found" });
-//     } else {
-//       res.status(200).json(updatedProduct);
-//     }
-//   } catch (error: any) {
-//     console.error("Error:", error);
-//     res.status(500).json({ message: "Internal Server Error" });
-//   }
-// };
+const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        const productId = req.params.productId;
+        const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, } = req.body;
+        const files = req.files;
+        const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
+        const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
+        const photoUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(photoFile);
+        const metaImageX = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(metaImageFile);
+        const tagsArray = tags.split(",").map((tag) => tag.trim());
+        const updatedData = {
+            title,
+            slug,
+            description,
+            shortDescription,
+            price,
+            unprice,
+            category,
+            stockStatus,
+            writer,
+            photo,
+            featured,
+            sele,
+            condition,
+            warranty,
+            youtubeVideo,
+            shippingInside,
+            shippingOutside,
+            metaTitle,
+            metaDescription,
+            tags: tagsArray,
+            metaImage,
+        };
+        if (photoUrl) {
+            updatedData.photo = photoUrl;
+        }
+        if (metaImageX) {
+            updatedData.metaImage = metaImageX;
+        }
+        const updatedProduct = yield product_model_1.default.findByIdAndUpdate(productId, updatedData, { new: true });
+        if (!updatedProduct) {
+            res.status(404).json({ message: "Product not found" });
+        }
+        else {
+            res.status(200).json(updatedProduct);
+        }
+    }
+    catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+exports.updateProduct = updateProduct;
 // export const updateProductVariant = async (req: Request, res: Response) => {
 //   try {
 //     const productId = req.params.productId;
@@ -328,6 +219,18 @@ const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getAllProducts = getAllProducts;
+const getSingleProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const product = yield product_model_1.default.findOne({ _id: req.params.productId })
+            .populate("writer")
+            .populate("category");
+        res.status(200).json(product);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getSingleProduct = getSingleProduct;
 const getAllProductsForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield product_model_1.default.find().select("_id photo title ");
@@ -339,127 +242,20 @@ const getAllProductsForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.getAllProductsForAdmin = getAllProductsForAdmin;
-// export const getLastUploadedProducts = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const result = await Product.find()
-//       .select("_id photo title featured sele price stockStatus")
-//       .populate("writer")
-//       .populate("category")
-//       .sort({ _id: -1 })
-//       .limit(10);
-//     const products = result;
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getAllProductsForHomePage = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const result = await Product.find()
-//       .select("_id photo title featured sale price stockStatus")
-//       .populate({
-//         path: "category",
-//         match: { display: true },
-//         select: "categoryName display displayPositionOfHomePage _id", // Include category ID
-//       })
-//       .exec();
-//     // Filter out products with no category (in case match fails)
-//     const filteredProducts = result.filter(
-//       (product) => product.category !== null
-//     );
-//     // Group products by category
-//     const groupedByCategory = filteredProducts.reduce<
-//       {
-//         categoryName: string;
-//         categoryId: string; // Include category ID
-//         position: number;
-//         products: typeof filteredProducts;
-//       }[]
-//     >((acc, product) => {
-//       // Type assertions to help TypeScript understand the populated data structure
-//       const categoryName = (product.category as any).categoryName;
-//       const position = (product.category as any).displayPositionOfHomePage;
-//       const categoryId = (product.category as any)._id.toString(); // Get category ID as string
-//       // Find the existing category in the accumulator
-//       const existingCategory = acc.find(
-//         (item) => item.categoryId === categoryId
-//       );
-//       if (existingCategory) {
-//         // If category exists, add the product to the category's products array
-//         existingCategory.products.push(product);
-//       } else {
-//         // If category does not exist, create a new category object
-//         acc.push({
-//           categoryName,
-//           categoryId, // Include category ID
-//           position,
-//           products: [product],
-//         });
-//       }
-//       return acc;
-//     }, []);
-//     // Limit products per category to 10 and reverse the products array
-//     const resultWithLimitedProducts = groupedByCategory.map((category) => {
-//       const totalProducts = category.products.length;
-//       const lastTenProducts = category.products
-//         .slice(Math.max(totalProducts - 10, 0)) // Get the last 10 products
-//         .reverse(); // Reverse the products array
-//       return {
-//         ...category,
-//         products: lastTenProducts,
-//       };
-//     });
-//     // Sort the grouped categories by position
-//     resultWithLimitedProducts.sort((a, b) => a.position - b.position);
-//     res.status(200).json(resultWithLimitedProducts);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getProductDetails = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const slug = req.params.slug;
-//   console.log(slug);
-//   try {
-//     const product = await Product.findOne({ slug: slug })
-//       .populate("writer")
-//       .populate("category");
-//     if (!product) {
-//       res.status(404).json({ message: "Product not found" });
-//       return;
-//     }
-//     console.log(product);
-//     res.status(200).json(product);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getSingleProduct = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const productId = req.params.productId;
-//   try {
-//     const product = await Product.findById(productId)
-//       .populate("writer")
-//       .populate("category");
-//     if (!product) {
-//       res.status(404).json({ message: "Product not found" });
-//       return;
-//     }
-//     res.status(200).json(product);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+const getAllProductsForOfferPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield product_model_1.default.find()
+            .select("_id photo title price subCategory ")
+            .populate("brand", "title")
+            .populate("category", "categoryName");
+        const products = result.reverse();
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getAllProductsForOfferPage = getAllProductsForOfferPage;
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const productId = req.params.productId;
     try {

@@ -22,10 +22,12 @@ const getAllSuggestions = (req, res) => __awaiter(void 0, void 0, void 0, functi
             select: "_id title price photo",
         });
         if (suggestions.length === 0) {
-            res.status(404).json({ message: "Suggestions not found" });
+            res.status(200).json({ suggestions, message: "Suggestions not found" });
             return;
         }
-        res.status(200).json(suggestions);
+        res
+            .status(200)
+            .json({ suggestions, message: "Suggestions Fetched successfully" });
     }
     catch (error) {
         res.status(500).json({ error: error.message });

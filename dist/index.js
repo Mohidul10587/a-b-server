@@ -13,11 +13,12 @@ const admin_routes_1 = __importDefault(require("./app/admin_m/admin/admin.routes
 const writer_routes_1 = __importDefault(require("./app/admin_m/writer/writer.routes"));
 const product_routes_1 = __importDefault(require("./app/product/product.routes"));
 const category_routes_1 = __importDefault(require("./app/admin_m/category/category.routes"));
-// import settingsRoutes from "./app/settings/settings.routes";
+const settings_routes_1 = __importDefault(require("./app/admin_m/settings/settings.routes"));
 const banner_routes_1 = __importDefault(require("./app/admin_m/banner/banner.routes"));
-// import orderRoutes from "./app/order/order.routes";
+const order_routes_1 = __importDefault(require("./app/admin_m/order/order.routes"));
 const element_routes_1 = __importDefault(require("./app/admin_m/elements/element.routes"));
 const suggestion_routes_1 = __importDefault(require("./app/admin_m/suggestion/suggestion.routes"));
+const defaultInsertsion_1 = require("./app/shared/defaultInsertsion");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
@@ -28,8 +29,8 @@ const db = mongoose_1.default.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
     console.log("Connected to MongoDB");
-    // registerAdmin("Admin", "admin@gmail.com", "admin123", "image");
-    // createDefaultSettings();
+    (0, defaultInsertsion_1.registerAdmin)("Admin", "admin@gmail.com", "admin123", "image");
+    (0, defaultInsertsion_1.createDefaultSettings)();
 });
 // Middleware
 app.use(body_parser_1.default.json()); // Parse JSON bodies
@@ -48,9 +49,9 @@ app.use("/admin", admin_routes_1.default);
 app.use("/writer", writer_routes_1.default);
 app.use("/product", product_routes_1.default);
 app.use("/category", category_routes_1.default);
-// app.use("/settings", settingsRoutes);
+app.use("/settings", settings_routes_1.default);
 app.use("/banner", banner_routes_1.default);
-// app.use("/order", orderRoutes);
+app.use("/order", order_routes_1.default);
 app.use("/element", element_routes_1.default);
 app.use("/suggestion", suggestion_routes_1.default);
 app.listen(port, () => {

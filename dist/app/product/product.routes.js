@@ -47,6 +47,7 @@ router.get("/allForAdmin", product_controller_1.getAllProductsForAdmin);
 // // Route for getting Last Uploaded Products
 // router.get("/lastUploadedProducts", getLastUploadedProducts);
 // router.get("/productsForHomePage", getAllProductsForHomePage);
+router.get("/getAllProductsForOfferPage", product_controller_1.getAllProductsForOfferPage);
 // // Route for getting products by category
 // router.get("/category/:categoryId/:notIncludeProductId", getProductsByCategory);
 // router.get("/category2/:categoryId", getProductsByCategory2);
@@ -62,11 +63,11 @@ router.get("/allForAdmin", product_controller_1.getAllProductsForAdmin);
 // // Route for getting a single product by ID
 // router.get("/productDetails/:slug", getProductDetails);
 // // Route for getting a single product by ID
-// router.get("/:productId", getSingleProduct);
+router.get("/:productId", product_controller_1.getSingleProduct);
 // // Route for deleting a product by ID
 router.delete("/:productId", admin_middleware_1.default, product_controller_1.deleteProduct);
 // // Route for updating a product by ID
-// router.put("/update/:productId", verifyToken, uploadFields, updateProduct);
+router.put("/update/:productId", admin_middleware_1.default, uploadFields, product_controller_1.updateProduct);
 // // Route for updating a product by ID
 // router.put(
 //   "/updateVariant/:productId",

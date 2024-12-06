@@ -59,5 +59,5 @@ writerSchema.pre("save", function (next) {
         next();
     });
 });
-const Writer = (0, mongoose_1.model)("writer", writerSchema);
+const Writer = (0, mongoose_1.model)("Writer", writerSchema);
 exports.default = Writer;
