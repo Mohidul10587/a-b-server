@@ -42,7 +42,7 @@ app.use(bodyParser.json()); // Parse JSON bodies
 app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://bestprice.co.ke"],
+    origin: ["http://localhost:3000", "https://book7.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
