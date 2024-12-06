@@ -1,0 +1,39 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = require("mongoose");
+const settingsSchema = new mongoose_1.Schema({
+    logo: String,
+    favicon: String,
+    loto: String,
+    fbImage: String,
+    bgColor: String,
+    websiteTitle: String,
+    websiteBgColor: String,
+    copyright: String,
+    country: String,
+    currencySymbol: String,
+    priceZero: String,
+    highlights: String,
+    shippingInside: String,
+    shippingOutside: String,
+    deliveryMethod1: String,
+    deliveryTime1: String,
+    deliveryMethod2: String,
+    deliveryTime2: String,
+    payment: String,
+    paymentText1: String,
+    paymentText2: String,
+    officeAddress: String,
+    whatsapp: String,
+    telegram: String,
+    note: String,
+    order: String,
+    orderText: String,
+    metaDescription: String,
+    description: String, // Added field
+    privacyPolicies: String,
+    termsAndConditions: String, // Added field
+    otherPolicies: String, // Added field
+});
+const Settings = (0, mongoose_1.model)("Settings", settingsSchema);
+exports.default = Settings;
