@@ -344,7 +344,7 @@ export const getAllProductsForOfferPage = async (
   try {
     const result = await Product.find()
       .select("_id photo title price subCategory ")
-      .populate("brand", "title")
+      .populate("writer", "title")
       .populate("category", "categoryName");
     const products = result.reverse();
 
