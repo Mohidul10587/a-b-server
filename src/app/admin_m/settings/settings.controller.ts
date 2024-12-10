@@ -138,6 +138,7 @@ export const updateSettings = async (
       res.status(404).json({ message: "Settings not found" });
     }
   } catch (error: any) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

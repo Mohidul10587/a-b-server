@@ -61,7 +61,7 @@ router.get("/getAllProductsForOfferPage", product_controller_1.getAllProductsFor
 // // Route for getting two products by IDs
 // router.get("/by-ids/:id1/:id2", getTwoProductsByIds);
 // // Route for getting a single product by ID
-// router.get("/productDetails/:slug", getProductDetails);
+router.get("/productDetails/:slug", product_controller_1.getProductDetails);
 // // Route for getting a single product by ID
 router.get("/:productId", product_controller_1.getSingleProduct);
 // // Route for deleting a product by ID

@@ -51,6 +51,7 @@ export const createDefaultSettings = async (): Promise<void> => {
         otherPolicies: "",
         sellerDefalutStatus: true,
         phone: "Your phone no",
+        tags: ["keyword1", "keyword2"],
       });
 
       await settings.save();

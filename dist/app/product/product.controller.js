@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.updateProduct = exports.createProduct = void 0;
+exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
 // import cloudinary from "../shared/cloudinary.config";
@@ -22,7 +22,8 @@ const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToClou
 // } from "../shared/uploadToCloudinary";
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
-    const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, publisher, summary, numberOfPage, ISBN, edition, binding, productType, translatorName, language, orderType, titleEnglish, subTitle, } = req.body;
+    const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, publisher, summary, numberOfPage, ISBN, edition, binding, productType, translatorName, language, orderType, titleEnglish, subTitle, suggestion, } = req.body;
+    console.log(suggestion);
     const files = req.files;
     try {
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
@@ -32,7 +33,7 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const tagsArray = tags.split(",").map((tag) => tag.trim());
         const newProduct = yield product_model_1.default.create({
             title,
-            slug: JSON.stringify(Math.random()),
+            slug,
             description,
             shortDescription,
             category,
@@ -61,6 +62,7 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             tags: tagsArray,
             photo: photoUrl ? photoUrl : "",
             metaImage: metaImage ? metaImage : "",
+            suggestion,
         });
         res.status(201).json(newProduct);
     }
@@ -124,6 +126,89 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.updateProduct = updateProduct;
+const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Step 1: Find the product by slug
+        const product = yield product_model_1.default.findOne({ slug: req.params.slug })
+            .populate({
+            path: "writer",
+            model: "Writer",
+            select: "title photo slug", // Include only the 'name' field of the brand
+        })
+            .populate({
+            path: "suggestion",
+            model: "Suggestion",
+            populate: {
+                path: "products",
+                model: "Product",
+                select: "title photo slug price stockStatus ",
+            },
+            select: "title", // Include only the 'title' field of the category
+        })
+            .populate({
+            path: "category",
+            model: "Category",
+            select: "categoryName slug", // Include only the 'title' field of the category
+        });
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+        // const parentCategory = await Category.findById({
+        //   // @ts-expect-error: Suppressing error for type mismatch in `_id`
+        //   _id: product.category._id,
+        // }).select("subCategories._id subCategories.slug subCategories.title");
+        // const subCategory = parentCategory.subCategories.find((subCat) =>
+        //   // @ts-expect-error: Suppressing error for type mismatch in `_id`
+        //   subCat._id.equals(new mongoose.Types.ObjectId(product.subCategory))
+        // );
+        // Step 2: Fetch the suggestion data separately if it exists
+        // let suggestionData = null;
+        // if (product.suggestion) {
+        //   suggestionData = await Suggestion.findOne({ _id: product.suggestion })
+        //     .select("title products")
+        //     .populate({
+        //       path: "products",
+        //       model: "Product",
+        //       select: ["_id", "title", "price", "unprice", "photo", "slug"], // Only select the fields you need
+        //     });
+        // }
+        const categoryProducts = yield product_model_1.default.aggregate([
+            {
+                $match: {
+                    // @ts-expect-error: Suppressing error for type mismatch in `_id`
+                    category: product.category._id,
+                    _id: { $ne: product._id },
+                },
+            },
+            {
+                $sample: {
+                    size: 10, // Randomly select 10 products
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    title: 1,
+                    price: 1,
+                    unprice: 1,
+                    photo: 1,
+                    slug: 1,
+                    stockStatus: 1,
+                },
+            },
+        ]);
+        // Step 3: Respond with the product and suggestion data
+        res.status(200).json(Object.assign(Object.assign({}, product.toObject()), { 
+            // subCategory: subCategory || {},
+            // suggestion: suggestionData,
+            productsOfSameCategory: categoryProducts }));
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductDetails = getProductDetails;
 // export const updateProductVariant = async (req: Request, res: Response) => {
 //   try {
 //     const productId = req.params.productId;
@@ -233,7 +318,9 @@ const getSingleProduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.getSingleProduct = getSingleProduct;
 const getAllProductsForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield product_model_1.default.find().select("_id photo title ");
+        const result = yield product_model_1.default.find()
+            .select("_id photo title price slug")
+            .populate("writer", "title");
         const products = result.reverse();
         res.status(200).json(products);
     }
@@ -245,7 +332,7 @@ exports.getAllProductsForAdmin = getAllProductsForAdmin;
 const getAllProductsForOfferPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield product_model_1.default.find()
-            .select("_id photo title price subCategory ")
+            .select("_id photo title price slug subCategory ")
             .populate("writer", "title")
             .populate("category", "categoryName");
         const products = result.reverse();

@@ -15,6 +15,7 @@ export const createProduct = async (
 ): Promise<void> => {
   const {
     title,
+
     slug,
     description,
     shortDescription,
@@ -42,8 +43,9 @@ export const createProduct = async (
     orderType,
     titleEnglish,
     subTitle,
+    suggestion,
   } = req.body;
-
+  console.log(suggestion);
   const files = req.files as {
     photo?: Express.Multer.File[];
     metaImage?: Express.Multer.File[];
@@ -61,7 +63,7 @@ export const createProduct = async (
 
     const newProduct = await Product.create({
       title,
-      slug: JSON.stringify(Math.random()),
+      slug,
       description,
       shortDescription,
       category,
@@ -90,6 +92,7 @@ export const createProduct = async (
       tags: tagsArray,
       photo: photoUrl ? photoUrl : "",
       metaImage: metaImage ? metaImage : "",
+      suggestion,
     });
     res.status(201).json(newProduct);
   } catch (error: any) {
@@ -190,6 +193,97 @@ export const updateProduct = async (
   } catch (error: any) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const getProductDetails = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    // Step 1: Find the product by slug
+    const product = await Product.findOne({ slug: req.params.slug })
+      .populate({
+        path: "writer",
+        model: "Writer",
+        select: "title photo slug", // Include only the 'name' field of the brand
+      })
+      .populate({
+        path: "suggestion",
+        model: "Suggestion",
+        populate: {
+          path: "products",
+          model: "Product",
+          select: "title photo slug price stockStatus ",
+        },
+        select: "title", // Include only the 'title' field of the category
+      })
+      .populate({
+        path: "category",
+        model: "Category",
+        select: "categoryName slug", // Include only the 'title' field of the category
+      });
+
+    if (!product) {
+      res.status(404).json({ message: "Product not found" });
+      return;
+    }
+
+    // const parentCategory = await Category.findById({
+    //   // @ts-expect-error: Suppressing error for type mismatch in `_id`
+    //   _id: product.category._id,
+    // }).select("subCategories._id subCategories.slug subCategories.title");
+
+    // const subCategory = parentCategory.subCategories.find((subCat) =>
+    //   // @ts-expect-error: Suppressing error for type mismatch in `_id`
+    //   subCat._id.equals(new mongoose.Types.ObjectId(product.subCategory))
+    // );
+
+    // Step 2: Fetch the suggestion data separately if it exists
+    // let suggestionData = null;
+    // if (product.suggestion) {
+    //   suggestionData = await Suggestion.findOne({ _id: product.suggestion })
+    //     .select("title products")
+    //     .populate({
+    //       path: "products",
+    //       model: "Product",
+    //       select: ["_id", "title", "price", "unprice", "photo", "slug"], // Only select the fields you need
+    //     });
+    // }
+    const categoryProducts = await Product.aggregate([
+      {
+        $match: {
+          // @ts-expect-error: Suppressing error for type mismatch in `_id`
+          category: product.category._id,
+          _id: { $ne: product._id },
+        },
+      },
+      {
+        $sample: {
+          size: 10, // Randomly select 10 products
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          price: 1,
+          unprice: 1,
+          photo: 1,
+          slug: 1,
+          stockStatus: 1,
+        },
+      },
+    ]);
+
+    // Step 3: Respond with the product and suggestion data
+    res.status(200).json({
+      ...product.toObject(),
+      // subCategory: subCategory || {},
+      // suggestion: suggestionData,
+      productsOfSameCategory: categoryProducts,
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 };
 
@@ -327,7 +421,9 @@ export const getAllProductsForAdmin = async (
   res: Response
 ): Promise<void> => {
   try {
-    const result = await Product.find().select("_id photo title ");
+    const result = await Product.find()
+      .select("_id photo title price slug")
+      .populate("writer", "title");
 
     const products = result.reverse();
 
@@ -343,7 +439,7 @@ export const getAllProductsForOfferPage = async (
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id photo title price subCategory ")
+      .select("_id photo title price slug subCategory ")
       .populate("writer", "title")
       .populate("category", "categoryName");
     const products = result.reverse();

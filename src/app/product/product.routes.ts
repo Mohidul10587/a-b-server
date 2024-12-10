@@ -4,7 +4,7 @@ import path from "path";
 import {
   createProduct,
   getAllProducts,
-  // getProductDetails,
+  getProductDetails,
   getSingleProduct,
   deleteProduct,
   // getProductsByCategory,
@@ -99,7 +99,7 @@ router.get("/getAllProductsForOfferPage", getAllProductsForOfferPage);
 // router.get("/by-ids/:id1/:id2", getTwoProductsByIds);
 
 // // Route for getting a single product by ID
-// router.get("/productDetails/:slug", getProductDetails);
+router.get("/productDetails/:slug", getProductDetails);
 // // Route for getting a single product by ID
 router.get("/:productId", getSingleProduct);
 

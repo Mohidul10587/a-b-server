@@ -1,39 +1,46 @@
-import { Schema, model, Document } from "mongoose";
+// models/Order.ts
+import mongoose, { Schema, Document } from "mongoose";
 
-interface CheckoutDocument extends Document {
-  name: string;
-  address: string;
-  location: string;
-  phoneNumber: string;
-  products: Schema.Types.ObjectId[]; // Update this to an array
-  shippingCost: number;
-  totalPrice: number;
-  selectedShipping: string;
-  selectedDeliveryOption: string;
-  variantTitle: string;
-  variantSectionTitle: string;
+interface IOrder extends Document {
+  cart: {
+    id: Schema.Types.ObjectId;
+    quantity: number;
+  }[];
+  deliveryInfo: {
+    name: string;
+    email: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    phone: string;
+  };
+  paymentMethod: string;
   status: string;
   createdAt: Date;
 }
 
-const checkoutSchema = new Schema<CheckoutDocument>(
+const OrderSchema = new Schema<IOrder>(
   {
-    name: { type: String, required: true },
-    address: { type: String, required: true },
-    location: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    products: [{ type: Schema.Types.ObjectId, ref: "Product" }], // Updated field
-    shippingCost: { type: Number, required: true },
-    totalPrice: { type: Number, required: true },
-    selectedShipping: { type: String, required: true },
-    selectedDeliveryOption: { type: String, required: true },
-    variantTitle: { type: String },
-    variantSectionTitle: { type: String },
-    status: { type: String, required: true },
+    cart: [
+      {
+        id: { type: Schema.Types.ObjectId, ref: "Product" },
+        quantity: { type: Number, required: true },
+      },
+    ],
+    deliveryInfo: {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      address: { type: String, required: true },
+      city: { type: String, required: true },
+      postalCode: { type: String, required: true },
+      phone: { type: String, required: true },
+    },
+    paymentMethod: { type: String, required: true },
+    status: { type: String, default: "Pending" },
+    createdAt: { type: Date, default: Date.now },
   },
-  { timestamps: true } // Enable timestamps
+  { timestamps: true }
 );
 
-const Order = model<CheckoutDocument>("Order", checkoutSchema);
-
+const Order = mongoose.model<IOrder>("Order", OrderSchema);
 export default Order;

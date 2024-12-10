@@ -1,20 +1,22 @@
-import { Router } from "express";
+// routes/orderRoutes.ts
+import express from "express";
 import {
-  submitOrder,
-  getAllOrders,
-  getSingleOrder,
-  updateOrder,
-  deleteOrder,
+  createOrder,
+  getOrders,
+  getSingleOrders,
   updateOrderStatus,
 } from "./order.controller";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/submit", submitOrder);
-router.get("/all", getAllOrders);
-router.get("/getSingleOrder/:id", getSingleOrder);
-router.put("/updateOrder/:id", updateOrder);
-router.put("/updateOrderStatus/:id", updateOrderStatus);
-router.delete("/delete/:id", deleteOrder);
+// Create a new order
+router.post("/create", createOrder);
+
+// Get all orders
+router.get("/all", getOrders);
+router.get("/getSingleOrder/:id", getSingleOrders);
+
+// Update order status
+router.patch("/orders/:id", updateOrderStatus);
 
 export default router;

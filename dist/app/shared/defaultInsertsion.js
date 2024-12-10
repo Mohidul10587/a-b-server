@@ -62,6 +62,7 @@ const createDefaultSettings = () => __awaiter(void 0, void 0, void 0, function* 
                 otherPolicies: "",
                 sellerDefalutStatus: true,
                 phone: "Your phone no",
+                tags: ["keyword1", "keyword2"],
             });
             yield settings.save();
         }

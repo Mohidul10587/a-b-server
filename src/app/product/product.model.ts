@@ -12,6 +12,8 @@ export interface IProduct extends Document {
   unprice: number;
   stockStatus: string;
   writer: Schema.Types.ObjectId | null;
+  suggestion: Schema.Types.ObjectId | null;
+
   youtubeVideo: string;
   shippingInside: number;
   shippingOutside: number;
@@ -73,10 +75,34 @@ const ProductSchema = new Schema<IProduct>(
     photo: { type: String },
     metaImage: { type: String, default: "" },
     attachedFiles: { type: [String], default: [] },
+    suggestion: {
+      type: Schema.Types.ObjectId,
+      ref: "Suggestion",
+      default: null,
+    },
   },
   { timestamps: true }
 );
 
 // Model
+
+// Middleware to make the slug unique if it's already taken
+ProductSchema.pre("save", async function (next) {
+  const doc = this as unknown as IProduct;
+
+  if (!doc.isModified("slug")) return next();
+
+  let slug = doc.slug;
+  let counter = 1;
+
+  // Check if a product with the same slug already exists
+  while (await mongoose.models.Product.exists({ slug })) {
+    slug = `${doc.slug}-${counter++}`;
+  }
+
+  doc.slug = slug;
+  next();
+});
+
 const Product = mongoose.model<IProduct>("Product", ProductSchema);
 export default Product;
