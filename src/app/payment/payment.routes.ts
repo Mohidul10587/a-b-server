@@ -33,11 +33,10 @@ router.post("/initialize-payment", async (req: Request, res: Response) => {
 
     // Send request to AmarPay
     const response = await axios.post(`${BASE_URL}/request.php`, paymentData);
-    console.log(response);
+
     // AmarPay returns a payment URL
     res.json({ paymentUrl: response.data });
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Payment initialization failed" });
   }
 });
