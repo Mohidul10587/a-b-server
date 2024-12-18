@@ -13,6 +13,8 @@ import bannerRoutes from "./app/admin_m/banner/banner.routes";
 import orderRoutes from "./app/admin_m/order/order.routes";
 import elementsRoutes from "./app/admin_m/elements/element.routes";
 import suggestionRoutes from "./app/admin_m/suggestion/suggestion.routes";
+import paymentRoutes from "./app/payment/payment.routes";
+
 import {
   createDefaultSettings,
   registerAdmin,
@@ -63,6 +65,7 @@ app.use("/banner", bannerRoutes);
 app.use("/order", orderRoutes);
 app.use("/element", elementsRoutes);
 app.use("/suggestion", suggestionRoutes);
+app.use("/payment", paymentRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
