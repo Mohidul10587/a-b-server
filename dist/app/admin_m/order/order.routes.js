@@ -13,5 +13,5 @@ router.post("/create", order_controller_1.createOrder);
 router.get("/all", order_controller_1.getOrders);
 router.get("/getSingleOrder/:id", order_controller_1.getSingleOrders);
 // Update order status
-router.patch("/orders/:id", order_controller_1.updateOrderStatus);
+router.patch("/updateOrderStatus/:id", order_controller_1.updateOrderStatus);
 exports.default = router;

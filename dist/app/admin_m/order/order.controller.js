@@ -48,6 +48,7 @@ const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             paymentMethod: order.paymentMethod,
             _id: order._id,
             firstProduct: order.cart[0].id,
+            status: order.status,
         }));
         res.status(200).json({ orders: updatedOrders });
     }
@@ -61,7 +62,10 @@ const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const { id } = req.params;
         const { status } = req.body;
+        console.log("first", status);
+        console.log(id);
         const order = yield order_model_1.default.findByIdAndUpdate(id, { status }, { new: true });
+        console.log(order);
         if (!order) {
             return res.status(404).json({ message: "Order not found." });
         }
@@ -70,6 +74,7 @@ const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
             .json({ message: "Order status updated successfully!", order });
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Failed to update order status.", error });
     }
 });
