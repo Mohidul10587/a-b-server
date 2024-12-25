@@ -59,16 +59,16 @@ router.post("/success/:transactionId", async (req: Request, res: Response) => {
     );
     console.log(result);
 
-    res.redirect(`http://localhost:3000/success/${transactionId}`);
+    res.redirect(`${clientSideUrl}/success/${transactionId}`);
   } catch (error) {
     res.status(500).json({ message: "Payment initialization failed" });
   }
 });
 
-router.post("/fail", async (req: Request, res: Response) => {
+router.post("/fail/:transactionId", async (req: Request, res: Response) => {
   try {
-    console.log("Failed");
-    res.redirect("http://localhost:3000/fail");
+    const transactionId = req.params.transactionId;
+    res.redirect(`${clientSideUrl}/fail/${transactionId}`);
   } catch (error) {
     res.status(500).json({ message: "Payment initialization failed" });
   }

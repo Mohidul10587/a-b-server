@@ -61,16 +61,16 @@ router.post("/success/:transactionId", (req, res) => __awaiter(void 0, void 0, v
         const transactionId = req.params.transactionId;
         const result = yield order_model_1.default.findOneAndUpdate({ paymentTnxId: transactionId }, { $set: { paymentStatus: true } }, { new: true });
         console.log(result);
-        res.redirect(`http://localhost:3000/success/${transactionId}`);
+        res.redirect(`${clientSideUrl}/success/${transactionId}`);
     }
     catch (error) {
         res.status(500).json({ message: "Payment initialization failed" });
     }
 }));
-router.post("/fail", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/fail/:transactionId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("Failed");
-        res.redirect("http://localhost:3000/fail");
+        const transactionId = req.params.transactionId;
+        res.redirect(`${clientSideUrl}/fail/${transactionId}`);
     }
     catch (error) {
         res.status(500).json({ message: "Payment initialization failed" });
