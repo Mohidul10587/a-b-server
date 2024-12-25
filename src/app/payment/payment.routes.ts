@@ -8,11 +8,11 @@ const router = express.Router();
 const MERCHANT_ID = process.env.AMARPAY_MERCHANT_ID!;
 const SIGNATURE_KEY = process.env.AMARPAY_SIGNATURE_KEY!;
 const BASE_URL = "https://sandbox.aamarpay.com";
-const redirectUrl = "http://localhost:5000";
-const clientSideUrl = "http://localhost:3000";
+// const redirectUrl = "http://localhost:5000";
+// const clientSideUrl = "http://localhost:3000";
 
-// const redirectUrl = "https://a-b-server.onrender.com";
-// const clientSideUrl = "https://book7.vercel.app";
+const redirectUrl = "https://a-b-server.onrender.com";
+const clientSideUrl = "https://book7.vercel.app";
 
 router.post("/initialize-payment", async (req: Request, res: Response) => {
   const { amount, transactionId, name, email, phone, orderInfoForStore } =
