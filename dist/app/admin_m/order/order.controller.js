@@ -17,17 +17,9 @@ const order_model_1 = __importDefault(require("./order.model"));
 // Create a new order
 const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { cart, deliveryInfo, paymentMethod } = req.body;
-        console.log(cart);
-        if (!cart || !deliveryInfo || !paymentMethod) {
-            return res.status(400).json({ message: "All fields are required." });
-        }
-        const newOrder = new order_model_1.default({
-            cart,
-            deliveryInfo,
-            paymentMethod,
-        });
-        yield newOrder.save();
+        const orderInfo = req.body;
+        console.log(orderInfo);
+        const newOrder = yield order_model_1.default.create(orderInfo);
         res
             .status(201)
             .json({ message: "Order placed successfully!", order: newOrder });
@@ -42,18 +34,20 @@ exports.createOrder = createOrder;
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const orders = yield order_model_1.default.find()
-            .select("deliveryInfo.name deliveryInfo.address deliveryInfo.phone status")
+            .select("deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status")
             .populate({
             path: "cart.id",
             model: "Product",
             select: "title  photo  -_id",
         });
-        const updatedOrders = orders.map((o) => ({
-            customersName: o.deliveryInfo.name,
-            address: o.deliveryInfo.address,
-            phone: o.deliveryInfo.phone,
-            _id: o._id,
-            firstProduct: o.cart[0].id,
+        const updatedOrders = orders.map((order) => ({
+            customersName: order.deliveryInfo.name,
+            address: order.deliveryInfo.address,
+            phone: order.deliveryInfo.phone,
+            paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
+            paymentMethod: order.paymentMethod,
+            _id: order._id,
+            firstProduct: order.cart[0].id,
         }));
         res.status(200).json({ orders: updatedOrders });
     }
@@ -82,7 +76,6 @@ const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.updateOrderStatus = updateOrderStatus;
 const getSingleOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(req.params.id);
         const order = yield order_model_1.default.findOne({ _id: req.params.id }).populate({
             path: "cart.id",
             model: "Product",

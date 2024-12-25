@@ -48,7 +48,6 @@ export const createBanner = async (req: Request, res: Response) => {
     // Respond with the saved banner data
     res.status(201).json(newBanner);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

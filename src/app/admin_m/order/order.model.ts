@@ -4,6 +4,7 @@ import mongoose, { Schema, Document } from "mongoose";
 interface IOrder extends Document {
   cart: {
     id: Schema.Types.ObjectId;
+    priceWhenSubmitOrder: number;
     quantity: number;
   }[];
   deliveryInfo: {
@@ -14,9 +15,11 @@ interface IOrder extends Document {
     postalCode: string;
     phone: string;
   };
+  paidAmount: number;
   paymentMethod: string;
+  paymentStatus: boolean;
+  paymentTnxId: string;
   status: string;
-  createdAt: Date;
 }
 
 const OrderSchema = new Schema<IOrder>(
@@ -24,6 +27,7 @@ const OrderSchema = new Schema<IOrder>(
     cart: [
       {
         id: { type: Schema.Types.ObjectId, ref: "Product" },
+        priceWhenSubmitOrder: { type: Number, required: true },
         quantity: { type: Number, required: true },
       },
     ],
@@ -35,9 +39,11 @@ const OrderSchema = new Schema<IOrder>(
       postalCode: { type: String, required: true },
       phone: { type: String, required: true },
     },
+    paidAmount: { type: Number, required: true },
     paymentMethod: { type: String, required: true },
+    paymentStatus: { type: Boolean, default: false },
+    paymentTnxId: { type: String, required: true },
     status: { type: String, default: "Pending" },
-    createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

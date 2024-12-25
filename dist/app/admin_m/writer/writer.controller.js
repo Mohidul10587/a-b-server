@@ -38,7 +38,6 @@ const createBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(200).send({ writer });
     }
     catch (err) {
-        console.log(err);
         res.status(500).send({ error: "Internal Server Error" });
     }
 });

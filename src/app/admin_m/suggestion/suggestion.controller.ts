@@ -81,7 +81,7 @@ export const deleteSuggestion = async (
 export const updateSuggestion = async (req: Request, res: Response) => {
   const suggestionId = req.params.id;
   const data = req.body; // Destructuring the updated data from the request body
-  console.log(data);
+
   try {
     // Find the suggestion by its ID and update it
     const updatedSuggestion = await Suggestion.findByIdAndUpdate(

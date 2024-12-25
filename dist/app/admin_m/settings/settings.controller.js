@@ -139,7 +139,6 @@ const updateSettings = (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -154,8 +153,6 @@ const updateDefaultSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0
                 .status(400)
                 .json({ message: "Missing required field: status" });
         }
-        console.log("Received ID:", id);
-        console.log("Received Status:", status);
         // Find the document by ID and update the 'sellerDefaultStatus' field
         const result = yield settings_model_1.default.findByIdAndUpdate(id, // Match the document by ID
         { sellerDefaultStatus: status }, // Update only the 'sellerDefaultStatus' field
@@ -172,7 +169,6 @@ const updateDefaultSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0
         });
     }
     catch (error) {
-        console.log("Error during update:", error);
         res.status(500).json({
             message: "Error updating Default seller status",
             error: error.message,

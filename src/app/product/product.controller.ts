@@ -45,7 +45,7 @@ export const createProduct = async (
     subTitle,
     suggestion,
   } = req.body;
-  console.log(suggestion);
+
   const files = req.files as {
     photo?: Express.Multer.File[];
     metaImage?: Express.Multer.File[];

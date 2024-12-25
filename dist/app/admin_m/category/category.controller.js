@@ -17,10 +17,8 @@ const category_model_1 = __importDefault(require("./category.model"));
 const product_model_1 = __importDefault(require("../../product/product.model"));
 const uploadSingleFileToCloudinary_1 = require("../../shared/uploadSingleFileToCloudinary");
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("first");
     try {
         const { categoryName, slug, description, display, displayPositionOfHomePage, subCategories, metaTitle, metaDescription, tags, position, } = req.body;
-        console.log(req.body);
         // Create and save the new category
         const newCategory = new category_model_1.default({
             categoryName,
@@ -38,7 +36,6 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(201).json(newCategory);
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -81,7 +78,6 @@ const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
     var _a, _b;
     try {
         const { categoryName, slug, description, infoSections, metaTitle, metaDescription, tags, position, } = req.body;
-        console.log("This is slug", position);
         const categoryId = req.params.id;
         const category = yield category_model_1.default.findById(categoryId);
         if (!category) {
@@ -117,7 +113,6 @@ const updateCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).json(updatedCategory); // Return the updated category
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ error: error.message });
     }
 });

@@ -84,7 +84,6 @@ exports.deleteSuggestion = deleteSuggestion;
 const updateSuggestion = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const suggestionId = req.params.id;
     const data = req.body; // Destructuring the updated data from the request body
-    console.log(data);
     try {
         // Find the suggestion by its ID and update it
         const updatedSuggestion = yield suggestion_model_1.default.findByIdAndUpdate(suggestionId, { title: data.title, products: data.products }, // Fields to update

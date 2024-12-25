@@ -14,7 +14,7 @@ function extractPublicKeyAndDelete(url) {
             const lastSlashIndex = url.lastIndexOf("/");
             const lastDotIndex = url.lastIndexOf(".");
             // Allowed extensions
-            const validExtensions = ["jpg", "jpeg", "svg", "png"];
+            const validExtensions = ["jpg", "jpeg", "svg", "png", "webp"];
             // Extract the extension
             const extension = url.substring(lastDotIndex + 1).toLowerCase();
             // Validate the format and extension
@@ -30,7 +30,6 @@ function extractPublicKeyAndDelete(url) {
                 cloudinary_config_1.default.uploader
                     .destroy(publicKey, { invalidate: true })
                     .then((result) => {
-                    console.log("Delete result:", result);
                     if (result.result === "ok") {
                         resolve("Image deleted successfully");
                     }

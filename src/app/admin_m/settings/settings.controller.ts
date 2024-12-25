@@ -138,7 +138,6 @@ export const updateSettings = async (
       res.status(404).json({ message: "Settings not found" });
     }
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -158,9 +157,6 @@ export const updateDefaultSellerStatus = async (
         .json({ message: "Missing required field: status" });
     }
 
-    console.log("Received ID:", id);
-    console.log("Received Status:", status);
-
     // Find the document by ID and update the 'sellerDefaultStatus' field
     const result = await Settings.findByIdAndUpdate(
       id, // Match the document by ID
@@ -179,7 +175,6 @@ export const updateDefaultSellerStatus = async (
       data: result,
     });
   } catch (error: any) {
-    console.log("Error during update:", error);
     res.status(500).json({
       message: "Error updating Default seller status",
       error: error.message,

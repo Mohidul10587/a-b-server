@@ -5,19 +5,9 @@ import Order from "./order.model";
 // Create a new order
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { cart, deliveryInfo, paymentMethod } = req.body;
-    console.log(cart);
-    if (!cart || !deliveryInfo || !paymentMethod) {
-      return res.status(400).json({ message: "All fields are required." });
-    }
-
-    const newOrder = new Order({
-      cart,
-      deliveryInfo,
-      paymentMethod,
-    });
-
-    await newOrder.save();
+    const orderInfo = req.body;
+    console.log(orderInfo);
+    const newOrder = await Order.create(orderInfo);
 
     res
       .status(201)
@@ -33,20 +23,21 @@ export const getOrders = async (req: Request, res: Response) => {
   try {
     const orders = await Order.find()
       .select(
-        "deliveryInfo.name deliveryInfo.address deliveryInfo.phone status"
+        "deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status"
       )
       .populate({
         path: "cart.id",
         model: "Product",
         select: "title  photo  -_id",
       });
-    const updatedOrders = orders.map((o) => ({
-      customersName: o.deliveryInfo.name,
-      address: o.deliveryInfo.address,
-      phone: o.deliveryInfo.phone,
-
-      _id: o._id,
-      firstProduct: o.cart[0].id,
+    const updatedOrders = orders.map((order) => ({
+      customersName: order.deliveryInfo.name,
+      address: order.deliveryInfo.address,
+      phone: order.deliveryInfo.phone,
+      paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
+      paymentMethod: order.paymentMethod,
+      _id: order._id,
+      firstProduct: order.cart[0].id,
     }));
 
     res.status(200).json({ orders: updatedOrders });
@@ -75,7 +66,6 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 };
 export const getSingleOrders = async (req: Request, res: Response) => {
   try {
-    console.log(req.params.id);
     const order = await Order.findOne({ _id: req.params.id }).populate({
       path: "cart.id",
       model: "Product",

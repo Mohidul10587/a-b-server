@@ -4,7 +4,6 @@ import Product from "../../product/product.model";
 import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
 
 export const createCategory = async (req: Request, res: Response) => {
-  console.log("first");
   try {
     const {
       categoryName,
@@ -18,7 +17,7 @@ export const createCategory = async (req: Request, res: Response) => {
       tags,
       position,
     } = req.body;
-    console.log(req.body);
+
     // Create and save the new category
     const newCategory = new Category({
       categoryName,
@@ -37,7 +36,6 @@ export const createCategory = async (req: Request, res: Response) => {
     await newCategory.save();
     res.status(201).json(newCategory);
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -98,7 +96,7 @@ export const updateCategory = async (req: Request, res: Response) => {
       tags,
       position,
     } = req.body;
-    console.log("This is slug", position);
+
     const categoryId = req.params.id;
 
     const category = await Category.findById(categoryId);
@@ -145,7 +143,6 @@ export const updateCategory = async (req: Request, res: Response) => {
     const updatedCategory = await category.save(); // Ensure the updated category is saved
     res.status(200).json(updatedCategory); // Return the updated category
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };

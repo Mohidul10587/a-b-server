@@ -23,7 +23,6 @@ const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToClou
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, publisher, summary, numberOfPage, ISBN, edition, binding, productType, translatorName, language, orderType, titleEnglish, subTitle, suggestion, } = req.body;
-    console.log(suggestion);
     const files = req.files;
     try {
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];

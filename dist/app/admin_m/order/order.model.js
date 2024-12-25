@@ -29,6 +29,7 @@ const OrderSchema = new mongoose_1.Schema({
     cart: [
         {
             id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
+            priceWhenSubmitOrder: { type: Number, required: true },
             quantity: { type: Number, required: true },
         },
     ],
@@ -40,9 +41,11 @@ const OrderSchema = new mongoose_1.Schema({
         postalCode: { type: String, required: true },
         phone: { type: String, required: true },
     },
+    paidAmount: { type: Number, required: true },
     paymentMethod: { type: String, required: true },
+    paymentStatus: { type: Boolean, default: false },
+    paymentTnxId: { type: String, required: true },
     status: { type: String, default: "Pending" },
-    createdAt: { type: Date, default: Date.now },
 }, { timestamps: true });
 const Order = mongoose_1.default.model("Order", OrderSchema);
 exports.default = Order;
