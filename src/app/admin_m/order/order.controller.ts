@@ -38,6 +38,7 @@ export const getOrders = async (req: Request, res: Response) => {
       paymentMethod: order.paymentMethod,
       _id: order._id,
       firstProduct: order.cart[0].id,
+      status: order.status,
     }));
 
     res.status(200).json({ orders: updatedOrders });
@@ -51,8 +52,10 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
-
+    console.log("first", status);
+    console.log(id);
     const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
+    console.log(order);
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
     }
@@ -61,6 +64,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
       .status(200)
       .json({ message: "Order status updated successfully!", order });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to update order status.", error });
   }
 };

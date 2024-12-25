@@ -17,6 +17,6 @@ router.get("/all", getOrders);
 router.get("/getSingleOrder/:id", getSingleOrders);
 
 // Update order status
-router.patch("/orders/:id", updateOrderStatus);
+router.patch("/updateOrderStatus/:id", updateOrderStatus);
 
 export default router;
