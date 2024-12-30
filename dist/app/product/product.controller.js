@@ -75,7 +75,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a, _b;
     try {
         const productId = req.params.productId;
-        const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, } = req.body;
+        const { title, slug, description, shortDescription, category, subCategory, price, rating, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, } = req.body;
         const files = req.files;
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
         const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
@@ -88,6 +88,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             description,
             shortDescription,
             price,
+            rating,
             unprice,
             category,
             stockStatus,
@@ -140,7 +141,12 @@ const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
             populate: {
                 path: "products",
                 model: "Product",
-                select: "title photo slug price stockStatus ",
+                select: "title photo slug price  rating",
+                populate: {
+                    path: "writer",
+                    model: "Writer",
+                    select: "title",
+                },
             },
             select: "title", // Include only the 'title' field of the category
         })

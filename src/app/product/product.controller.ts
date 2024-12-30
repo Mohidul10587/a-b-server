@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Product from "./product.model";
 import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
+import { populate } from "dotenv";
 
 // import cloudinary from "../shared/cloudinary.config";
 
@@ -116,6 +117,7 @@ export const updateProduct = async (
       subCategory,
 
       price,
+      rating,
       unprice,
       stockStatus,
       writer,
@@ -153,6 +155,7 @@ export const updateProduct = async (
       description,
       shortDescription,
       price,
+      rating,
       unprice,
       category,
 
@@ -213,7 +216,12 @@ export const getProductDetails = async (
         populate: {
           path: "products",
           model: "Product",
-          select: "title photo slug price stockStatus ",
+          select: "title photo slug price  rating",
+          populate: {
+            path: "writer",
+            model: "Writer",
+            select: "title",
+          },
         },
         select: "title", // Include only the 'title' field of the category
       })

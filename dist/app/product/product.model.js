@@ -68,6 +68,7 @@ const ProductSchema = new mongoose_1.Schema({
     subTitle: { type: String, default: "" },
     tags: { type: [String], default: [] },
     photo: { type: String },
+    rating: { type: Number, default: 3.5 },
     metaImage: { type: String, default: "" },
     attachedFiles: { type: [String], default: [] },
     suggestion: {

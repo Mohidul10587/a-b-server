@@ -13,7 +13,6 @@ export interface IProduct extends Document {
   stockStatus: string;
   writer: Schema.Types.ObjectId | null;
   suggestion: Schema.Types.ObjectId | null;
-
   youtubeVideo: string;
   shippingInside: number;
   shippingOutside: number;
@@ -22,6 +21,8 @@ export interface IProduct extends Document {
   publisher: Schema.Types.ObjectId | null;
   summary: string;
   numberOfPage: number;
+  rating: number;
+
   ISBN: string;
   edition: string;
   productType: string;
@@ -73,6 +74,8 @@ const ProductSchema = new Schema<IProduct>(
     subTitle: { type: String, default: "" },
     tags: { type: [String], default: [] },
     photo: { type: String },
+    rating: { type: Number, default: 3.5 },
+
     metaImage: { type: String, default: "" },
     attachedFiles: { type: [String], default: [] },
     suggestion: {
