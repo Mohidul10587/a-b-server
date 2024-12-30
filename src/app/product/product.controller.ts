@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Product from "./product.model";
 import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
 import { populate } from "dotenv";
+import { writer } from "repl";
 
 // import cloudinary from "../shared/cloudinary.config";
 
@@ -133,6 +134,7 @@ export const updateProduct = async (
       metaDescription,
       tags,
       metaImage,
+      suggestion,
     } = req.body;
 
     const files = req.files as {
@@ -173,6 +175,11 @@ export const updateProduct = async (
       metaDescription,
       tags: tagsArray,
       metaImage,
+      suggestion: ["null", "undefined", null, undefined, ""].includes(
+        suggestion
+      )
+        ? null
+        : suggestion,
     };
 
     if (photoUrl) {
@@ -274,7 +281,9 @@ export const getProductDetails = async (
         $project: {
           _id: 1,
           title: 1,
+          writer: 1,
           price: 1,
+          rating: 1,
           unprice: 1,
           photo: 1,
           slug: 1,

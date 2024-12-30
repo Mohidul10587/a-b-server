@@ -38,11 +38,13 @@ const writerSchema = new mongoose_1.Schema({
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     photo: { type: String, required: true },
+    rating: { type: Number, default: 4 },
     metaTitle: { type: String }, // New field
     metaDescription: { type: String }, // New field
     tags: { type: [String] }, // New field
     metaImage: { type: String },
 });
+const Writer = (0, mongoose_1.model)("Writer", writerSchema);
 // Middleware to make the slug unique if it's already taken
 writerSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -52,12 +54,11 @@ writerSchema.pre("save", function (next) {
         let slug = doc.slug;
         let counter = 1;
         // Check if a product with the same slug already exists
-        while (yield mongoose_1.default.models.writer.exists({ slug })) {
+        while (yield mongoose_1.default.models.Writer.exists({ slug })) {
             slug = `${doc.slug}-${counter++}`;
         }
         doc.slug = slug;
         next();
     });
 });
-const Writer = (0, mongoose_1.model)("Writer", writerSchema);
 exports.default = Writer;

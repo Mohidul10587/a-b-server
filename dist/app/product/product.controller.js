@@ -75,7 +75,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a, _b;
     try {
         const productId = req.params.productId;
-        const { title, slug, description, shortDescription, category, subCategory, price, rating, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, } = req.body;
+        const { title, slug, description, shortDescription, category, subCategory, price, rating, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, suggestion, } = req.body;
         const files = req.files;
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
         const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
@@ -105,6 +105,9 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             metaDescription,
             tags: tagsArray,
             metaImage,
+            suggestion: ["null", "undefined", null, undefined, ""].includes(suggestion)
+                ? null
+                : suggestion,
         };
         if (photoUrl) {
             updatedData.photo = photoUrl;
@@ -195,7 +198,9 @@ const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 $project: {
                     _id: 1,
                     title: 1,
+                    writer: 1,
                     price: 1,
+                    rating: 1,
                     unprice: 1,
                     photo: 1,
                     slug: 1,

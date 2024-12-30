@@ -6,12 +6,13 @@ import {
   // deleteBrand,
   getAllBrands,
   // getBrandBySlug,
-  // getBrandById,
+  getWriteById,
   // getAllBrands2,
-  // updateBrand,
+  updateBrand,
   // getAllBrandIds,
 } from "./writer.controller";
 import path from "path";
+import verifyToken from "../admin/admin.middleware";
 
 const router = Router();
 
@@ -45,10 +46,10 @@ router.get("/all", getAllBrands);
 
 // router.get("/singleBrandBySlug/:slug", getBrandBySlug);
 
-// router.get("/singleBrand/:id", getBrandById);
+router.get("/singleWriter/:id", getWriteById);
 // router.get("/all2", getAllBrands2);
 
-// router.put("/updateBrand/:id", verifyToken, uploadMiddleware, updateBrand);
+router.put("/updateWriter/:id", verifyToken, uploadMiddleware, updateBrand);
 // router.delete("/deleteBrand/:id", verifyToken, deleteBrand);
 
 export default router;

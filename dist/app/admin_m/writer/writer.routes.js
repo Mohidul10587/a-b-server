@@ -7,6 +7,7 @@ const express_1 = require("express");
 const multer_1 = __importDefault(require("multer"));
 const writer_controller_1 = require("./writer.controller");
 const path_1 = __importDefault(require("path"));
+const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
 const router = (0, express_1.Router)();
 // Multer configuration for file uploads (image validation)
 const upload = (0, multer_1.default)({
@@ -32,8 +33,8 @@ router.post("/create", uploadMiddleware, writer_controller_1.createBrand);
 // router.get("/allBrandIds", getAllBrandIds);
 router.get("/all", writer_controller_1.getAllBrands);
 // router.get("/singleBrandBySlug/:slug", getBrandBySlug);
-// router.get("/singleBrand/:id", getBrandById);
+router.get("/singleWriter/:id", writer_controller_1.getWriteById);
 // router.get("/all2", getAllBrands2);
-// router.put("/updateBrand/:id", verifyToken, uploadMiddleware, updateBrand);
+router.put("/updateWriter/:id", admin_middleware_1.default, uploadMiddleware, writer_controller_1.updateBrand);
 // router.delete("/deleteBrand/:id", verifyToken, deleteBrand);
 exports.default = router;
