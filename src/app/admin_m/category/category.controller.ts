@@ -67,6 +67,49 @@ export const getAllCategories = async (
     res.status(500).json({ error: error.message });
   }
 };
+export const getCategoryBySlug = async (req: Request, res: Response) => {
+  const slug = req.params.slug;
+  try {
+    const category = await Category.findOne({ slug });
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+    res.status(200).json(category);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getAllCategoriesForCatMainPage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    // Fetch all categories
+    const previousCategories = await Category.find().select(
+      "categoryName slug photoUrl position"
+    );
+
+    // Fetch products and count products per category
+    const primaryCategories = await Promise.all(
+      previousCategories.map(async (category) => {
+        const productCount = await Product.countDocuments({
+          category: category._id,
+        });
+        return {
+          ...category.toJSON(),
+          categoryProducts: productCount,
+        };
+      })
+    );
+    const categories = primaryCategories.sort(
+      (a, b) => a.position - b.position
+    );
+    res.status(200).json({ categories });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 // Add this function  to your existing controller file
 export const deleteCategory = async (req: Request, res: Response) => {
   try {

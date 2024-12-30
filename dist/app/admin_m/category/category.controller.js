@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCategoryById = exports.updateCategory = exports.deleteCategory = exports.getAllCategories = exports.createCategory = void 0;
+exports.getCategoryById = exports.updateCategory = exports.deleteCategory = exports.getAllCategoriesForCatMainPage = exports.getCategoryBySlug = exports.getAllCategories = exports.createCategory = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const product_model_1 = __importDefault(require("../../product/product.model"));
 const uploadSingleFileToCloudinary_1 = require("../../shared/uploadSingleFileToCloudinary");
@@ -59,6 +59,39 @@ const getAllCategories = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getAllCategories = getAllCategories;
+const getCategoryBySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    try {
+        const category = yield category_model_1.default.findOne({ slug });
+        if (!category) {
+            return res.status(404).json({ error: "Category not found" });
+        }
+        res.status(200).json(category);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getCategoryBySlug = getCategoryBySlug;
+const getAllCategoriesForCatMainPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Fetch all categories
+        const previousCategories = yield category_model_1.default.find().select("categoryName slug photoUrl position");
+        // Fetch products and count products per category
+        const primaryCategories = yield Promise.all(previousCategories.map((category) => __awaiter(void 0, void 0, void 0, function* () {
+            const productCount = yield product_model_1.default.countDocuments({
+                category: category._id,
+            });
+            return Object.assign(Object.assign({}, category.toJSON()), { categoryProducts: productCount });
+        })));
+        const categories = primaryCategories.sort((a, b) => a.position - b.position);
+        res.status(200).json({ categories });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getAllCategoriesForCatMainPage = getAllCategoriesForCatMainPage;
 // Add this function  to your existing controller file
 const deleteCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

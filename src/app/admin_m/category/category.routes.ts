@@ -7,9 +7,10 @@ import {
   // findSubcategoryById,
   // findSubcategoryBySlug,
   getAllCategories,
+  getAllCategoriesForCatMainPage,
   // getAllCategoryIds,
   getCategoryById,
-  // getCategoryBySlug,
+  getCategoryBySlug,
   // getSubcategoryById,
   updateCategory,
   // updateSubcategory,
@@ -55,10 +56,11 @@ router.post("/create", uploadMiddleware, createCategory);
 
 // Route to get all categories
 router.get("/all", getAllCategories);
+router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
 
 // // Route to get a single category by ID
 // router.get("/allCategoryIds", getAllCategoryIds);
-// router.get("/category_by_slug/:slug", getCategoryBySlug);
+router.get("/category_by_slug/:slug", getCategoryBySlug);
 router.get("/:id", getCategoryById);
 
 // router.get("/subCategoryBySlug/:slug", findSubcategoryBySlug);

@@ -3,6 +3,8 @@ import Product from "./product.model";
 import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
 import { populate } from "dotenv";
 import { writer } from "repl";
+import Writer from "../admin_m/writer/writer.model";
+import Category from "../admin_m/category/category.model";
 
 // import cloudinary from "../shared/cloudinary.config";
 
@@ -558,24 +560,43 @@ export const deleteProduct = async (
 //   }
 // };
 
-// export const getProductsByCategorySlug = async (
-//   req: Request,
-//   res: Response
-// ) => {
-//   const slug = req.params.slug;
+export const getProductsByCategorySlug = async (
+  req: Request,
+  res: Response
+) => {
+  const slug = req.params.slug;
 
-//   try {
-//     const products = await Product.find({
-//       slug: slug,
-//     })
-//       .populate("writer")
-//       .populate("category");
+  try {
+    const category = await Category.findOne({ slug: slug })
+      .select(
+        "_id categoryName slug photoUrl metaTitle metaDescription description shortDescription tags"
+      )
+      .lean();
 
-//     res.status(200).json(products.reverse());
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+    const categoryId = category?._id;
+    const products = await Product.find({
+      category: categoryId,
+    })
+      .select("_id photo title featured sele price slug stockStatus")
+      .populate({
+        path: "writer",
+        model: "Writer",
+        select: "title  slug", // Include only the 'name' field of the brand
+      })
+      .populate({
+        path: "category",
+        model: "Category",
+        select: "categoryName slug", // Include only the 'title' field of the category
+      });
+    const writers = await Writer.find().select("_id title slug photo").lean();
+
+    const reverseProducts = products.reverse();
+
+    res.status(200).json({ products: reverseProducts, writers, category });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 // export const getProductsBySubCategorySlug = async (
 //   req: Request,

@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
+exports.getProductsByCategorySlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
+const writer_model_1 = __importDefault(require("../admin_m/writer/writer.model"));
+const category_model_1 = __importDefault(require("../admin_m/category/category.model"));
 // import cloudinary from "../shared/cloudinary.config";
 // import {
 //   CloudinaryUploadResult,
@@ -431,22 +433,36 @@ exports.deleteProduct = deleteProduct;
 //     res.status(500).json({ error: error.message });
 //   }
 // };
-// export const getProductsByCategorySlug = async (
-//   req: Request,
-//   res: Response
-// ) => {
-//   const slug = req.params.slug;
-//   try {
-//     const products = await Product.find({
-//       slug: slug,
-//     })
-//       .populate("writer")
-//       .populate("category");
-//     res.status(200).json(products.reverse());
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    try {
+        const category = yield category_model_1.default.findOne({ slug: slug })
+            .select("_id categoryName slug photoUrl metaTitle metaDescription description shortDescription tags")
+            .lean();
+        const categoryId = category === null || category === void 0 ? void 0 : category._id;
+        const products = yield product_model_1.default.find({
+            category: categoryId,
+        })
+            .select("_id photo title featured sele price slug stockStatus")
+            .populate({
+            path: "writer",
+            model: "Writer",
+            select: "title  slug", // Include only the 'name' field of the brand
+        })
+            .populate({
+            path: "category",
+            model: "Category",
+            select: "categoryName slug", // Include only the 'title' field of the category
+        });
+        const writers = yield writer_model_1.default.find().select("_id title slug photo").lean();
+        const reverseProducts = products.reverse();
+        res.status(200).json({ products: reverseProducts, writers, category });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByCategorySlug = getProductsByCategorySlug;
 // export const getProductsBySubCategorySlug = async (
 //   req: Request,
 //   res: Response

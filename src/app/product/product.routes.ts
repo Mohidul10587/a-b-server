@@ -24,7 +24,7 @@ import {
   getAllProductsForOfferPage,
   // updateProductVariant,
   // getProductsByWriterSlug,
-  // getProductsByCategorySlug,
+  getProductsByCategorySlug,
 } from "./product.controller";
 import verifyToken from "../admin_m/admin/admin.middleware";
 // import verifyToken from "../admin/admin.middleware";
@@ -84,7 +84,7 @@ router.get("/getAllProductsForOfferPage", getAllProductsForOfferPage);
 // router.get("/category/:categoryId/:notIncludeProductId", getProductsByCategory);
 
 // router.get("/category2/:categoryId", getProductsByCategory2);
-// router.get("/products_by_category_slug/:slug", getProductsByCategorySlug);
+router.get("/products_by_category_slug/:slug", getProductsByCategorySlug);
 
 // router.get("/product_by_subcategory_slug/:slug", getProductsBySubCategorySlug);
 

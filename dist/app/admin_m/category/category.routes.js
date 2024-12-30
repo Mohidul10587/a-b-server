@@ -38,9 +38,10 @@ const uploadMiddleware = upload.fields([
 router.post("/create", uploadMiddleware, category_controller_1.createCategory);
 // Route to get all categories
 router.get("/all", category_controller_1.getAllCategories);
+router.get("/getAllCategoriesForCatMainPage", category_controller_1.getAllCategoriesForCatMainPage);
 // // Route to get a single category by ID
 // router.get("/allCategoryIds", getAllCategoryIds);
-// router.get("/category_by_slug/:slug", getCategoryBySlug);
+router.get("/category_by_slug/:slug", category_controller_1.getCategoryBySlug);
 router.get("/:id", category_controller_1.getCategoryById);
 // router.get("/subCategoryBySlug/:slug", findSubcategoryBySlug);
 // router.get("/subCategory/:subCategoryId", findSubcategoryById);
