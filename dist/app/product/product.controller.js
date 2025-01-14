@@ -12,16 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsByCategorySlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
+exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
 const writer_model_1 = __importDefault(require("../admin_m/writer/writer.model"));
 const category_model_1 = __importDefault(require("../admin_m/category/category.model"));
-// import cloudinary from "../shared/cloudinary.config";
-// import {
-//   CloudinaryUploadResult,
-//   uploadToCloudinary,
-// } from "../shared/uploadToCloudinary";
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, publisher, summary, numberOfPage, ISBN, edition, binding, productType, translatorName, language, orderType, titleEnglish, subTitle, suggestion, } = req.body;
@@ -63,7 +58,9 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             tags: tagsArray,
             photo: photoUrl ? photoUrl : "",
             metaImage: metaImage ? metaImage : "",
-            suggestion,
+            suggestion: ["null", "undefined", null, undefined, ""].includes(suggestion)
+                ? null
+                : suggestion,
         });
         res.status(201).json(newProduct);
     }
@@ -77,6 +74,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a, _b;
     try {
         const productId = req.params.productId;
+        console.log(productId);
         const { title, slug, description, shortDescription, category, subCategory, price, rating, unprice, stockStatus, writer, photo, featured, sele, condition, warranty, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, metaImage, suggestion, } = req.body;
         const files = req.files;
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
@@ -126,6 +124,7 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         }
     }
     catch (error) {
+        console.log(error);
         console.error("Error:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
@@ -366,73 +365,73 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.deleteProduct = deleteProduct;
-// export const getProductsByWriterSlug = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const slug = req.params.slug;
-//   try {
-//     const result = await Product.find({ slug })
-//       .select("_id photo title featured sele price slug")
-//       .populate("writer")
-//       .populate("category");
-//     const products = result.reverse();
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getProductsByWriter = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const writerId = req.params.writerId;
-//   try {
-//     const result = await Product.find({ writer: writerId })
-//       .select("_id photo title featured sele price slug")
-//       .populate("writer")
-//       .populate("category");
-//     const products = result.reverse();
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getProductsByCategory = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const categoryId = req.params.categoryId;
-//   const notIncludeProductId = req.params.notIncludeProductId;
-//   try {
-//     const products = await Product.find({
-//       category: categoryId,
-//       _id: { $ne: notIncludeProductId },
-//     })
-//       .populate("writer")
-//       .populate("category");
-//     // if (!products || products.length === 0) {
-//     //   res.status(404).json({ message: "No products found for this category" });
-//     //   return;
-//     // }
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
-// export const getProductsByCategory2 = async (req: Request, res: Response) => {
-//   const categoryId = req.params.categoryId;
-//   try {
-//     const products = await Product.find({
-//       category: categoryId,
-//     })
-//       .populate("writer")
-//       .populate("category");
-//     res.status(200).json(products.reverse());
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+const getProductsByWriterSlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    try {
+        const writer = yield writer_model_1.default.find({ slug });
+        const result = yield product_model_1.default.find({ writer })
+            .select("_id photo title featured sele price slug")
+            .populate("writer")
+            .populate("category");
+        const products = result.reverse();
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByWriterSlug = getProductsByWriterSlug;
+const getProductsByWriter = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const writerId = req.params.writerId;
+    try {
+        const result = yield product_model_1.default.find({ writer: writerId })
+            .select("_id photo title featured sele price slug")
+            .populate("writer")
+            .populate("category");
+        const products = result.reverse();
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByWriter = getProductsByWriter;
+const getProductsByCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const categoryId = req.params.categoryId;
+    const notIncludeProductId = req.params.notIncludeProductId;
+    try {
+        const products = yield product_model_1.default.find({
+            category: categoryId,
+            _id: { $ne: notIncludeProductId },
+        })
+            .populate("writer")
+            .populate("category");
+        // if (!products || products.length === 0) {
+        //   res.status(404).json({ message: "No products found for this category" });
+        //   return;
+        // }
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByCategory = getProductsByCategory;
+const getProductsByCategory2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const categoryId = req.params.categoryId;
+    try {
+        const products = yield product_model_1.default.find({
+            category: categoryId,
+        })
+            .populate("writer")
+            .populate("category");
+        res.status(200).json(products.reverse());
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByCategory2 = getProductsByCategory2;
 const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const slug = req.params.slug;
     try {

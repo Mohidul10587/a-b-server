@@ -125,21 +125,21 @@ export const getAllBrands = async (
   }
 };
 
-// export const getBrandBySlug = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const writer = await writer.findOne({ slug: req.params.slug });
-//     if (!writer) {
-//       res.status(404).send({ error: "writer not found" });
-//       return;
-//     }
-//     res.status(200).send({ writer });
-//   } catch (err) {
-//     res.status(500).send({ error: "Internal Server Error" });
-//   }
-// };
+export const getWriterBySlug = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const writer = await Writer.findOne({ slug: req.params.slug });
+    if (!writer) {
+      res.status(404).send({ error: "writer not found" });
+      return;
+    }
+    res.status(200).send({ writer });
+  } catch (err) {
+    res.status(500).send({ error: "Internal Server Error" });
+  }
+};
 
 export const getWriteById = async (
   req: Request,

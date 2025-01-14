@@ -6,13 +6,6 @@ import { writer } from "repl";
 import Writer from "../admin_m/writer/writer.model";
 import Category from "../admin_m/category/category.model";
 
-// import cloudinary from "../shared/cloudinary.config";
-
-// import {
-//   CloudinaryUploadResult,
-//   uploadToCloudinary,
-// } from "../shared/uploadToCloudinary";
-
 export const createProduct = async (
   req: Request,
   res: Response
@@ -96,7 +89,11 @@ export const createProduct = async (
       tags: tagsArray,
       photo: photoUrl ? photoUrl : "",
       metaImage: metaImage ? metaImage : "",
-      suggestion,
+      suggestion: ["null", "undefined", null, undefined, ""].includes(
+        suggestion
+      )
+        ? null
+        : suggestion,
     });
     res.status(201).json(newProduct);
   } catch (error: any) {
@@ -111,6 +108,7 @@ export const updateProduct = async (
 ): Promise<void> => {
   try {
     const productId = req.params.productId;
+    console.log(productId);
     const {
       title,
       slug,
@@ -203,6 +201,7 @@ export const updateProduct = async (
       res.status(200).json(updatedProduct);
     }
   } catch (error: any) {
+    console.log(error);
     console.error("Error:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -482,83 +481,84 @@ export const deleteProduct = async (
   }
 };
 
-// export const getProductsByWriterSlug = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const slug = req.params.slug;
+export const getProductsByWriterSlug = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const slug = req.params.slug;
 
-//   try {
-//     const result = await Product.find({ slug })
-//       .select("_id photo title featured sele price slug")
-//       .populate("writer")
-//       .populate("category");
-//     const products = result.reverse();
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+  try {
+    const writer = await Writer.find({ slug });
+    const result = await Product.find({ writer })
+      .select("_id photo title featured sele price slug")
+      .populate("writer")
+      .populate("category");
+    const products = result.reverse();
+    res.status(200).json(products);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-// export const getProductsByWriter = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const writerId = req.params.writerId;
+export const getProductsByWriter = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const writerId = req.params.writerId;
 
-//   try {
-//     const result = await Product.find({ writer: writerId })
-//       .select("_id photo title featured sele price slug")
-//       .populate("writer")
-//       .populate("category");
-//     const products = result.reverse();
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+  try {
+    const result = await Product.find({ writer: writerId })
+      .select("_id photo title featured sele price slug")
+      .populate("writer")
+      .populate("category");
+    const products = result.reverse();
+    res.status(200).json(products);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-// export const getProductsByCategory = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   const categoryId = req.params.categoryId;
-//   const notIncludeProductId = req.params.notIncludeProductId;
+export const getProductsByCategory = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const categoryId = req.params.categoryId;
+  const notIncludeProductId = req.params.notIncludeProductId;
 
-//   try {
-//     const products = await Product.find({
-//       category: categoryId,
-//       _id: { $ne: notIncludeProductId },
-//     })
-//       .populate("writer")
-//       .populate("category");
+  try {
+    const products = await Product.find({
+      category: categoryId,
+      _id: { $ne: notIncludeProductId },
+    })
+      .populate("writer")
+      .populate("category");
 
-//     // if (!products || products.length === 0) {
-//     //   res.status(404).json({ message: "No products found for this category" });
-//     //   return;
-//     // }
+    // if (!products || products.length === 0) {
+    //   res.status(404).json({ message: "No products found for this category" });
+    //   return;
+    // }
 
-//     res.status(200).json(products);
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+    res.status(200).json(products);
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
-// export const getProductsByCategory2 = async (req: Request, res: Response) => {
-//   const categoryId = req.params.categoryId;
+export const getProductsByCategory2 = async (req: Request, res: Response) => {
+  const categoryId = req.params.categoryId;
 
-//   try {
-//     const products = await Product.find({
-//       category: categoryId,
-//     })
-//       .populate("writer")
-//       .populate("category");
+  try {
+    const products = await Product.find({
+      category: categoryId,
+    })
+      .populate("writer")
+      .populate("category");
 
-//     res.status(200).json(products.reverse());
-//   } catch (error: any) {
-//     res.status(500).json({ error: error.message });
-//   }
-// };
+    res.status(200).json(products.reverse());
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 export const getProductsByCategorySlug = async (
   req: Request,

@@ -23,7 +23,7 @@ import {
   getAllProductsForAdmin,
   getAllProductsForOfferPage,
   // updateProductVariant,
-  // getProductsByWriterSlug,
+  getProductsByWriterSlug,
   getProductsByCategorySlug,
 } from "./product.controller";
 import verifyToken from "../admin_m/admin/admin.middleware";
@@ -91,11 +91,11 @@ router.get("/products_by_category_slug/:slug", getProductsByCategorySlug);
 // router.get("/subcategory2/:subcategoryId", getProductsBySubCategory2);
 
 // // Route for getting products by writer
-// router.get("/writer_products_by_slug/:slug", getProductsByWriterSlug);
+router.get("/writer_products_by_slug/:slug", getProductsByWriterSlug);
 // // Route for getting products by writer
 // router.get("/writer/:writerId", getProductsByWriter);
 
-// // Route for getting two products by IDs
+// // Route for getting two products by    IDs
 // router.get("/by-ids/:id1/:id2", getTwoProductsByIds);
 
 // // Route for getting a single product by ID

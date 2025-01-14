@@ -5,7 +5,7 @@ import {
   createBrand,
   // deleteBrand,
   getAllBrands,
-  // getBrandBySlug,
+  getWriterBySlug,
   getWriteById,
   // getAllBrands2,
   updateBrand,
@@ -44,7 +44,7 @@ router.post("/create", uploadMiddleware, createBrand);
 // router.get("/allBrandIds", getAllBrandIds);
 router.get("/all", getAllBrands);
 
-// router.get("/singleBrandBySlug/:slug", getBrandBySlug);
+router.get("/singleWriterBySlug/:slug", getWriterBySlug);
 
 router.get("/singleWriter/:id", getWriteById);
 // router.get("/all2", getAllBrands2);

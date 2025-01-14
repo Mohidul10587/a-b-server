@@ -32,7 +32,7 @@ router.post("/create", uploadMiddleware, writer_controller_1.createBrand);
 // Route to get all writer IDs
 // router.get("/allBrandIds", getAllBrandIds);
 router.get("/all", writer_controller_1.getAllBrands);
-// router.get("/singleBrandBySlug/:slug", getBrandBySlug);
+router.get("/singleWriterBySlug/:slug", writer_controller_1.getWriterBySlug);
 router.get("/singleWriter/:id", writer_controller_1.getWriteById);
 // router.get("/all2", getAllBrands2);
 router.put("/updateWriter/:id", admin_middleware_1.default, uploadMiddleware, writer_controller_1.updateBrand);

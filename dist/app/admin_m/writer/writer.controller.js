@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWriteById = exports.getAllBrands = exports.updateBrand = exports.createBrand = void 0;
+exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.updateBrand = exports.createBrand = void 0;
 const writer_model_1 = __importDefault(require("./writer.model"));
 const uploadSingleFileToCloudinary_1 = require("../../shared/uploadSingleFileToCloudinary");
 const extractPublicKeyAndDelete_1 = require("../../shared/extractPublicKeyAndDelete");
@@ -112,21 +112,20 @@ const getAllBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getAllBrands = getAllBrands;
-// export const getBrandBySlug = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const writer = await writer.findOne({ slug: req.params.slug });
-//     if (!writer) {
-//       res.status(404).send({ error: "writer not found" });
-//       return;
-//     }
-//     res.status(200).send({ writer });
-//   } catch (err) {
-//     res.status(500).send({ error: "Internal Server Error" });
-//   }
-// };
+const getWriterBySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const writer = yield writer_model_1.default.findOne({ slug: req.params.slug });
+        if (!writer) {
+            res.status(404).send({ error: "writer not found" });
+            return;
+        }
+        res.status(200).send({ writer });
+    }
+    catch (err) {
+        res.status(500).send({ error: "Internal Server Error" });
+    }
+});
+exports.getWriterBySlug = getWriterBySlug;
 const getWriteById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const writer = yield writer_model_1.default.findById(req.params.id);
