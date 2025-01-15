@@ -74,7 +74,7 @@ export const createProduct = async (
       shippingOutside,
       metaTitle,
       metaDescription,
-      publisher: "67444ff54a37388ed8edafe5",
+      publisher,
       summary,
       numberOfPage,
       ISBN,

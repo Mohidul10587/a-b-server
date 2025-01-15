@@ -13,7 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cloudinaryUpload = void 0;
+exports.uploadMiddleware = exports.cloudinaryUpload = void 0;
+const multer_1 = __importDefault(require("multer"));
 const cloudinary_config_1 = __importDefault(require("./cloudinary.config"));
 // Helper function to handle Cloudinary uploads
 const cloudinaryUpload = (file) => __awaiter(void 0, void 0, void 0, function* () {
@@ -31,3 +32,7 @@ const cloudinaryUpload = (file) => __awaiter(void 0, void 0, void 0, function* (
     });
 });
 exports.cloudinaryUpload = cloudinaryUpload;
+// Multer configuration for file uploads (image validation)
+const upload = (0, multer_1.default)({ storage: multer_1.default.memoryStorage() }); // Store files in memory
+// Middleware for handling both single and multiple file uploads
+exports.uploadMiddleware = upload.any();

@@ -19,6 +19,7 @@ const order_routes_1 = __importDefault(require("./app/admin_m/order/order.routes
 const element_routes_1 = __importDefault(require("./app/admin_m/elements/element.routes"));
 const suggestion_routes_1 = __importDefault(require("./app/admin_m/suggestion/suggestion.routes"));
 const payment_routes_1 = __importDefault(require("./app/payment/payment.routes"));
+const publishers_routes_1 = __importDefault(require("./app/admin_m/publishers/publishers.routes"));
 const defaultInsertsion_1 = require("./app/shared/defaultInsertsion");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -56,6 +57,7 @@ app.use("/order", order_routes_1.default);
 app.use("/element", element_routes_1.default);
 app.use("/suggestion", suggestion_routes_1.default);
 app.use("/payment", payment_routes_1.default);
+app.use("/publishers", publishers_routes_1.default);
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

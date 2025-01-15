@@ -33,52 +33,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-// Schema
-const ProductSchema = new mongoose_1.Schema({
-    title: { type: String },
+const publishersSchema = new mongoose_1.Schema({
+    title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     shortDescription: { type: String },
-    category: { type: mongoose_1.Schema.Types.ObjectId, ref: "Category", required: true },
-    price: { type: Number },
-    unprice: { type: Number },
-    stockStatus: { type: String },
-    writer: { type: mongoose_1.Schema.Types.ObjectId, ref: "Writer", required: true },
-    youtubeVideo: { type: String, default: "" },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
-    metaTitle: { type: String, default: "" },
-    metaDescription: { type: String, default: "" },
-    publisher: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Publisher",
-        required: true,
-    },
-    summary: { type: String, default: "" },
-    numberOfPage: { type: Number },
-    ISBN: { type: String },
-    edition: { type: String },
-    productType: { type: String },
-    translatorName: { type: String, default: "" },
-    binding: { type: String },
-    language: { type: String },
-    orderType: { type: String },
-    titleEnglish: { type: String, default: "" },
-    subTitle: { type: String, default: "" },
-    tags: { type: [String], default: [] },
-    photo: { type: String },
-    rating: { type: Number, default: 3.5 },
-    metaImage: { type: String, default: "" },
-    attachedFiles: { type: [String], default: [] },
-    suggestion: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Suggestion",
-        default: null,
-    },
-}, { timestamps: true });
-// Model
+    rating: { type: Number, required: true },
+    img: { type: String, default: null },
+    metaTitle: { type: String }, // New field
+    metaDescription: { type: String }, // New field
+    keywords: { type: [String] }, // New field
+    metaImg: { type: String, default: null },
+    position: { type: Number, default: 0 },
+    video: { type: String },
+    link: { type: String, default: "#" },
+});
 // Middleware to make the slug unique if it's already taken
-ProductSchema.pre("save", function (next) {
+publishersSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const doc = this;
         if (!doc.isModified("slug"))
@@ -86,12 +57,12 @@ ProductSchema.pre("save", function (next) {
         let slug = doc.slug;
         let counter = 1;
         // Check if a product with the same slug already exists
-        while (yield mongoose_1.default.models.Product.exists({ slug })) {
+        while (yield mongoose_1.default.models.Publisher.exists({ slug })) {
             slug = `${doc.slug}-${counter++}`;
         }
         doc.slug = slug;
         next();
     });
 });
-const Product = mongoose_1.default.model("Product", ProductSchema);
-exports.default = Product;
+const Publisher = (0, mongoose_1.model)("Publisher", publishersSchema);
+exports.default = Publisher;

@@ -14,6 +14,7 @@ import orderRoutes from "./app/admin_m/order/order.routes";
 import elementsRoutes from "./app/admin_m/elements/element.routes";
 import suggestionRoutes from "./app/admin_m/suggestion/suggestion.routes";
 import paymentRoutes from "./app/payment/payment.routes";
+import publishersRoutes from "./app/admin_m/publishers/publishers.routes";
 
 import {
   createDefaultSettings,
@@ -66,6 +67,7 @@ app.use("/order", orderRoutes);
 app.use("/element", elementsRoutes);
 app.use("/suggestion", suggestionRoutes);
 app.use("/payment", paymentRoutes);
+app.use("/publishers", publishersRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

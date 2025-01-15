@@ -6,19 +6,18 @@ export interface IProduct extends Document {
   slug: string;
   description: string;
   shortDescription: string;
-  category: Schema.Types.ObjectId | null;
-  subCategory: Schema.Types.ObjectId | null;
+  category: Schema.Types.ObjectId;
   price: number;
   unprice: number;
   stockStatus: string;
-  writer: Schema.Types.ObjectId | null;
+  writer: Schema.Types.ObjectId;
   suggestion: Schema.Types.ObjectId | null;
   youtubeVideo: string;
   shippingInside: number;
   shippingOutside: number;
   metaTitle: string;
   metaDescription: string;
-  publisher: Schema.Types.ObjectId | null;
+  publisher: Schema.Types.ObjectId;
   summary: string;
   numberOfPage: number;
   rating: number;
@@ -45,22 +44,21 @@ const ProductSchema = new Schema<IProduct>(
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     shortDescription: { type: String },
-    category: { type: Schema.Types.ObjectId, ref: "Category", default: null },
-    subCategory: {
-      type: Schema.Types.ObjectId,
-      ref: "Subcategory",
-      default: null,
-    },
+    category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
     price: { type: Number },
     unprice: { type: Number },
     stockStatus: { type: String },
-    writer: { type: Schema.Types.ObjectId, ref: "Writer", default: null },
+    writer: { type: Schema.Types.ObjectId, ref: "Writer", required: true },
     youtubeVideo: { type: String, default: "" },
     shippingInside: { type: Number },
     shippingOutside: { type: Number },
     metaTitle: { type: String, default: "" },
     metaDescription: { type: String, default: "" },
-    publisher: { type: Schema.Types.ObjectId, ref: "Publisher", default: null },
+    publisher: {
+      type: Schema.Types.ObjectId,
+      ref: "Publisher",
+      required: true,
+    },
     summary: { type: String, default: "" },
     numberOfPage: { type: Number },
     ISBN: { type: String },
@@ -75,7 +73,6 @@ const ProductSchema = new Schema<IProduct>(
     tags: { type: [String], default: [] },
     photo: { type: String },
     rating: { type: Number, default: 3.5 },
-
     metaImage: { type: String, default: "" },
     attachedFiles: { type: [String], default: [] },
     suggestion: {
