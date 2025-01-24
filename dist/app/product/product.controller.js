@@ -12,11 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
+exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.updateProduct = exports.createProduct = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
 const writer_model_1 = __importDefault(require("../admin_m/writer/writer.model"));
 const category_model_1 = __importDefault(require("../admin_m/category/category.model"));
+const publishers_model_1 = __importDefault(require("../admin_m/publishers/publishers.model"));
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     const { title, slug, description, shortDescription, category, subCategory, price, unprice, stockStatus, writer, youtubeVideo, shippingInside, shippingOutside, metaTitle, metaDescription, tags, publisher, summary, numberOfPage, ISBN, edition, binding, productType, translatorName, language, orderType, titleEnglish, subTitle, suggestion, } = req.body;
@@ -462,6 +463,37 @@ const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0
     }
 });
 exports.getProductsByCategorySlug = getProductsByCategorySlug;
+const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const slug = req.params.slug;
+    try {
+        const publisher = yield publishers_model_1.default.findOne({ slug: slug })
+            .select("_id title slug photoUrl keywords metaTitle metaDescription description shortDescription tags")
+            .lean();
+        const publisherId = publisher === null || publisher === void 0 ? void 0 : publisher._id;
+        const products = yield product_model_1.default.find({
+            publisher: publisherId,
+        })
+            .select("_id photo title featured sele price slug stockStatus")
+            .populate({
+            path: "writer",
+            model: "Writer",
+            select: "title  slug", // Include only the 'name' field of the brand
+        })
+            .populate({
+            path: "publisher",
+            model: "Publisher",
+            select: "title slug photo", // Include only the 'title' field of the category
+        });
+        const writers = yield writer_model_1.default.find().select("_id title slug photo").lean();
+        const reverseProducts = products.reverse();
+        res.status(200).json({ products: reverseProducts, writers, publisher });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
 // export const getProductsBySubCategorySlug = async (
 //   req: Request,
 //   res: Response

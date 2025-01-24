@@ -20,7 +20,8 @@ const element_routes_1 = __importDefault(require("./app/admin_m/elements/element
 const suggestion_routes_1 = __importDefault(require("./app/admin_m/suggestion/suggestion.routes"));
 const payment_routes_1 = __importDefault(require("./app/payment/payment.routes"));
 const publishers_routes_1 = __importDefault(require("./app/admin_m/publishers/publishers.routes"));
-const defaultInsertsion_1 = require("./app/shared/defaultInsertsion");
+const gallery_route_1 = __importDefault(require("./app/admin_m/gallery/gallery.route"));
+const defaultInsertion_1 = require("./app/shared/defaultInsertion");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
@@ -31,8 +32,8 @@ const db = mongoose_1.default.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
     console.log("Connected to MongoDB");
-    (0, defaultInsertsion_1.registerAdmin)("Admin", "admin@gmail.com", "admin123", "image");
-    (0, defaultInsertsion_1.createDefaultSettings)();
+    (0, defaultInsertion_1.registerAdmin)("Admin", "admin@gmail.com", "admin123", "image");
+    (0, defaultInsertion_1.createDefaultSettings)();
 });
 // Middleware
 app.use(body_parser_1.default.json()); // Parse JSON bodies
@@ -58,6 +59,7 @@ app.use("/element", element_routes_1.default);
 app.use("/suggestion", suggestion_routes_1.default);
 app.use("/payment", payment_routes_1.default);
 app.use("/publishers", publishers_routes_1.default);
+app.use("/gallery", gallery_route_1.default);
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

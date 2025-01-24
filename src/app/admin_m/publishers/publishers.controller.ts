@@ -18,8 +18,6 @@ export const createPublisher = async (
     }
     const imgUrl = await cloudinaryUpload(imgFile);
     const metaImgUrl = await cloudinaryUpload(metaImgFile);
-    // const imgUrl = null;
-    // const metaImgUrl = null;
     const keywords = req.body.keywords
       .split(",")
       .map((tag: string) => tag.trim());

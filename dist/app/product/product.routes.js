@@ -52,6 +52,7 @@ router.get("/getAllProductsForOfferPage", product_controller_1.getAllProductsFor
 // router.get("/category/:categoryId/:notIncludeProductId", getProductsByCategory);
 // router.get("/category2/:categoryId", getProductsByCategory2);
 router.get("/products_by_category_slug/:slug", product_controller_1.getProductsByCategorySlug);
+router.get("/products_by_punishers_slug/:slug", product_controller_1.getProductsByPublishersSlug);
 // router.get("/product_by_subcategory_slug/:slug", getProductsBySubCategorySlug);
 // router.get("/subcategory2/:subcategoryId", getProductsBySubCategory2);
 // // Route for getting products by writer

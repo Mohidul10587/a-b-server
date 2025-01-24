@@ -39,8 +39,6 @@ const createPublisher = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         const imgUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(imgFile);
         const metaImgUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(metaImgFile);
-        // const imgUrl = null;
-        // const metaImgUrl = null;
         const keywords = req.body.keywords
             .split(",")
             .map((tag) => tag.trim());

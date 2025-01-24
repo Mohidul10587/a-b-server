@@ -5,6 +5,7 @@ import { populate } from "dotenv";
 import { writer } from "repl";
 import Writer from "../admin_m/writer/writer.model";
 import Category from "../admin_m/category/category.model";
+import Publisher from "../admin_m/publishers/publishers.model";
 
 export const createProduct = async (
   req: Request,
@@ -594,6 +595,45 @@ export const getProductsByCategorySlug = async (
 
     res.status(200).json({ products: reverseProducts, writers, category });
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getProductsByPublishersSlug = async (
+  req: Request,
+  res: Response
+) => {
+  const slug = req.params.slug;
+
+  try {
+    const publisher = await Publisher.findOne({ slug: slug })
+      .select(
+        "_id title slug photoUrl keywords metaTitle metaDescription description shortDescription tags"
+      )
+      .lean();
+
+    const publisherId = publisher?._id;
+    const products = await Product.find({
+      publisher: publisherId,
+    })
+      .select("_id photo title featured sele price slug stockStatus")
+      .populate({
+        path: "writer",
+        model: "Writer",
+        select: "title  slug", // Include only the 'name' field of the brand
+      })
+      .populate({
+        path: "publisher",
+        model: "Publisher",
+        select: "title slug photo", // Include only the 'title' field of the category
+      });
+    const writers = await Writer.find().select("_id title slug photo").lean();
+
+    const reverseProducts = products.reverse();
+
+    res.status(200).json({ products: reverseProducts, writers, publisher });
+  } catch (error: any) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
