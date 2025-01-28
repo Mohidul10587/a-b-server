@@ -6,19 +6,18 @@ import {
   updatePassword,
   checkAdmin,
   getCountsOfDocuments,
-  refreshToken,
   updateAdminEmail,
 } from "./admin.controller";
 import verifyToken from "./admin.middleware";
+import { logOut } from "../../shared/logOut";
 
 const router = express.Router();
 
 router.post("/register", registerAdmin);
 router.post("/login", loginAdmin);
-router.post("/refresh-token", refreshToken);
+router.post("/logout", logOut);
 router.put("/update-password", verifyToken, updatePassword);
 router.get("/check-admin", verifyToken, checkAdmin); // Adding the checkAdmin route with verifyToken middleware
 router.get("/getOrdersCount", getCountsOfDocuments);
-router.put("/update-email", verifyToken, updateAdminEmail);
 
 export default router;

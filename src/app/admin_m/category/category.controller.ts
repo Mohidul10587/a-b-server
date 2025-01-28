@@ -1,203 +1,183 @@
 import { Request, Response } from "express";
 import Category from "./category.model";
-import Product from "../../product/product.model";
-import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
+import { generateSlug } from "../../shared/generateSLug";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const {
-      categoryName,
-      slug,
-      description,
-      display,
-      displayPositionOfHomePage,
-      subCategories,
-      metaTitle,
-      metaDescription,
-      tags,
-      position,
-    } = req.body;
-
-    // Create and save the new category
-    const newCategory = new Category({
-      categoryName,
-      slug,
-      description,
-
-      photoUrl: "/default.jpg",
-      subCategories,
-      metaTitle,
-      metaDescription,
-      tags: ["sd"],
-      metaImage: "/default.jpg",
-      position: 0,
+    const newCategory = await Category.create({
+      ...req.body,
+      slug: generateSlug(req.body.title),
     });
 
-    await newCategory.save();
-    res.status(201).json(newCategory);
+    // Send success message along with the created category data
+    res.status(201).json({
+      message: "Created successfully!",
+      respondedData: newCategory, // Optionally, include the created category in the response
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.log(error);
+
+    // Send error message if there was an issue
+    res.status(500).json({
+      message: "Failed to create.",
+      error: error.message,
+    });
   }
 };
-export const getAllCategories = async (
+
+// Get all
+export const allCategoriesForSubCatAddPage = async (
   req: Request,
   res: Response
-): Promise<void> => {
+) => {
   try {
-    // Fetch all categories
-    const previousCategories = await Category.find();
+    const items = await Category.find().select("title slug");
 
-    // Fetch products and count products per category
-    const primaryCategories = await Promise.all(
-      previousCategories.map(async (category) => {
-        const productCount = await Product.countDocuments({
-          category: category._id,
-        });
-        return {
-          ...category.toJSON(),
-          categoryProducts: productCount,
-        };
-      })
-    );
-    const categories = primaryCategories.sort(
-      (a, b) => a.position - b.position
-    );
-    res.status(200).json({ categories });
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };
-export const getCategoryBySlug = async (req: Request, res: Response) => {
-  const slug = req.params.slug;
+// Get all
+export const allCategoriesForNavBar = async (req: Request, res: Response) => {
   try {
-    const category = await Category.findOne({ slug });
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
-    }
-    res.status(200).json(category);
+    const items = await Category.find().select("title slug");
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };
 
-export const getAllCategoriesForCatMainPage = async (
+// Get all
+export const allCategoryForProductAddPage = async (
   req: Request,
   res: Response
-): Promise<void> => {
+) => {
   try {
-    // Fetch all categories
-    const previousCategories = await Category.find().select(
-      "categoryName slug photoUrl position"
-    );
+    const items = await Category.find().select("title").populate({
+      path: "subcategories",
+      select: "title",
+    });
 
-    // Fetch products and count products per category
-    const primaryCategories = await Promise.all(
-      previousCategories.map(async (category) => {
-        const productCount = await Product.countDocuments({
-          category: category._id,
-        });
-        return {
-          ...category.toJSON(),
-          categoryProducts: productCount,
-        };
-      })
-    );
-    const categories = primaryCategories.sort(
-      (a, b) => a.position - b.position
-    );
-    res.status(200).json({ categories });
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
-// Add this function  to your existing controller file
-export const deleteCategory = async (req: Request, res: Response) => {
-  try {
-    const categoryId = req.params.id;
-    const category = await Category.findByIdAndDelete(categoryId);
+    console.error(error);
 
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
-    }
-
-    res.status(200).json({ message: "Category deleted successfully" });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };
 
-export const updateCategory = async (req: Request, res: Response) => {
+// Get all
+export const allCategoriesForAdminCatIndexPage = async (
+  req: Request,
+  res: Response
+) => {
   try {
-    const {
-      categoryName,
-      slug,
-      description,
+    const items = await Category.find().select("title slug img");
 
-      infoSections,
-      metaTitle,
-      metaDescription,
-      tags,
-      position,
-    } = req.body;
-
-    const categoryId = req.params.id;
-
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
-    }
-    const files = req.files as {
-      [fieldname: string]: Express.Multer.File[];
-    };
-
-    const photoFile = files?.photo?.[0];
-    const newMetaImageFile = files?.metaImage?.[0];
-
-    // Upload metaImage if provided
-    const photoUrl = await cloudinaryUpload(photoFile);
-    const newMetaImage = await cloudinaryUpload(newMetaImageFile);
-    const tagsArray = tags.split(",").map((tag: string) => tag.trim());
-
-    // Update the category with new values
-    category.categoryName = categoryName;
-    category.slug = slug;
-
-    category.description = description;
-
-    category.subCategories;
-    category.metaTitle = metaTitle;
-    category.metaDescription = metaDescription;
-    category.tags = tagsArray;
-    // category.position = parseInt(position);
-    category.position = 0;
-
-    if (photoUrl) {
-      category.photoUrl = photoUrl;
-    }
-    if (newMetaImage) {
-      category.metaImage = newMetaImage;
-    }
-
-    // Fetch all products by category ID
-    const products = await Product.find({ category: category._id });
-
-    // Merge info sections and update products individually
-
-    const updatedCategory = await category.save(); // Ensure the updated category is saved
-    res.status(200).json(updatedCategory); // Return the updated category
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };
 
-export const getCategoryById = async (req: Request, res: Response) => {
+// Get all
+export const allCategoryForFiltering = async (req: Request, res: Response) => {
   try {
-    const category = await Category.findById(req.params.id);
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
-    }
-    res.status(200).json(category);
+    const items = await Category.find().select("title");
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};
+
+// Get single
+export const singleCategoryForCategoryEditPage = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const item = await Category.findOne({ _id: req.params.id });
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: item,
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};
+
+// Update
+export const update = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const updatedItem = await Category.findByIdAndUpdate(id, req.body, {
+      new: true, // Return the updated document
+      runValidators: true, // Run validation on the updated data
+    });
+
+    if (!updatedItem) {
+      return res.status(404).json({
+        message: "Not found.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Updated successfully!",
+      respondedData: updatedItem,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to update.",
+      error: error.message,
+    });
   }
 };

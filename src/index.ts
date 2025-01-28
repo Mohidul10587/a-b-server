@@ -8,6 +8,8 @@ import adminRoutes from "./app/admin_m/admin/admin.routes";
 import writerRoutes from "./app/admin_m/writer/writer.routes";
 import productRoutes from "./app/product/product.routes";
 import categoryRoutes from "./app/admin_m/category/category.routes";
+import subcategoryRoutes from "./app/admin_m/subcategory/subcategory.routes";
+
 import settingsRoutes from "./app/admin_m/settings/settings.routes";
 import bannerRoutes from "./app/admin_m/banner/banner.routes";
 import orderRoutes from "./app/admin_m/order/order.routes";
@@ -61,6 +63,8 @@ app.use("/admin", adminRoutes);
 app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes);
+app.use("/subcategory", subcategoryRoutes);
+
 app.use("/settings", settingsRoutes);
 app.use("/banner", bannerRoutes);
 app.use("/order", orderRoutes);

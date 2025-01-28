@@ -13,6 +13,7 @@ const admin_routes_1 = __importDefault(require("./app/admin_m/admin/admin.routes
 const writer_routes_1 = __importDefault(require("./app/admin_m/writer/writer.routes"));
 const product_routes_1 = __importDefault(require("./app/product/product.routes"));
 const category_routes_1 = __importDefault(require("./app/admin_m/category/category.routes"));
+const subcategory_routes_1 = __importDefault(require("./app/admin_m/subcategory/subcategory.routes"));
 const settings_routes_1 = __importDefault(require("./app/admin_m/settings/settings.routes"));
 const banner_routes_1 = __importDefault(require("./app/admin_m/banner/banner.routes"));
 const order_routes_1 = __importDefault(require("./app/admin_m/order/order.routes"));
@@ -52,6 +53,7 @@ app.use("/admin", admin_routes_1.default);
 app.use("/writer", writer_routes_1.default);
 app.use("/product", product_routes_1.default);
 app.use("/category", category_routes_1.default);
+app.use("/subcategory", subcategory_routes_1.default);
 app.use("/settings", settings_routes_1.default);
 app.use("/banner", banner_routes_1.default);
 app.use("/order", order_routes_1.default);

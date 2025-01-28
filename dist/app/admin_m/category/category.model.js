@@ -33,33 +33,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const SubcategorySchema = new mongoose_1.Schema({
-    title: { type: String, required: true },
-    slug: { type: String },
-    photo: { type: String, required: true },
-    description: { type: String },
-    metaTitle: { type: String },
-    metaDescription: { type: String },
-    tags: { type: [String] },
-    metaImage: { type: String },
-    position: { type: Number, default: 0 },
-});
 const CategorySchema = new mongoose_1.Schema({
-    categoryName: { type: String, required: true },
+    title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
-    photoUrl: { type: String, required: true },
-    subCategories: [SubcategorySchema],
+    shortDescription: { type: String },
+    display: { type: Boolean },
+    img: { type: String, required: true },
     metaTitle: { type: String },
     metaDescription: { type: String },
-    tags: { type: [String] },
-    metaImage: { type: String },
+    keywords: { type: [String] },
+    metaImg: { type: String },
     position: { type: Number, default: 0 },
+    subcategories: {
+        type: [{ type: mongoose_1.Schema.Types.ObjectId, ref: "Subcategory" }],
+        default: [],
+    },
+    queAndAnsArray: [
+        {
+            title: { type: String },
+            description: { type: String },
+        },
+    ],
 });
 // Middleware to make the category slug unique if it's already taken
 CategorySchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
         const doc = this;
         // Ensure the unique slug for Category
         if (!doc.isModified("slug"))
@@ -71,16 +70,6 @@ CategorySchema.pre("save", function (next) {
             slug = `${doc.slug}-${counter++}`;
         }
         doc.slug = slug;
-        // Ensure each subcategory has a unique slug within the context of the category
-        for (let i = 0; i < (((_a = doc.subCategories) === null || _a === void 0 ? void 0 : _a.length) || 0); i++) {
-            let subcategorySlug = doc.subCategories[i].slug;
-            let subCounter = 1;
-            // Check if a subcategory with the same slug exists in the current category
-            while ((_b = doc.subCategories) === null || _b === void 0 ? void 0 : _b.some((sub, index) => sub.slug === subcategorySlug && index !== i)) {
-                subcategorySlug = `${doc.subCategories[i].slug}-${subCounter++}`;
-            }
-            doc.subCategories[i].slug = subcategorySlug;
-        }
         next();
     });
 });

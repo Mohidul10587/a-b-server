@@ -7,15 +7,17 @@ import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import ApiResponse from "../../shared/response.type";
 
-import Product from "../../product/product.model";
 import Category from "../category/category.model";
 
-import Banner from "../banner/banner.model";
-import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
-import { extractPublicKeyAndDelete } from "../../shared/extractPublicKeyAndDelete";
+import { setRefreshTokenCookie } from "../../shared/setToken";
+
 // Load environment variables
 // Define color codes
-
+declare module "express" {
+  interface Request {
+    admin?: IAdmin; // Adjust the type based on your User model
+  }
+}
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 export const registerAdmin = async (
@@ -48,28 +50,12 @@ export const registerAdmin = async (
     // Save admin to database
     await admin.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { adminId: admin._id, email: admin.email },
-      JWT_SECRET,
-      { expiresIn: "20s" }
-    );
-    const refreshToken = jwt.sign(
-      { adminId: admin._id, email: admin.email },
-      JWT_SECRET,
-      { expiresIn: "40s" }
-    );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
+    setRefreshTokenCookie(res, admin);
 
     // Send response with token
     res.status(201).json({
       success: true,
       data: admin,
-      token,
       message: "Admin registered successfully",
     });
   } catch (error) {
@@ -98,56 +84,39 @@ export const checkAdmin = async (
   });
 };
 
-export const loginAdmin = async (
-  req: Request,
-  res: Response<ApiResponse<IAdmin>>
-) => {
+// Authenticate user with email and password
+export const loginAdmin = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
   try {
-    const { email, password } = req.body;
-
-    // Find admin by email
-    const admin = await Admin.findOne({ email });
-
-    if (!admin) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Admin not found" });
+    const user = await Admin.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     }
 
-    // Check if password matches
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Invalid password" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
     }
+    setRefreshTokenCookie(res, user);
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { adminId: admin._id, email: admin.email },
-      JWT_SECRET,
-      { expiresIn: "20s" }
-    );
-    const refreshToken = jwt.sign(
-      { adminId: admin._id, email: admin.email },
-      JWT_SECRET,
-      { expiresIn: "1d" }
-    );
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-    });
-    // Send response with token
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      data: admin,
-      token,
-      message: "Admin logged in successfully",
+      user,
+      message: "User authenticated successfully",
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Admin login failed" });
+    console.error("Error authenticating user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Authentication failed",
+    });
   }
 };
 
@@ -177,7 +146,7 @@ export const refreshToken = async (
     const accessToken = jwt.sign(
       { adminId: admin._id, email: admin.email },
       JWT_SECRET,
-      { expiresIn: "20s" }
+      { expiresIn: "20000s" }
     );
 
     return res.status(200).json({
@@ -225,23 +194,17 @@ export const getCountsOfDocuments = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  // try {
-  //   const ordersCount = await Order.countDocuments();
-  //   const productsCount = await Product.countDocuments();
-  //   const categoriesCount = await Category.countDocuments();
-  //   const brandsCount = await Brand.countDocuments();
-  //   const bannersCount = await Banner.countDocuments();
-  //   res.status(200).json({
-  //     ordersCount,
-  //     productsCount,
-  //     categoriesCount,
-  //     brandsCount,
-  //     bannersCount,
-  //   });
-  // } catch (error) {
-  //   res.status(500).json({ message: "Error retrieving counts", error });
-  // }
+  try {
+    const categoriesCount = await Category.countDocuments();
+
+    res.status(200).json({
+      categoriesCount,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving counts", error });
+  }
 };
+
 // change
 
 // Controller to update admin email

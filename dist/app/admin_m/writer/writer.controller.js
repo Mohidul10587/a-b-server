@@ -93,18 +93,6 @@ const getAllBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     try {
         // Fetch all brands
         const writers = yield writer_model_1.default.find();
-        // // Fetch products and count products per writer
-        // const brands = await Promise.all(
-        //   previousBrands.map(async (writer) => {
-        //     const productCount = await Product.countDocuments({
-        //       writer: writer._id,
-        //     });
-        //     return {
-        //       ...writer.toJSON(),
-        //       brandProducts: productCount,
-        //     };
-        //   })
-        // );
         res.status(200).json({ writers });
     }
     catch (error) {
@@ -140,43 +128,3 @@ const getWriteById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getWriteById = getWriteById;
-// export const getAllBrands2 = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const brands = await writer.find().select("_id title").lean();
-//     res.status(200).send(brands);
-//   } catch (err) {
-//     res.status(500).send({ error: "Internal Server Error" });
-//   }
-// };
-// export const deleteBrand = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const writer = await writer.findByIdAndDelete(req.params.id);
-//     if (!writer) {
-//       res.status(404).send({ error: "writer not found" });
-//       return;
-//     }
-//     res.status(200).send({ message: "writer deleted successfully" });
-//   } catch (err) {
-//     res.status(500).send({ error: "Internal Server Error" });
-//   }
-// };
-// // Function to get all writer IDs
-// export const getAllBrandIds = async (
-//   req: Request,
-//   res: Response
-// ): Promise<void> => {
-//   try {
-//     const brandIds = await writer.find().select("_id").lean();
-//     // Extract the _id field from each writer and return an array of IDs
-//     const ids = brandIds.map((writer) => writer._id);
-//     res.status(200).json(ids);
-//   } catch (err) {
-//     res.status(500).send({ error: "Internal Server Error" });
-//   }
-// };

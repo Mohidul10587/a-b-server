@@ -133,7 +133,7 @@ export const allForProductUploadPage = async (
 //     // Product counting part end
 
 //     const categories = await Category.find()
-//       .select("subCategories categoryName")
+//       .select("subCategories title")
 //       .lean();
 
 //     // Flatten all subcategories into a single lookup map
@@ -207,7 +207,7 @@ export const allForProductUploadPage = async (
 //     // Product counting part end
 
 //     const categories = await Category.find()
-//       .select("subCategories categoryName")
+//       .select("subCategories title")
 //       .lean();
 
 //     // Flatten all subcategories into a single lookup map

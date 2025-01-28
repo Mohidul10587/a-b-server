@@ -33,64 +33,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-// Schema
-const ProductSchema = new mongoose_1.Schema({
-    title: { type: String },
+const SubcategorySchema = new mongoose_1.Schema({
+    title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     shortDescription: { type: String },
-    category: { type: mongoose_1.Schema.Types.ObjectId, ref: "Category", required: true },
-    price: { type: Number },
-    unprice: { type: Number },
-    stockStatus: { type: String },
-    writer: { type: mongoose_1.Schema.Types.ObjectId, ref: "Writer", required: true },
-    youtubeVideo: { type: String, default: "" },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
-    metaTitle: { type: String, default: "" },
-    metaDescription: { type: String, default: "" },
-    publisher: {
+    display: { type: Boolean },
+    img: { type: String, required: true },
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    keywords: { type: [String] },
+    metaImg: { type: String },
+    position: { type: Number, default: 0 },
+    parentCategory: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Publisher",
+        ref: "Category",
         required: true,
     },
-    summary: { type: String, default: "" },
-    numberOfPage: { type: Number },
-    ISBN: { type: String },
-    edition: { type: String },
-    productType: { type: String },
-    translatorName: { type: String, default: "" },
-    binding: { type: String },
-    language: { type: String },
-    orderType: { type: String },
-    titleEnglish: { type: String, default: "" },
-    subTitle: { type: String, default: "" },
-    tags: { type: [String], default: [] },
-    img: { type: String },
-    rating: { type: Number, default: 3.5 },
-    metaImg: { type: String, default: "" },
-    attachedFiles: { type: [String], default: [] },
-    suggestion: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Suggestion",
-        default: null,
-    },
-}, { timestamps: true });
-// Middleware to make the slug unique if it's already taken
-ProductSchema.pre("save", function (next) {
+});
+// Middleware to make the category slug unique if it's already taken
+SubcategorySchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const doc = this;
+        // Ensure the unique slug for Subcategory
         if (!doc.isModified("slug"))
             return next();
         let slug = doc.slug;
         let counter = 1;
-        // Check if a product with the same slug already exists
-        while (yield mongoose_1.default.models.Product.exists({ slug })) {
+        // Check if a category with the same slug already exists
+        while (yield mongoose_1.default.models.Subcategory.exists({ slug })) {
             slug = `${doc.slug}-${counter++}`;
         }
         doc.slug = slug;
         next();
     });
 });
-const Product = mongoose_1.default.model("Product", ProductSchema);
-exports.default = Product;
+const Subcategory = (0, mongoose_1.model)("Subcategory", SubcategorySchema);
+exports.default = Subcategory;

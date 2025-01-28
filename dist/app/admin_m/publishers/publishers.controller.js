@@ -127,7 +127,7 @@ exports.allForProductUploadPage = allForProductUploadPage;
 //       .lean();
 //     // Product counting part end
 //     const categories = await Category.find()
-//       .select("subCategories categoryName")
+//       .select("subCategories title")
 //       .lean();
 //     // Flatten all subcategories into a single lookup map
 //     const subcategoryLookup: { [key: string]: Subcategory } = categories.reduce(
@@ -193,7 +193,7 @@ exports.allForProductUploadPage = allForProductUploadPage;
 //     );
 //     // Product counting part end
 //     const categories = await Category.find()
-//       .select("subCategories categoryName")
+//       .select("subCategories title")
 //       .lean();
 //     // Flatten all subcategories into a single lookup map
 //     const subcategoryLookup: { [key: string]: Subcategory } = categories.reduce(

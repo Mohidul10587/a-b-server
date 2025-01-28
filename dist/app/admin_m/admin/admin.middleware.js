@@ -13,39 +13,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const admin_model_1 = __importDefault(require("./admin.model"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const admin_model_1 = __importDefault(require("./admin.model"));
 // Load environment variables
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const verifyToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res
-            .status(401)
-            .json({ success: false, message: "Authorization header not provided" });
-    }
-    const token = authHeader.split(" ")[1]; // Extract the token from the "Bearer <token>" format
-    if (!token) {
-        return res
-            .status(401)
-            .json({ success: false, message: "Token not provided" });
-    }
-    jsonwebtoken_1.default.verify(token, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+    const { _ } = req.cookies;
+    jsonwebtoken_1.default.verify(_, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
             return res
                 .status(401)
                 .json({ success: false, message: "Failed to authenticate token" });
         }
         try {
-            const admin = yield admin_model_1.default.findById(decoded.adminId);
-            if (!admin) {
+            const user = yield admin_model_1.default.findById(decoded.userId);
+            if (!user) {
                 return res
                     .status(404)
-                    .json({ success: false, message: "Admin not found" });
+                    .json({ success: false, message: "User not found" });
             }
-            // Attach admin object to request for further usage
-            req.admin = admin;
+            // Attach user object to request for further usage
+            req.admin = user;
             next();
         }
         catch (error) {

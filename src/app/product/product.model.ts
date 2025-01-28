@@ -21,7 +21,6 @@ export interface IProduct extends Document {
   summary: string;
   numberOfPage: number;
   rating: number;
-
   ISBN: string;
   edition: string;
   productType: string;
@@ -32,8 +31,8 @@ export interface IProduct extends Document {
   titleEnglish: string;
   subTitle: string;
   tags: string[];
-  photo: string;
-  metaImage: string;
+  img: string;
+  metaImg: string;
   attachedFiles: string[];
 }
 
@@ -71,9 +70,9 @@ const ProductSchema = new Schema<IProduct>(
     titleEnglish: { type: String, default: "" },
     subTitle: { type: String, default: "" },
     tags: { type: [String], default: [] },
-    photo: { type: String },
+    img: { type: String },
     rating: { type: Number, default: 3.5 },
-    metaImage: { type: String, default: "" },
+    metaImg: { type: String, default: "" },
     attachedFiles: { type: [String], default: [] },
     suggestion: {
       type: Schema.Types.ObjectId,
@@ -83,8 +82,6 @@ const ProductSchema = new Schema<IProduct>(
   },
   { timestamps: true }
 );
-
-// Model
 
 // Middleware to make the slug unique if it's already taken
 ProductSchema.pre("save", async function (next) {
