@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPublisherIds = exports.deletePublisher = exports.allForIndexPage = exports.getPublisherBySlug = exports.allForProductUploadPage = exports.getAllPublishers = exports.getPublisherById = exports.createPublisher = void 0;
+exports.allPublisherForFiltering = exports.getAllPublisherIds = exports.deletePublisher = exports.allForIndexPage = exports.getPublisherBySlug = exports.allForProductUploadPage = exports.getAllPublishers = exports.getPublisherById = exports.createPublisher = void 0;
 const product_model_1 = __importDefault(require("../../product/product.model"));
 const uploadSingleFileToCloudinary_1 = require("../../shared/uploadSingleFileToCloudinary");
 const publishers_model_1 = __importDefault(require("./publishers.model"));
@@ -295,3 +295,21 @@ const getAllPublisherIds = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.getAllPublisherIds = getAllPublisherIds;
+// Get all
+const allPublisherForFiltering = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield publishers_model_1.default.find().select("title");
+        res.status(200).json({
+            message: "Fetched successfully!",
+            respondedData: items.reverse(),
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.allPublisherForFiltering = allPublisherForFiltering;

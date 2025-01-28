@@ -223,7 +223,9 @@ export const getProductsByWriterSlug = async (
   try {
     const writer = await Writer.find({ slug });
     const result = await Product.find({ writer })
-      .select("_id img title featured sele price slug category")
+      .select(
+        "_id img title featured sele price slug category subcategory publisher language"
+      )
       .populate("writer");
 
     const products = result.reverse();
@@ -343,7 +345,9 @@ export const getProductsByPublishersSlug = async (
     const products = await Product.find({
       publisher: publisherId,
     })
-      .select("_id img title featured sele price slug stockStatus")
+      .select(
+        "_id img title category subcategory featured sele price slug stockStatus"
+      )
       .populate({
         path: "writer",
         model: "Writer",

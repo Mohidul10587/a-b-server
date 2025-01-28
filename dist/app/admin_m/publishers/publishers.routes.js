@@ -20,4 +20,5 @@ router.get("/singlePublisher/:id", publishers_controller_1.getPublisherById);
 router.get("/allForIndexPage", publishers_controller_1.allForIndexPage);
 // router.put("/updatePublisher/:id", verifyToken, uploadMiddleware, updatePublisher);
 router.delete("/:id", admin_middleware_1.default, publishers_controller_1.deletePublisher);
+router.get("/allPublisherForFiltering", publishers_controller_1.allPublisherForFiltering);
 exports.default = router;

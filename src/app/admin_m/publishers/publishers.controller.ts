@@ -320,3 +320,21 @@ export const getAllPublisherIds = async (
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
+// Get all
+export const allPublisherForFiltering = async (req: Request, res: Response) => {
+  try {
+    const items = await Publisher.find().select("title");
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};

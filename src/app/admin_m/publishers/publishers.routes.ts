@@ -8,11 +8,9 @@ import {
   getPublisherBySlug,
   getPublisherById,
   allForIndexPage,
-  // updatePublisher,
   getAllPublisherIds,
-  // getAllPublishersForNavbar,
-  // getAllPublishersForPublisherPage,
   allForProductUploadPage,
+  allPublisherForFiltering,
 } from "./publishers.controller";
 
 import { uploadMiddleware } from "../../shared/uploadSingleFileToCloudinary";
@@ -37,4 +35,9 @@ router.get("/allForIndexPage", allForIndexPage);
 // router.put("/updatePublisher/:id", verifyToken, uploadMiddleware, updatePublisher);
 router.delete("/:id", verifyToken, deletePublisher);
 
+router.get(
+  "/allPublisherForFiltering",
+
+  allPublisherForFiltering
+);
 export default router;

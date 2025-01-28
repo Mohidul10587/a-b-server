@@ -204,7 +204,7 @@ const getProductsByWriterSlug = (req, res) => __awaiter(void 0, void 0, void 0, 
     try {
         const writer = yield writer_model_1.default.find({ slug });
         const result = yield product_model_1.default.find({ writer })
-            .select("_id img title featured sele price slug category")
+            .select("_id img title featured sele price slug category subcategory publisher language")
             .populate("writer");
         const products = result.reverse();
         res.status(200).json(products);
@@ -301,7 +301,7 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
         const products = yield product_model_1.default.find({
             publisher: publisherId,
         })
-            .select("_id img title featured sele price slug stockStatus")
+            .select("_id img title category subcategory featured sele price slug stockStatus")
             .populate({
             path: "writer",
             model: "Writer",
