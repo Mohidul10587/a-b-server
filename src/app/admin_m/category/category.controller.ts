@@ -131,6 +131,27 @@ export const allCategoryForFiltering = async (req: Request, res: Response) => {
   }
 };
 
+// Get all
+export const getAllCategoriesForCatMainPage = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const items = await Category.find();
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: items.reverse(),
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};
 // Get single
 export const singleCategoryForCategoryEditPage = async (
   req: Request,

@@ -8,6 +8,7 @@ import {
   allCategoriesForNavBar,
   allCategoryForProductAddPage,
   allCategoryForFiltering,
+  getAllCategoriesForCatMainPage,
 } from "./category.controller";
 import verifyToken from "../admin/admin.middleware";
 
@@ -51,4 +52,9 @@ router.get(
   allCategoryForFiltering
 );
 
+router.get(
+  "/getAllCategoriesForCatMainPage",
+
+  getAllCategoriesForCatMainPage
+);
 export default router;

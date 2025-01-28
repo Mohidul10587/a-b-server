@@ -17,4 +17,5 @@ router.get("/singleCategoryForCategoryEditPage/:id", category_controller_1.singl
 router.put("/update/:id", admin_middleware_1.default, category_controller_1.update);
 // common routes
 router.get("/allCategoryForFiltering", category_controller_1.allCategoryForFiltering);
+router.get("/getAllCategoriesForCatMainPage", category_controller_1.getAllCategoriesForCatMainPage);
 exports.default = router;

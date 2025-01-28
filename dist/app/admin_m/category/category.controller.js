@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.singleCategoryForCategoryEditPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.createCategory = void 0;
+exports.update = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.createCategory = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../../shared/generateSLug");
 const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -127,6 +127,24 @@ const allCategoryForFiltering = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.allCategoryForFiltering = allCategoryForFiltering;
+// Get all
+const getAllCategoriesForCatMainPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield category_model_1.default.find();
+        res.status(200).json({
+            message: "Fetched successfully!",
+            respondedData: items.reverse(),
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.getAllCategoriesForCatMainPage = getAllCategoriesForCatMainPage;
 // Get single
 const singleCategoryForCategoryEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
