@@ -151,7 +151,7 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
             path: "suggestionId",
             populate: {
                 path: "products",
-                select: "_id title slug photo price unprice stockStatus",
+                select: "_id title slug img price unprice stockStatus",
             },
         });
         // If no page elements are found, return a 404 error
@@ -166,7 +166,7 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
             // Check by category
             const categoryProducts = yield product_model_1.default.find({
                 category: element.productSectionId,
-            }).select("_id title slug photo price unprice stockStatus");
+            }).select("_id title slug img price unprice stockStatus");
             if (categoryProducts.length > 0) {
                 products = categoryProducts;
             }
@@ -174,7 +174,7 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
                 // Check by subcategory if no category products found
                 const subCategoryProducts = yield product_model_1.default.find({
                     subCategory: element.productSectionId,
-                }).select("_id title slug photo price unprice stockStatus");
+                }).select("_id title slug img price unprice stockStatus");
                 if (subCategoryProducts.length > 0) {
                     products = subCategoryProducts;
                 }
@@ -182,7 +182,7 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
                     // Fallback to brand if no category or subcategory products found
                     const brandProducts = yield product_model_1.default.find({
                         brand: element.productSectionId,
-                    }).select("_id title slug photo price unprice stockStatus");
+                    }).select("_id title slug img price unprice stockStatus");
                     products = brandProducts;
                 }
             }
