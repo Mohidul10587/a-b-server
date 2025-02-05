@@ -8,7 +8,7 @@ const category_controller_1 = require("./category.controller");
 const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
 const router = (0, express_1.Router)();
 //Admin routes
-router.post("/create", admin_middleware_1.default, category_controller_1.createCategory);
+router.post("/create", admin_middleware_1.default, category_controller_1.create);
 router.get("/allCategoriesForSubCatAddPage", category_controller_1.allCategoriesForSubCatAddPage);
 router.get("/allCategoriesForNavBar", category_controller_1.allCategoriesForNavBar);
 router.get("/allCategoriesForAdminCatIndexPage", category_controller_1.allCategoriesForAdminCatIndexPage);

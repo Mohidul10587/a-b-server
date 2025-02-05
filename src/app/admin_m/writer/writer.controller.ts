@@ -1,100 +1,50 @@
 import { Request, Response } from "express";
 
 import Writer from "./writer.model";
-import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
-import { extractPublicKeyAndDelete } from "../../shared/extractPublicKeyAndDelete";
+import { generateSlug } from "../../shared/generateSLug";
 
-export const createBrand = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const files = req.files as {
-    photo?: Express.Multer.File[];
-    metaImage?: Express.Multer.File[];
-  };
-
+export const create = async (req: Request, res: Response) => {
   try {
-    const photoFile = files?.photo?.[0];
-    const metaImageFile = files?.metaImage?.[0];
-    const photoUrl = await cloudinaryUpload(photoFile);
-    const metaImage = await cloudinaryUpload(metaImageFile);
-
-    const tagsArray = req.body.tags.split(",").map((tag: string) => tag.trim());
-    const writer = new Writer({
-      title: req.body.title,
-      slug: req.body.slug,
-      description: req.body.description,
-
-      photo: photoUrl,
-      metaTitle: req.body.metaTitle,
-      metaDescription: req.body.metaDescription,
-      tags: tagsArray,
-      metaImage: metaImage,
+    const newCategory = await Writer.create({
+      ...req.body,
+      slug: generateSlug(req.body.title),
     });
 
-    await writer.save();
+    // Send success message along with the created category data
+    res.status(201).json({
+      message: "Created successfully!",
+      respondedData: newCategory, // Optionally, include the created category in the response
+    });
+  } catch (error: any) {
+    console.log(error);
 
-    res.status(200).send({ writer });
-  } catch (err) {
-    res.status(500).send({ error: "Internal Server Error" });
+    // Send error message if there was an issue
+    res.status(500).json({
+      message: "Failed to create.",
+      error: error.message,
+    });
   }
 };
 
-export const updateBrand = async (
+// Get single
+export const singleWriterForWriterEditPage = async (
   req: Request,
   res: Response
-): Promise<void> => {
-  const files = req.files as {
-    photo?: Express.Multer.File[];
-    metaImage?: Express.Multer.File[];
-  };
-  console.log(req.body.previousPhoto);
+) => {
   try {
-    const writer = await Writer.findById(req.params.id);
-    if (!writer) {
-      res.status(404).send({ error: "writer not found" });
-      return;
-    }
+    const item = await Writer.findOne({ _id: req.params.id });
 
-    const photoFile = files?.photo?.[0];
-    const metaImageFile = files?.metaImage?.[0];
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: item,
+    });
+  } catch (error: any) {
+    console.error(error);
 
-    const photoUrl = await cloudinaryUpload(photoFile);
-    const metaImage = await cloudinaryUpload(metaImageFile);
-
-    // Update writer fields with data from the request body
-    writer.title = req.body.title || writer.title;
-    writer.slug = req.body.slug || writer.slug;
-
-    writer.description = req.body.description || writer.description;
-    writer.rating = req.body.rating || writer.rating;
-    writer.metaTitle = req.body.metaTitle || writer.metaTitle;
-    writer.metaDescription = req.body.metaDescription || writer.metaDescription;
-
-    // Convert tags to an array if they are comma-separated
-    writer.tags = req.body.tags
-      ? req.body.tags.split(",").map((tag: string) => tag.trim())
-      : writer.tags;
-
-    // Update images if provided
-    if (photoUrl) {
-      writer.photo = photoUrl;
-
-      const publicKey = req.body.previousPhoto;
-      console.log("fisr", publicKey);
-      await extractPublicKeyAndDelete(publicKey);
-    }
-    if (metaImage) {
-      writer.metaImage = metaImage;
-      const publicKey = req.body.previousMetaImage;
-      await extractPublicKeyAndDelete(publicKey);
-    }
-
-    await writer.save();
-    res.status(200).send({ writer });
-  } catch (err) {
-    console.log(err);
-    res.status(500).send({ error: "Internal Server Error" });
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };
 
@@ -141,5 +91,38 @@ export const getWriteById = async (
     res.status(200).send({ writer });
   } catch (err) {
     res.status(500).send({ error: "Internal Server Error" });
+  }
+};
+
+// Update
+export const update = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const updatedItem = await Writer.findByIdAndUpdate(
+      id,
+      { ...req.body, slug: generateSlug(req.body.title) },
+      {
+        new: true, // Return the updated document
+        runValidators: true, // Run validation on the updated data
+      }
+    );
+
+    if (!updatedItem) {
+      return res.status(404).json({
+        message: "Not found.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Updated successfully!",
+      respondedData: updatedItem,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to update.",
+      error: error.message,
+    });
   }
 };

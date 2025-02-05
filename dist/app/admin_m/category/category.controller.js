@@ -12,10 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.createCategory = void 0;
+exports.update = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.create = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../../shared/generateSLug");
-const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const newCategory = yield category_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
         // Send success message along with the created category data
@@ -33,7 +33,7 @@ const createCategory = (req, res) => __awaiter(void 0, void 0, void 0, function*
         });
     }
 });
-exports.createCategory = createCategory;
+exports.create = create;
 // Get all
 const allCategoriesForSubCatAddPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

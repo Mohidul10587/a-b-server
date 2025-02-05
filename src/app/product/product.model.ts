@@ -7,6 +7,7 @@ export interface IProduct extends Document {
   description: string;
   shortDescription: string;
   category: Schema.Types.ObjectId;
+  subcategory: Schema.Types.ObjectId;
   price: number;
   unprice: number;
   stockStatus: string;
@@ -44,6 +45,12 @@ const ProductSchema = new Schema<IProduct>(
     description: { type: String },
     shortDescription: { type: String },
     category: { type: Schema.Types.ObjectId, ref: "Category", required: true },
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      default: null,
+    },
+
     price: { type: Number },
     unprice: { type: Number },
     stockStatus: { type: String },

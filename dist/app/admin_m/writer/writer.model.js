@@ -37,12 +37,12 @@ const writerSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
-    photo: { type: String, required: true },
+    img: { type: String, required: true },
     rating: { type: Number, default: 4 },
     metaTitle: { type: String }, // New field
     metaDescription: { type: String }, // New field
     tags: { type: [String] }, // New field
-    metaImage: { type: String },
+    metaImg: { type: String },
 });
 const Writer = (0, mongoose_1.model)("Writer", writerSchema);
 // Middleware to make the slug unique if it's already taken

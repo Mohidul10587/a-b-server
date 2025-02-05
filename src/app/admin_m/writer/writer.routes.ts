@@ -1,55 +1,34 @@
 import { Router } from "express";
 
-import multer from "multer";
 import {
-  createBrand,
-  // deleteBrand,
+  create,
   getAllBrands,
   getWriterBySlug,
   getWriteById,
-  // getAllBrands2,
-  updateBrand,
+  singleWriterForWriterEditPage,
+  update,
+
   // getAllBrandIds,
 } from "./writer.controller";
-import path from "path";
+
 import verifyToken from "../admin/admin.middleware";
 
 const router = Router();
 
-// Multer configuration for file uploads (image validation)
-const upload = multer({
-  storage: multer.memoryStorage(),
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    if (
-      ext !== ".jpg" &&
-      ext !== ".jpeg" &&
-      ext !== ".webp" &&
-      ext !== ".png"
-    ) {
-      return cb(new Error("Only images are allowed"));
-    }
-    cb(null, true);
-  },
-});
-
-// Middleware for handling both single and multiple file uploads
-const uploadMiddleware = upload.fields([
-  { name: "photo", maxCount: 1 },
-  { name: "metaImage", maxCount: 1 },
-]);
-
-router.post("/create", uploadMiddleware, createBrand);
+router.post("/create", verifyToken, create);
 // Route to get all writer IDs
-// router.get("/allBrandIds", getAllBrandIds);
+router.get(
+  "/singleWriterForWriterEditPage/:id",
+
+  singleWriterForWriterEditPage
+);
+
+router.put("/update/:id", verifyToken, update);
+
 router.get("/all", getAllBrands);
 
 router.get("/singleWriterBySlug/:slug", getWriterBySlug);
 
 router.get("/singleWriter/:id", getWriteById);
-// router.get("/all2", getAllBrands2);
-
-router.put("/updateWriter/:id", verifyToken, uploadMiddleware, updateBrand);
-// router.delete("/deleteBrand/:id", verifyToken, deleteBrand);
 
 export default router;

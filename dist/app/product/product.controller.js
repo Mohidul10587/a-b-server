@@ -265,23 +265,16 @@ const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0
     const slug = req.params.slug;
     try {
         const category = yield category_model_1.default.findOne({ slug: slug })
-            .select("_id title slug imgUrl metaTitle metaDescription description shortDescription tags")
+            .select("_id title slug img metaTitle metaDescription description shortDescription tags")
+            .populate({
+            path: "subcategories",
+            select: "title",
+        })
             .lean();
         const categoryId = category === null || category === void 0 ? void 0 : category._id;
         const products = yield product_model_1.default.find({
             category: categoryId,
-        })
-            .select("_id img title featured sele price slug stockStatus")
-            .populate({
-            path: "writer",
-            model: "Writer",
-            select: "title  slug", // Include only the 'name' field of the brand
-        })
-            .populate({
-            path: "category",
-            model: "Category",
-            select: "title slug", // Include only the 'title' field of the category
-        });
+        }).select("_id img title featured sele price slug stockStatus writer publisher  subcategory language");
         const writers = yield writer_model_1.default.find().select("_id title slug img").lean();
         const reverseProducts = products.reverse();
         res.status(200).json({ products: reverseProducts, writers, category });

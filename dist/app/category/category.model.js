@@ -23,7 +23,7 @@ const CategorySchema = new mongoose_1.Schema({
   display: { type: Boolean },
   displayPositionOfHomePage: { type: Number },
   infoSections: [InfoSectionSchema],
-  photoUrl: { type: String, required: true },
+  img: { type: String, required: true },
   subCategories: [SubcategorySchema],
 });
 const Category = (0, mongoose_1.model)("Category", CategorySchema);

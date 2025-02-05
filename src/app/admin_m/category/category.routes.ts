@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  createCategory,
+  create,
   allCategoriesForSubCatAddPage,
   allCategoriesForAdminCatIndexPage,
   update,
@@ -15,7 +15,7 @@ import verifyToken from "../admin/admin.middleware";
 const router = Router();
 
 //Admin routes
-router.post("/create", verifyToken, createCategory);
+router.post("/create", verifyToken, create);
 router.get(
   "/allCategoriesForSubCatAddPage",
 

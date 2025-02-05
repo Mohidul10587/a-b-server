@@ -162,7 +162,7 @@ const createCategory = (req, res) =>
         display,
         displayPositionOfHomePage,
         infoSections: parsedInfoSections,
-        photoUrl: photoResult.secure_url,
+        img: photoResult.secure_url,
         subCategories,
       });
       yield newCategory.save();
@@ -302,7 +302,7 @@ const updateCategory = (req, res) =>
       category.subCategories;
       // Set photo URL, keeping the old one if no new photo was uploaded
       if (photoResult && photoResult.secure_url) {
-        category.photoUrl = photoResult.secure_url;
+        category.img = photoResult.secure_url;
       }
       // Fetch all products by category ID
       const products = yield product_model_1.default.find({

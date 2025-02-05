@@ -40,6 +40,11 @@ const ProductSchema = new mongoose_1.Schema({
     description: { type: String },
     shortDescription: { type: String },
     category: { type: mongoose_1.Schema.Types.ObjectId, ref: "Category", required: true },
+    subcategory: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Subcategory",
+        default: null,
+    },
     price: { type: Number },
     unprice: { type: Number },
     stockStatus: { type: String },

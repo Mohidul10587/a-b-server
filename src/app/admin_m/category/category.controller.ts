@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Category from "./category.model";
 import { generateSlug } from "../../shared/generateSLug";
 
-export const createCategory = async (req: Request, res: Response) => {
+export const create = async (req: Request, res: Response) => {
   try {
     const newCategory = await Category.create({
       ...req.body,

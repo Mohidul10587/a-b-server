@@ -12,83 +12,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.updateBrand = exports.createBrand = void 0;
+exports.update = exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.singleWriterForWriterEditPage = exports.create = void 0;
 const writer_model_1 = __importDefault(require("./writer.model"));
-const uploadSingleFileToCloudinary_1 = require("../../shared/uploadSingleFileToCloudinary");
-const extractPublicKeyAndDelete_1 = require("../../shared/extractPublicKeyAndDelete");
-const createBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const files = req.files;
+const generateSLug_1 = require("../../shared/generateSLug");
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
-        const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
-        const photoUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(photoFile);
-        const metaImage = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(metaImageFile);
-        const tagsArray = req.body.tags.split(",").map((tag) => tag.trim());
-        const writer = new writer_model_1.default({
-            title: req.body.title,
-            slug: req.body.slug,
-            description: req.body.description,
-            photo: photoUrl,
-            metaTitle: req.body.metaTitle,
-            metaDescription: req.body.metaDescription,
-            tags: tagsArray,
-            metaImage: metaImage,
+        const newCategory = yield writer_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
+        // Send success message along with the created category data
+        res.status(201).json({
+            message: "Created successfully!",
+            respondedData: newCategory, // Optionally, include the created category in the response
         });
-        yield writer.save();
-        res.status(200).send({ writer });
     }
-    catch (err) {
-        res.status(500).send({ error: "Internal Server Error" });
+    catch (error) {
+        console.log(error);
+        // Send error message if there was an issue
+        res.status(500).json({
+            message: "Failed to create.",
+            error: error.message,
+        });
     }
 });
-exports.createBrand = createBrand;
-const updateBrand = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
-    const files = req.files;
-    console.log(req.body.previousPhoto);
+exports.create = create;
+// Get single
+const singleWriterForWriterEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const writer = yield writer_model_1.default.findById(req.params.id);
-        if (!writer) {
-            res.status(404).send({ error: "writer not found" });
-            return;
-        }
-        const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
-        const metaImageFile = (_b = files === null || files === void 0 ? void 0 : files.metaImage) === null || _b === void 0 ? void 0 : _b[0];
-        const photoUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(photoFile);
-        const metaImage = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(metaImageFile);
-        // Update writer fields with data from the request body
-        writer.title = req.body.title || writer.title;
-        writer.slug = req.body.slug || writer.slug;
-        writer.description = req.body.description || writer.description;
-        writer.rating = req.body.rating || writer.rating;
-        writer.metaTitle = req.body.metaTitle || writer.metaTitle;
-        writer.metaDescription = req.body.metaDescription || writer.metaDescription;
-        // Convert tags to an array if they are comma-separated
-        writer.tags = req.body.tags
-            ? req.body.tags.split(",").map((tag) => tag.trim())
-            : writer.tags;
-        // Update images if provided
-        if (photoUrl) {
-            writer.photo = photoUrl;
-            const publicKey = req.body.previousPhoto;
-            console.log("fisr", publicKey);
-            yield (0, extractPublicKeyAndDelete_1.extractPublicKeyAndDelete)(publicKey);
-        }
-        if (metaImage) {
-            writer.metaImage = metaImage;
-            const publicKey = req.body.previousMetaImage;
-            yield (0, extractPublicKeyAndDelete_1.extractPublicKeyAndDelete)(publicKey);
-        }
-        yield writer.save();
-        res.status(200).send({ writer });
+        const item = yield writer_model_1.default.findOne({ _id: req.params.id });
+        res.status(200).json({
+            message: "Fetched successfully!",
+            respondedData: item,
+        });
     }
-    catch (err) {
-        console.log(err);
-        res.status(500).send({ error: "Internal Server Error" });
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
     }
 });
-exports.updateBrand = updateBrand;
+exports.singleWriterForWriterEditPage = singleWriterForWriterEditPage;
 const getAllBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Fetch all brands
@@ -128,3 +91,30 @@ const getWriteById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getWriteById = getWriteById;
+// Update
+const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const updatedItem = yield writer_model_1.default.findByIdAndUpdate(id, Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }), {
+            new: true, // Return the updated document
+            runValidators: true, // Run validation on the updated data
+        });
+        if (!updatedItem) {
+            return res.status(404).json({
+                message: "Not found.",
+            });
+        }
+        res.status(200).json({
+            message: "Updated successfully!",
+            respondedData: updatedItem,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to update.",
+            error: error.message,
+        });
+    }
+});
+exports.update = update;

@@ -5,6 +5,7 @@ import Writer from "../admin_m/writer/writer.model";
 import Category from "../admin_m/category/category.model";
 import Publisher from "../admin_m/publishers/publishers.model";
 import { generateSlug } from "../shared/generateSLug";
+import path from "path";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -299,25 +300,21 @@ export const getProductsByCategorySlug = async (
   try {
     const category = await Category.findOne({ slug: slug })
       .select(
-        "_id title slug imgUrl metaTitle metaDescription description shortDescription tags"
+        "_id title slug img metaTitle metaDescription description shortDescription tags"
       )
+      .populate({
+        path: "subcategories",
+        select: "title",
+      })
       .lean();
 
     const categoryId = category?._id;
     const products = await Product.find({
       category: categoryId,
-    })
-      .select("_id img title featured sele price slug stockStatus")
-      .populate({
-        path: "writer",
-        model: "Writer",
-        select: "title  slug", // Include only the 'name' field of the brand
-      })
-      .populate({
-        path: "category",
-        model: "Category",
-        select: "title slug", // Include only the 'title' field of the category
-      });
+    }).select(
+      "_id img title featured sele price slug stockStatus writer publisher  subcategory language"
+    );
+
     const writers = await Writer.find().select("_id title slug img").lean();
 
     const reverseProducts = products.reverse();
