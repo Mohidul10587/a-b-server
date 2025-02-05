@@ -203,9 +203,7 @@ const getProductsByWriterSlug = (req, res) => __awaiter(void 0, void 0, void 0, 
     const slug = req.params.slug;
     try {
         const writer = yield writer_model_1.default.find({ slug });
-        const result = yield product_model_1.default.find({ writer })
-            .select("_id img title featured sele price slug category subcategory publisher language")
-            .populate("writer");
+        const result = yield product_model_1.default.find({ writer }).select("_id img title featured sele price slug category subcategory publisher language");
         const products = result.reverse();
         res.status(200).json(products);
     }
@@ -288,26 +286,24 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
     const slug = req.params.slug;
     try {
         const publisher = yield publishers_model_1.default.findOne({ slug: slug })
-            .select("_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags")
+            .select("_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags ")
             .lean();
         const publisherId = publisher === null || publisher === void 0 ? void 0 : publisher._id;
         const products = yield product_model_1.default.find({
             publisher: publisherId,
-        })
-            .select("_id img title category subcategory featured sele price slug stockStatus")
+        }).select("_id img title category subcategory writer  featured sele price slug stockStatus language ");
+        const writers = yield writer_model_1.default.find().select("title").lean();
+        const categories = yield category_model_1.default.find()
+            .select("title")
             .populate({
-            path: "writer",
-            model: "Writer",
-            select: "title  slug", // Include only the 'name' field of the brand
+            path: "subcategories",
+            select: "title",
         })
-            .populate({
-            path: "publisher",
-            model: "Publisher",
-            select: "title slug img", // Include only the 'title' field of the category
-        });
-        const writers = yield writer_model_1.default.find().select("_id title slug img").lean();
+            .lean();
         const reverseProducts = products.reverse();
-        res.status(200).json({ products: reverseProducts, writers, publisher });
+        res
+            .status(200)
+            .json({ products: reverseProducts, writers, publisher, categories });
     }
     catch (error) {
         console.log(error);
@@ -315,3 +311,4 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
     }
 });
 exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
+//new

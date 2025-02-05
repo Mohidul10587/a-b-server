@@ -173,17 +173,17 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
             else {
                 // Check by subcategory if no category products found
                 const subCategoryProducts = yield product_model_1.default.find({
-                    subCategory: element.productSectionId,
+                    subcategory: element.productSectionId,
                 }).select("_id title slug img price unprice stockStatus");
                 if (subCategoryProducts.length > 0) {
                     products = subCategoryProducts;
                 }
                 else {
                     // Fallback to brand if no category or subcategory products found
-                    const brandProducts = yield product_model_1.default.find({
-                        brand: element.productSectionId,
+                    const writerProducts = yield product_model_1.default.find({
+                        writer: element.productSectionId,
                     }).select("_id title slug img price unprice stockStatus");
-                    products = brandProducts;
+                    products = writerProducts;
                 }
             }
             // Return the latest 10 products

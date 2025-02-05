@@ -207,16 +207,16 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
       } else {
         // Check by subcategory if no category products found
         const subCategoryProducts = await Product.find({
-          subCategory: element.productSectionId,
+          subcategory: element.productSectionId,
         }).select("_id title slug img price unprice stockStatus");
         if (subCategoryProducts.length > 0) {
           products = subCategoryProducts;
         } else {
           // Fallback to brand if no category or subcategory products found
-          const brandProducts = await Product.find({
-            brand: element.productSectionId,
+          const writerProducts = await Product.find({
+            writer: element.productSectionId,
           }).select("_id title slug img price unprice stockStatus");
-          products = brandProducts;
+          products = writerProducts;
         }
       }
 

@@ -223,11 +223,9 @@ export const getProductsByWriterSlug = async (
 
   try {
     const writer = await Writer.find({ slug });
-    const result = await Product.find({ writer })
-      .select(
-        "_id img title featured sele price slug category subcategory publisher language"
-      )
-      .populate("writer");
+    const result = await Product.find({ writer }).select(
+      "_id img title featured sele price slug category subcategory publisher language"
+    );
 
     const products = result.reverse();
     res.status(200).json(products);
@@ -334,34 +332,35 @@ export const getProductsByPublishersSlug = async (
   try {
     const publisher = await Publisher.findOne({ slug: slug })
       .select(
-        "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags"
+        "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags "
       )
       .lean();
 
     const publisherId = publisher?._id;
     const products = await Product.find({
       publisher: publisherId,
-    })
-      .select(
-        "_id img title category subcategory featured sele price slug stockStatus"
-      )
+    }).select(
+      "_id img title category subcategory writer  featured sele price slug stockStatus language "
+    );
+
+    const writers = await Writer.find().select("title").lean();
+    const categories = await Category.find()
+      .select("title")
       .populate({
-        path: "writer",
-        model: "Writer",
-        select: "title  slug", // Include only the 'name' field of the brand
+        path: "subcategories",
+        select: "title",
       })
-      .populate({
-        path: "publisher",
-        model: "Publisher",
-        select: "title slug img", // Include only the 'title' field of the category
-      });
-    const writers = await Writer.find().select("_id title slug img").lean();
+      .lean();
 
     const reverseProducts = products.reverse();
 
-    res.status(200).json({ products: reverseProducts, writers, publisher });
+    res
+      .status(200)
+      .json({ products: reverseProducts, writers, publisher, categories });
   } catch (error: any) {
     console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
+
+//new
