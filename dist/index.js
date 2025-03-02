@@ -14,6 +14,7 @@ const writer_routes_1 = __importDefault(require("./app/admin_m/writer/writer.rou
 const product_routes_1 = __importDefault(require("./app/product/product.routes"));
 const category_routes_1 = __importDefault(require("./app/admin_m/category/category.routes"));
 const subcategory_routes_1 = __importDefault(require("./app/admin_m/subcategory/subcategory.routes"));
+const user_route_1 = __importDefault(require("./app/user/user.route"));
 const settings_routes_1 = __importDefault(require("./app/admin_m/settings/settings.routes"));
 const banner_routes_1 = __importDefault(require("./app/admin_m/banner/banner.routes"));
 const order_routes_1 = __importDefault(require("./app/admin_m/order/order.routes"));
@@ -62,6 +63,7 @@ app.use("/suggestion", suggestion_routes_1.default);
 app.use("/payment", payment_routes_1.default);
 app.use("/publishers", publishers_routes_1.default);
 app.use("/gallery", gallery_route_1.default);
+app.use("/user", user_route_1.default);
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

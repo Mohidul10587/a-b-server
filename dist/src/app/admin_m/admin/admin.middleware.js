@@ -14,32 +14,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const user_model_1 = __importDefault(require("./user.model"));
+const admin_model_1 = __importDefault(require("./admin.model"));
 // Load environment variables
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
-const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const { refreshToken } = req.cookies;
-    jsonwebtoken_1.default.verify(refreshToken, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
+const verifyToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { _ } = req.cookies;
+    jsonwebtoken_1.default.verify(_, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
             return res
                 .status(401)
                 .json({ success: false, message: "Failed to authenticate token" });
         }
         try {
-            const user = yield user_model_1.default.findById(decoded.userId);
+            const user = yield admin_model_1.default.findById(decoded.userId);
             if (!user) {
                 return res
                     .status(404)
                     .json({ success: false, message: "User not found" });
             }
-            if (user.isUser === false) {
-                return res
-                    .status(404)
-                    .json({ success: false, message: "User not allowed to log in" });
-            }
             // Attach user object to request for further usage
-            req.user = user;
+            req.admin = user;
             next();
         }
         catch (error) {
@@ -50,5 +45,5 @@ const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         }
     }));
 });
-exports.default = verifyUserToken;
+exports.default = verifyToken;
 // check

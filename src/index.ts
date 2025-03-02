@@ -9,7 +9,7 @@ import writerRoutes from "./app/admin_m/writer/writer.routes";
 import productRoutes from "./app/product/product.routes";
 import categoryRoutes from "./app/admin_m/category/category.routes";
 import subcategoryRoutes from "./app/admin_m/subcategory/subcategory.routes";
-
+import userRoutes from "./app/user/user.route";
 import settingsRoutes from "./app/admin_m/settings/settings.routes";
 import bannerRoutes from "./app/admin_m/banner/banner.routes";
 import orderRoutes from "./app/admin_m/order/order.routes";
@@ -73,7 +73,7 @@ app.use("/suggestion", suggestionRoutes);
 app.use("/payment", paymentRoutes);
 app.use("/publishers", publishersRoutes);
 app.use("/gallery", galleryRoutes);
-
+app.use("/user", userRoutes);
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

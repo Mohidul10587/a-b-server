@@ -18,7 +18,7 @@ const user_model_1 = __importDefault(require("./user.model"));
 // Load environment variables
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
-const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const verifySellerToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { refreshToken } = req.cookies;
     jsonwebtoken_1.default.verify(refreshToken, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
@@ -33,14 +33,11 @@ const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
                     .status(404)
                     .json({ success: false, message: "User not found" });
             }
-            if (user.isUser === false) {
-                return res
-                    .status(404)
-                    .json({ success: false, message: "User not allowed to log in" });
+            if (user.isSeller) {
+                req.user = user;
+                next();
             }
             // Attach user object to request for further usage
-            req.user = user;
-            next();
         }
         catch (error) {
             console.error(error);
@@ -50,5 +47,5 @@ const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, fu
         }
     }));
 });
-exports.default = verifyUserToken;
+exports.default = verifySellerToken;
 // check
