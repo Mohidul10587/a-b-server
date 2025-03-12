@@ -16,8 +16,8 @@ exports.registerAdmin = exports.createDefaultSettings = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const admin_model_1 = __importDefault(require("../admin_m/admin/admin.model"));
-const settings_model_1 = __importDefault(require("../admin_m/settings/settings.model"));
+const admin_model_1 = __importDefault(require("../admin/admin.model"));
+const settings_model_1 = __importDefault(require("../settings/settings.model"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const createDefaultSettings = () => __awaiter(void 0, void 0, void 0, function* () {

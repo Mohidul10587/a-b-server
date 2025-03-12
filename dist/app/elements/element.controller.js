@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePageElement = exports.updatePageElementStatus = exports.deletePageElementById = exports.getElementsByIdAndPage2 = exports.getElementsByIdAndPage = exports.getElementByIdForUpdate = exports.getElementById = exports.createPageElement = void 0;
+exports.updatePageElement = exports.updatePageElementStatus = exports.deletePageElementById = exports.getElementsByIdAndPage = exports.getElementByIdForUpdate = exports.getElementById = exports.createPageElement = void 0;
 const element_model_1 = require("./element.model"); // Your Mongoose model
 const cloudinary_config_1 = __importDefault(require("../shared/cloudinary.config"));
 const product_model_1 = __importDefault(require("../product/product.model"));
-const uploadToCloudinary_1 = require("../shared/uploadToCloudinary");
+const uplCloudinary_1 = require("../shared/uplCloudinary");
 // Helper function to upload images to Cloudinary using promises
 const uploadImageToCloudinary = (file) => {
     return new Promise((resolve, reject) => {
@@ -37,7 +37,7 @@ const uploadImageToCloudinary = (file) => {
     });
 };
 const createPageElement = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { targetedPageId, sectionTitle, link, status, subtitle, titleLink, titleAlignment, isTitle, desktopGrid, mobileGrid, margin, padding, titleBackgroundColor, sectionBackgroundColor, gridStyle, productStyle, postLimit, display, imagePosition, page, position, selectionType, bannerId, productSectionId, width, height, } = req.body;
+    const { targetedPageId, sectionTitle, link, status, subtitle, titleLink, titleAlignment, isTitle, desktopGrid, mobileGrid, margin, padding, titleBackgroundColor, boxText, sectionBackgroundColor, boxBg, gridStyle, productStyle, postLimit, display, imagePosition, page, position, selectionType, bannerId, productSectionId, width, height, suggestionId, } = req.body;
     try {
         // Handle uploaded images
         const uploadedImages = req.files;
@@ -64,6 +64,8 @@ const createPageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
             padding: parseInt(padding), // Convert string back to number
             titleBackgroundColor,
             sectionBackgroundColor,
+            boxText,
+            boxBg,
             gridStyle,
             productStyle,
             postLimit: parseInt(postLimit), // Convert string back to number
@@ -77,6 +79,7 @@ const createPageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
             images: imageUrls, // Store image URLs in the database
             width,
             height,
+            suggestionId: suggestionId ? suggestionId : null,
         });
         // Save the new PageElement to the database
         const savedPageElement = yield newPageElement.save();
@@ -142,7 +145,15 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
             targetedPageId: id,
             page: pageName,
             status: true,
-        }).populate("bannerId");
+        })
+            .populate("bannerId")
+            .populate({
+            path: "suggestionId",
+            populate: {
+                path: "products",
+                select: "_id title slug img price unprice stockStatus",
+            },
+        });
         // If no page elements are found, return a 404 error
         if (!pageElements.length) {
             return res
@@ -150,39 +161,39 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
                 .json({ message: "No PageElements found for the targeted page ID" });
         }
         // Helper function to find products based on category, subcategory, or brand
-        const findProducts = (element) => __awaiter(void 0, void 0, void 0, function* () {
+        const findProducts = (element, postLimit) => __awaiter(void 0, void 0, void 0, function* () {
             let products = [];
             // Check by category
             const categoryProducts = yield product_model_1.default.find({
                 category: element.productSectionId,
-            });
+            }).select("_id title slug img price unprice stockStatus");
             if (categoryProducts.length > 0) {
                 products = categoryProducts;
             }
             else {
                 // Check by subcategory if no category products found
                 const subCategoryProducts = yield product_model_1.default.find({
-                    subCategory: element.productSectionId,
-                });
+                    subcategory: element.productSectionId,
+                }).select("_id title slug img price unprice stockStatus");
                 if (subCategoryProducts.length > 0) {
                     products = subCategoryProducts;
                 }
                 else {
                     // Fallback to brand if no category or subcategory products found
-                    const brandProducts = yield product_model_1.default.find({
-                        brand: element.productSectionId,
-                    });
-                    products = brandProducts;
+                    const writerProducts = yield product_model_1.default.find({
+                        writer: element.productSectionId,
+                    }).select("_id title slug img price unprice stockStatus");
+                    products = writerProducts;
                 }
             }
             // Return the latest 10 products
-            return products.reverse().slice(0, 10);
+            return products.reverse().slice(0, postLimit);
         });
         // Initialize an array to store updated page elements with products
         const updatedPageElements = yield Promise.all(pageElements.map((element) => __awaiter(void 0, void 0, void 0, function* () {
             // Only process elements where selectionType is 'productSection'
             if (element.selectionType === "productSection") {
-                const productOfThisId = yield findProducts(element);
+                const productOfThisId = yield findProducts(element, element.postLimit);
                 // Return the updated element with the productOfThisId attached
                 return Object.assign(Object.assign({}, element.toObject()), { productOfThisId });
             }
@@ -192,7 +203,7 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
         const finalResponse = updatedPageElements.sort((a, b) => a.position - b.position);
         // Send the final response
         res.status(200).json({
-            message: `PageElements for targetedPageId ${id} fetched successfully`,
+            message: `PageElements for targeted Page Id: ${id} fetched successfully`,
             data: finalResponse,
         });
     }
@@ -203,75 +214,6 @@ const getElementsByIdAndPage = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.getElementsByIdAndPage = getElementsByIdAndPage;
-const getElementsByIdAndPage2 = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, pageName } = req.params;
-    try {
-        // Fetch all page elements for the targeted page ID and page name
-        const pageElements = yield element_model_1.PageElements.find({
-            targetedPageId: id,
-            page: pageName,
-            // status: "On",
-        }).populate("bannerId");
-        // If no page elements are found, return a 404 error
-        if (!pageElements.length) {
-            return res
-                .status(404)
-                .json({ message: "No PageElements found for the targeted page ID" });
-        }
-        // Helper function to find products based on category, subcategory, or brand
-        const findProducts = (element) => __awaiter(void 0, void 0, void 0, function* () {
-            let products = [];
-            // Check by category
-            const categoryProducts = yield product_model_1.default.find({
-                category: element.productSectionId,
-            });
-            if (categoryProducts.length > 0) {
-                products = categoryProducts;
-            }
-            else {
-                // Check by subcategory if no category products found
-                const subCategoryProducts = yield product_model_1.default.find({
-                    subCategory: element.productSectionId,
-                });
-                if (subCategoryProducts.length > 0) {
-                    products = subCategoryProducts;
-                }
-                else {
-                    // Fallback to brand if no category or subcategory products found
-                    const brandProducts = yield product_model_1.default.find({
-                        brand: element.productSectionId,
-                    });
-                    products = brandProducts;
-                }
-            }
-            // Return the latest 10 products
-            return products.reverse().slice(0, 10);
-        });
-        // Initialize an array to store updated page elements with products
-        const updatedPageElements = yield Promise.all(pageElements.map((element) => __awaiter(void 0, void 0, void 0, function* () {
-            // Only process elements where selectionType is 'productSection'
-            if (element.selectionType === "productSection") {
-                const productOfThisId = yield findProducts(element);
-                // Return the updated element with the productOfThisId attached
-                return Object.assign(Object.assign({}, element.toObject()), { productOfThisId });
-            }
-            return element.toObject(); // If selectionType isn't 'productSection', just return the element
-        })));
-        // Sort the updated elements by position
-        const finalResponse = updatedPageElements.sort((a, b) => a.position - b.position);
-        // Send the final response
-        res.status(200).json({
-            message: `PageElements for targetedPageId ${id} fetched successfully`,
-            data: finalResponse,
-        });
-    }
-    catch (error) {
-        res
-            .status(500)
-            .json({ message: "Error fetching PageElements", error: error.message });
-    }
-});
-exports.getElementsByIdAndPage2 = getElementsByIdAndPage2;
 // Delete a single PageElement by ID
 const deletePageElementById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
@@ -295,7 +237,6 @@ exports.deletePageElementById = deletePageElementById;
 const updatePageElementStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params; // Make sure the ID is being passed correctly
     const { status } = req.body;
-    console.log("This is status", status);
     try {
         const updatedPageElement = yield element_model_1.PageElements.findByIdAndUpdate(id, { status }, // Ensure 'status' is the correct field
         { new: true } // Return the updated document
@@ -319,9 +260,9 @@ exports.updatePageElementStatus = updatePageElementStatus;
 // Update Page Element
 const updatePageElement = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { elementId } = req.params;
-    console.log(elementId);
-    const { targetedPageId, sectionTitle, link, status, titleLink, titleAlignment, isTitle, desktopGrid, mobileGrid, margin, padding, titleBackgroundColor, sectionBackgroundColor, gridStyle, productStyle, postLimit, display, imagePosition, page, position, selectionType, bannerId, productSectionId, width, height, images, } = req.body;
+    const { targetedPageId, sectionTitle, link, status, titleLink, titleAlignment, isTitle, desktopGrid, mobileGrid, margin, padding, titleBackgroundColor, sectionBackgroundColor, boxText, boxBg, gridStyle, productStyle, postLimit, display, imagePosition, page, position, selectionType, bannerId, productSectionId, width, height, images, suggestionId, } = req.body;
     const parsedBannerId = bannerId === "null" ? null : bannerId;
+    const parsedSuggestionId = suggestionId === "null" ? null : suggestionId;
     const parsedImages = JSON.parse(images);
     try {
         // Find the existing PageElement by ID
@@ -337,8 +278,7 @@ const updatePageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
             // Upload images and collect secure URLs in the same order
             yield Promise.all(files.images.map((file, index) => __awaiter(void 0, void 0, void 0, function* () {
                 try {
-                    const result = yield (0, uploadToCloudinary_1.uploadToCloudinary)(file.buffer);
-                    console.log("This is the real url", result.secure_url);
+                    const result = yield (0, uplCloudinary_1.uploadToCloudinary)(file.buffer);
                     // Assign secure_url to the correct index
                     secureUrlArray[index] = result.secure_url;
                 }
@@ -347,7 +287,6 @@ const updatePageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
                     throw new Error("Error uploading image");
                 }
             })));
-            console.log("collected urls", secureUrlArray);
         }
         let urlIndex = 0; // To track which collected URL to use
         const Updated_Images_info = parsedImages.map((img) => {
@@ -381,6 +320,8 @@ const updatePageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
             titleBackgroundColor || pageElement.titleBackgroundColor;
         pageElement.sectionBackgroundColor =
             sectionBackgroundColor || pageElement.sectionBackgroundColor;
+        pageElement.boxText = boxText || pageElement.boxText;
+        pageElement.boxBg = boxBg || pageElement.boxBg;
         pageElement.gridStyle = gridStyle || pageElement.gridStyle;
         pageElement.productStyle = productStyle || pageElement.productStyle;
         pageElement.postLimit = postLimit
@@ -391,11 +332,24 @@ const updatePageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
         pageElement.page = page || pageElement.page;
         pageElement.position = position ? parseInt(position) : pageElement.position;
         pageElement.selectionType = selectionType || pageElement.selectionType;
-        pageElement.bannerId = parsedBannerId || pageElement.bannerId;
-        pageElement.productSectionId =
-            productSectionId || pageElement.productSectionId || null;
         pageElement.width = width || pageElement.width;
         pageElement.height = height || pageElement.height;
+        if (selectionType == "productSection") {
+            pageElement.productSectionId = productSectionId;
+            pageElement.suggestionId = null;
+            pageElement.bannerId = null;
+        }
+        else if (selectionType == "suggestionSection") {
+            pageElement.suggestionId = parsedSuggestionId;
+            pageElement.productSectionId = "";
+            pageElement.bannerId = null;
+        }
+        else {
+            pageElement.bannerId = parsedBannerId;
+            pageElement.productSectionId = "";
+            pageElement.suggestionId = null;
+        }
+        pageElement.productSectionId = productSectionId;
         // Only update images if new images are uploaded
         pageElement.images = Updated_Images_info;
         // Save the updated PageElement to the database

@@ -8,15 +8,14 @@ const element_controller_1 = require("./element.controller"); // Your controller
 const banner_routes_1 = require("../banner/banner.routes");
 const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
 const router = (0, express_1.Router)();
-const uploadFields = banner_routes_1.upload_c.fields([{ name: "images", maxCount: 10 }]);
+const uploadFields = banner_routes_1.upload_c.fields([{ name: "images", maxCount: 20 }]);
 // Route to handle form submission and image upload
 router.post("/create-page-element", admin_middleware_1.default, uploadFields, // 'images' is the field name for the file inputs, allowing up to 10 files
 element_controller_1.createPageElement);
 router.get("/elementByIdAndPage/:id/:pageName", element_controller_1.getElementsByIdAndPage);
-router.get("/elementByIdAndPage2/:id/:pageName", element_controller_1.getElementsByIdAndPage2);
 // Get PageElement by ID
 router.get("/singleElement/:id", element_controller_1.getElementById);
-router.get("/singleElementForUpdate/:id", admin_middleware_1.default, element_controller_1.getElementByIdForUpdate);
+router.get("/singleElementForUpdate/:id", element_controller_1.getElementByIdForUpdate);
 // Get all PageElements by page property
 router.patch("/updateStatus/:id", admin_middleware_1.default, element_controller_1.updatePageElementStatus);
 // Delete a single PageElement by ID

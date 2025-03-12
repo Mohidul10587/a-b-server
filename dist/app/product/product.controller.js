@@ -12,11 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.update = exports.create = void 0;
+exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.update = exports.create = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
-const writer_model_1 = __importDefault(require("../admin_m/writer/writer.model"));
-const category_model_1 = __importDefault(require("../admin_m/category/category.model"));
-const publishers_model_1 = __importDefault(require("../admin_m/publishers/publishers.model"));
+const writer_model_1 = __importDefault(require("../writer/writer.model"));
+const category_model_1 = __importDefault(require("../category/category.model"));
+const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -311,4 +311,40 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
     }
 });
 exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
+const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { type, mainId, variantId } = req.query;
+        console.log(type);
+        if (type == "main") {
+            const product = yield product_model_1.default.findOne({ _id: mainId });
+            res.status(200).json({
+                message: "Fetched successfully!",
+                respondedData: product === null || product === void 0 ? void 0 : product.existingQnt, // Optionally, include the created category in the response
+            });
+            return;
+        }
+        // if (type == "variant") {
+        //   const product = await Product.findOne(
+        //     {
+        //       _id: mainId,
+        //       "variantSectionInfo._id": variantId,
+        //     },
+        //     { "variantSectionInfo.$": 1 } // Returns only the matching variant section
+        //   );
+        //   res.status(200).json({
+        //     message: "Fetched successfully!",
+        //     respondedData: product?.variantSectionInfo[0].variantExistingQnt, // Optionally, include the created category in the response
+        //   });
+        //   return;
+        // }
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "Failed to Fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.getExistingQuantity = getExistingQuantity;
 //new

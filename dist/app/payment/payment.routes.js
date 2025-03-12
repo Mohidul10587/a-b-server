@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const axios_1 = __importDefault(require("axios"));
-const order_model_1 = __importDefault(require("../admin_m/order/order.model"));
+const order_model_1 = __importDefault(require("../order/order.model"));
 const router = express_1.default.Router();
 // Environment variables (use your real credentials in .env)
 const MERCHANT_ID = process.env.AMARPAY_MERCHANT_ID;

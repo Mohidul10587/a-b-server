@@ -15,13 +15,13 @@ exports.upload_c = (0, multer_1.default)({
     storage: storage,
     fileFilter: (req, file, cb) => {
         const ext = path_1.default.extname(file.originalname);
-        if (ext !== ".jpg" && ext !== ".jpeg" && ext !== ".png") {
+        if (ext !== ".jpg" && ext !== ".jpeg" && ext !== ".webp" && ext !== ".png") {
             return cb(new Error("Only images are allowed"));
         }
         cb(null, true);
     },
 });
-const uploadFields = exports.upload_c.fields([{ name: "bannerImages", maxCount: 10 }]);
+const uploadFields = exports.upload_c.fields([{ name: "bannerImages", maxCount: 20 }]);
 router.post("/create", admin_middleware_1.default, uploadFields, banner_controller_1.createBanner);
 router.get("/all", banner_controller_1.getAllBanners);
 router.get("/singleBanner/:id", banner_controller_1.getBannerById);

@@ -18,7 +18,9 @@ const pageElementsSchema = new mongoose_1.Schema({
     mobileGrid: { type: Number, default: 1 },
     margin: { type: Number, default: 0 },
     padding: { type: Number, default: 0 },
+    boxText: { type: String, default: "#ffffff" },
     titleBackgroundColor: { type: String, default: "#ffffff" },
+    boxBg: { type: String, default: "#ffffff" },
     sectionBackgroundColor: { type: String, default: "#ffffff" },
     gridStyle: { type: String, default: "1" },
     productStyle: { type: String, default: "1" },
@@ -30,13 +32,18 @@ const pageElementsSchema = new mongoose_1.Schema({
     },
     imagePosition: {
         type: String,
-        enum: ["left", "right", "top", "bottom"],
+        enum: ["left", "right", "center"],
         default: "left",
     },
     page: { type: String, required: true },
     position: { type: Number, required: true },
     selectionType: { type: String, required: true },
     bannerId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Banner", default: null }, // Reference to banner
+    suggestionId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Suggestion",
+        default: null,
+    }, // Reference to banner
     productSectionId: {
         type: String,
         required: false,

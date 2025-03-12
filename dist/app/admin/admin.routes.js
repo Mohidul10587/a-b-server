@@ -7,12 +7,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const admin_controller_1 = require("./admin.controller");
 const admin_middleware_1 = __importDefault(require("./admin.middleware"));
+const logOut_1 = require("../shared/logOut");
 const router = express_1.default.Router();
 router.post("/register", admin_controller_1.registerAdmin);
 router.post("/login", admin_controller_1.loginAdmin);
-router.post("/refresh-token", admin_controller_1.refreshToken);
+router.post("/logout", logOut_1.logOut);
 router.put("/update-password", admin_middleware_1.default, admin_controller_1.updatePassword);
 router.get("/check-admin", admin_middleware_1.default, admin_controller_1.checkAdmin); // Adding the checkAdmin route with verifyToken middleware
 router.get("/getOrdersCount", admin_controller_1.getCountsOfDocuments);
-router.put("/update-email", admin_middleware_1.default, admin_controller_1.updateAdminEmail);
 exports.default = router;

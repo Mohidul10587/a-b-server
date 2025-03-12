@@ -24,24 +24,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const CartItemSchema = new mongoose_1.Schema({
-    _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
-    type: { type: String, required: true },
-    photo: { type: String, required: true },
-    variantId: { type: String, required: true },
-    price: { type: Number, required: true },
-    title: { type: String },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
-    seller: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
-    quantity: { type: Number, required: true },
-    commissionForSeller: { type: Number, required: true },
-    isChecked: { type: Boolean, default: true },
+// Create Meta Schema
+const GallerySchema = new mongoose_1.Schema({
+    title: { type: String, required: true }, // Title is now required
+    img: { type: String, required: true }, // Image is now required
+    useCase: {
+        type: String,
+        enum: [
+            "product",
+            "category",
+            "subcategory",
+            "childCategory",
+            "brand",
+            "logo",
+            "banner",
+            "popup",
+            "others",
+        ],
+        required: true,
+        default: "others", // useCase is now required
+    },
+}, {
+    timestamps: true, // Automatically add createdAt and updatedAt
 });
-const CartSchema = new mongoose_1.Schema({
-    userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
-    cartItems: { type: [CartItemSchema], default: [] }, // Embedded array of cart items
-}, { timestamps: true } // Adds createdAt and updatedAt fields
-);
-const Cart = mongoose_1.default.model("Cart", CartSchema);
-exports.default = Cart;
+// Export the model
+const Gallery = mongoose_1.default.model("Gallery", GallerySchema);
+exports.default = Gallery;

@@ -54,21 +54,19 @@ const createOrUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.createOrUpdate = createOrUpdate;
 const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, cartItem } = req.body; // Accept a single cart item
+        const { userId, cartItem } = req.body;
         if (!userId || !cartItem || typeof cartItem !== "object") {
             return res.status(400).json({ message: "Invalid request data" });
         }
-        // Find the cart for the user
+        // Find or create the cart for the user
         let cart = yield cart_model_1.default.findOne({ userId });
         if (!cart) {
-            // Create a new cart if none exists
             cart = new cart_model_1.default({ userId, cartItems: [cartItem] });
         }
         else {
-            // Check if the item already exists in the cart
             const existingItemIndex = cart.cartItems.findIndex((item) => item.variantId === cartItem.variantId);
             if (existingItemIndex !== -1) {
-                // Update quantity if item already exists
+                // Increase quantity if item exists
                 cart.cartItems[existingItemIndex].quantity += cartItem.quantity;
             }
             else {
@@ -76,7 +74,7 @@ const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, func
                 cart.cartItems.push(cartItem);
             }
         }
-        // Save the updated cart
+        // Save the cart
         yield cart.save();
         res.status(200).json({ message: "Item added to cart successfully", cart });
     }

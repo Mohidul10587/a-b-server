@@ -5,11 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const product_controller_1 = require("./product.controller");
-const admin_middleware_1 = __importDefault(require("../admin_m/admin/admin.middleware"));
+const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
 const router = express_1.default.Router();
 router.post("/create", product_controller_1.create);
 // // Route for getting all products
 router.get("/all", product_controller_1.getAllProducts);
+router.get("/getExistingQuantity", product_controller_1.getExistingQuantity);
 // // Route for getting all products
 router.get("/allForAdmin", product_controller_1.getAllProductsForAdmin);
 router.get("/getAllProductsForOfferPage", product_controller_1.getAllProductsForOfferPage);

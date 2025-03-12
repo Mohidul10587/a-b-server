@@ -1,18 +1,51 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = require("mongoose");
-const checkoutSchema = new mongoose_1.Schema({
-    name: { type: String, required: true },
-    address: { type: String, required: true },
-    location: { type: String, required: true },
-    phoneNumber: { type: String, required: true },
-    product: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
-    shippingCost: { type: Number, required: true },
-    selectedShipping: { type: String, required: true },
-    selectedDeliveryOption: { type: String, required: true },
-    status: { type: String, required: true },
-    totalPrice: { type: Number, required: true },
-}, { timestamps: true } // Enable timestamps
-);
-const Order = (0, mongoose_1.model)("Order", checkoutSchema);
+// models/Order.ts
+const mongoose_1 = __importStar(require("mongoose"));
+const OrderSchema = new mongoose_1.Schema({
+    cart: [
+        {
+            id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
+            priceWhenSubmitOrder: { type: Number, required: true },
+            quantity: { type: Number, required: true },
+        },
+    ],
+    deliveryInfo: {
+        name: { type: String, required: true },
+        email: { type: String, required: true },
+        address: { type: String, required: true },
+        city: { type: String, required: true },
+        postalCode: { type: String, required: true },
+        phone: { type: String, required: true },
+    },
+    paidAmount: { type: Number, required: true },
+    paymentMethod: { type: String, required: true },
+    paymentStatus: { type: Boolean, default: false },
+    paymentTnxId: { type: String, required: true },
+    status: { type: String, default: "Pending" },
+}, { timestamps: true });
+const Order = mongoose_1.default.model("Order", OrderSchema);
 exports.default = Order;

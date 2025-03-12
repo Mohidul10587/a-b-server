@@ -30,10 +30,16 @@ const settingsSchema = new mongoose_1.Schema({
     order: String,
     orderText: String,
     metaDescription: String,
-    description: String, // Added field
+    description: String,
     privacyPolicies: String,
-    termsAndConditions: String, // Added field
-    otherPolicies: String, // Added field
+    termsAndConditions: String,
+    otherPolicies: String,
+    sellerDefaultStatus: Boolean,
+    tags: {
+        type: [String],
+        default: [],
+    },
+    phone: String,
 });
 const Settings = (0, mongoose_1.model)("Settings", settingsSchema);
 exports.default = Settings;
