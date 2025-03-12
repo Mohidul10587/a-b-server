@@ -1,10 +1,9 @@
 import { Request, Response } from "express";
 import { PageElements } from "./element.model"; // Your Mongoose model
-import cloudinary from "../../shared/cloudinary.config";
-import Product from "../../product/product.model";
-import { uploadToCloudinary } from "../../shared/uplCloudinary";
-import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
-import { extractPublicKeyAndDelete } from "../../shared/extractPublicKeyAndDelete";
+import cloudinary from "../shared/cloudinary.config";
+import Product from "../product/product.model";
+import { uploadToCloudinary } from "../shared/uplCloudinary";
+
 // Helper function to upload images to Cloudinary using promises
 
 const uploadImageToCloudinary = (

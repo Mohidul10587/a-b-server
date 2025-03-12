@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
 import axios from "axios";
-import Order from "../admin_m/order/order.model";
+import Order from "../order/order.model";
 
 const router = express.Router();
 

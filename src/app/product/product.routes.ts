@@ -12,8 +12,9 @@ import {
   getProductsByWriterSlug,
   getProductsByCategorySlug,
   getProductsByPublishersSlug,
+  getExistingQuantity,
 } from "./product.controller";
-import verifyToken from "../admin_m/admin/admin.middleware";
+import verifyToken from "../admin/admin.middleware";
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.post("/create", create);
 
 // // Route for getting all products
 router.get("/all", getAllProducts);
-
+router.get("/getExistingQuantity", getExistingQuantity);
 // // Route for getting all products
 router.get("/allForAdmin", getAllProductsForAdmin);
 

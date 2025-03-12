@@ -4,20 +4,20 @@ import mongoose from "mongoose"; // Import Mongoose
 import cors from "cors";
 import bodyParser from "body-parser"; // Import body-parser
 import cookieParser from "cookie-parser";
-import adminRoutes from "./app/admin_m/admin/admin.routes";
-import writerRoutes from "./app/admin_m/writer/writer.routes";
+import adminRoutes from "./app/admin/admin.routes";
+import writerRoutes from "./app/writer/writer.routes";
 import productRoutes from "./app/product/product.routes";
-import categoryRoutes from "./app/admin_m/category/category.routes";
-import subcategoryRoutes from "./app/admin_m/subcategory/subcategory.routes";
+import categoryRoutes from "./app/category/category.routes";
+import subcategoryRoutes from "./app/subcategory/subcategory.routes";
 import userRoutes from "./app/user/user.route";
-import settingsRoutes from "./app/admin_m/settings/settings.routes";
-import bannerRoutes from "./app/admin_m/banner/banner.routes";
-import orderRoutes from "./app/admin_m/order/order.routes";
-import elementsRoutes from "./app/admin_m/elements/element.routes";
-import suggestionRoutes from "./app/admin_m/suggestion/suggestion.routes";
+import settingsRoutes from "./app/settings/settings.routes";
+import bannerRoutes from "./app/banner/banner.routes";
+import orderRoutes from "./app/order/order.routes";
+import elementsRoutes from "./app/elements/element.routes";
+import suggestionRoutes from "./app/suggestion/suggestion.routes";
 import paymentRoutes from "./app/payment/payment.routes";
-import publishersRoutes from "./app/admin_m/publishers/publishers.routes";
-import galleryRoutes from "./app/admin_m/gallery/gallery.route";
+import publishersRoutes from "./app/publishers/publishers.routes";
+import galleryRoutes from "./app/gallery/gallery.route";
 import {
   createDefaultSettings,
   registerAdmin,

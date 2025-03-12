@@ -8,7 +8,7 @@ import {
   updateDefaultSellerStatus,
 } from "./settings.controller";
 import verifyToken from "../admin/admin.middleware";
-import upload from "../../shared/multer";
+import upload from "../shared/multer";
 
 const router = Router();
 

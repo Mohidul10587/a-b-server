@@ -10,6 +10,7 @@ export interface IProduct extends Document {
   subcategory: Schema.Types.ObjectId;
   price: number;
   unprice: number;
+  existingQnt: number;
   stockStatus: string;
   writer: Schema.Types.ObjectId;
   suggestion: Schema.Types.ObjectId | null;
@@ -53,6 +54,7 @@ const ProductSchema = new Schema<IProduct>(
 
     price: { type: Number },
     unprice: { type: Number },
+    existingQnt: { type: Number, default: 100 },
     stockStatus: { type: String },
     writer: { type: Schema.Types.ObjectId, ref: "Writer", required: true },
     youtubeVideo: { type: String, default: "" },

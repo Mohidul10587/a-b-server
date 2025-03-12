@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Category from "./category.model";
-import { generateSlug } from "../../shared/generateSLug";
+import { generateSlug } from "../shared/generateSLug";
 
 export const create = async (req: Request, res: Response) => {
   try {

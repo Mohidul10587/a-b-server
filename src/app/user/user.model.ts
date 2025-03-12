@@ -11,7 +11,6 @@ export interface IUser extends Document {
   isSeller: boolean;
   isUser: boolean;
   oneClickPayStartedAt: string;
-  sellerId: Schema.Types.ObjectId | null;
   coins: number;
   coinsTakingDate: string;
   toDaysCoins: number;
@@ -47,7 +46,7 @@ const UserSchema = new Schema<IUser>(
     slug: { type: String, unique: true },
     phone: { type: String, default: null },
     email: { type: String, unique: true, required: true },
-    password: { type: String },
+    password: { type: String, default: "a" },
     image: { type: String, default: "" },
     isSeller: { type: Boolean, required: true },
     isUser: { type: Boolean, default: true },
@@ -55,7 +54,6 @@ const UserSchema = new Schema<IUser>(
     coins: { type: Number, default: 0 },
     toDaysCoins: { type: Number, default: 0 },
     coinsTakingDate: { type: String, default: "" },
-    sellerId: { type: Schema.Types.ObjectId, ref: "Seller", default: null },
     companyName: { type: String, default: "" },
     companyEmail: { type: String, default: "" },
     country: { type: String, default: "" },
@@ -83,7 +81,7 @@ const UserSchema = new Schema<IUser>(
   },
   { timestamps: true }
 );
-
+UserSchema.index({ email: 1 });
 // Middleware to make the slug unique if it's already taken
 UserSchema.pre("save", async function (next) {
   const doc = this as unknown as IUser;

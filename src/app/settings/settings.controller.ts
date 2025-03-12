@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import cloudinary from "../../shared/cloudinary.config";
+import cloudinary from "../shared/cloudinary.config";
 import Settings from "./settings.model";
 
 const uploadToCloudinary = (file: Express.Multer.File) => {
@@ -24,7 +24,7 @@ export const getSettings = async (
       res.status(404).json({ message: "Settings not found" });
       return;
     }
-    res.status(200).json(settings);
+    res.status(200).json({ respondedData: settings });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }

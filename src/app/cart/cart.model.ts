@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, ObjectId } from "mongoose";
 
 interface ICartItem {
   _id: ObjectId;
+  type: string;
   photo: string;
   variantId: string;
   price: number;
@@ -21,6 +22,7 @@ interface ICart extends Document {
 
 const CartItemSchema = new Schema<ICartItem>({
   _id: { type: Schema.Types.ObjectId, ref: "Product" },
+  type: { type: String, required: true },
   photo: { type: String, required: true },
   variantId: { type: String, required: true },
   price: { type: Number, required: true },
@@ -30,7 +32,7 @@ const CartItemSchema = new Schema<ICartItem>({
   seller: { type: Schema.Types.ObjectId, ref: "User" },
   quantity: { type: Number, required: true },
   commissionForSeller: { type: Number, required: true },
-  isChecked: { type: Boolean, required: true },
+  isChecked: { type: Boolean, default: true },
 });
 
 const CartSchema = new Schema<ICart>(

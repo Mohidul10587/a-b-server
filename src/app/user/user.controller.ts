@@ -3,11 +3,10 @@ import User, { IUser } from "./user.model";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
-import { extractPublicKeyAndDelete } from "../shared/extractPublicKeyAndDelete";
-// import Seller, { ISeller } from "../seller/seller.model";
-import Order from "../admin_m/order/order.model";
-import Settings from "../admin_m/settings/settings.model";
+
+import Order from "../order/order.model";
+import Settings from "../settings/settings.model";
+
 declare module "express" {
   interface Request {
     user?: IUser; // Adjust the type based on your User model
@@ -20,15 +19,15 @@ const JWT_SECRET = process.env.JWT_SECRET as string;
 // Create a new user with Google login
 export const createUser = async (req: Request, res: Response) => {
   const { name, email, slug, image } = req.body;
-  // const sellerDefaultStatus = (await Settings.findOne())?.sellerDefaultStatus;
+  const sellerDefaultStatus = (await Settings.findOne())?.sellerDefaultStatus;
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      setRefreshTokenCookie(res, existingUser);
-
+      const token = setRefreshTokenCookie(res, existingUser);
       return res.status(200).json({
         success: true,
         user: existingUser,
+        token: token,
         message: "User already existed",
       });
     }
@@ -36,16 +35,18 @@ export const createUser = async (req: Request, res: Response) => {
     const newUser = await User.create({
       name,
       email,
-      isSeller: false,
+      isSeller: sellerDefaultStatus,
       slug: slug ?? "my-slug",
       image,
     });
 
-    setRefreshTokenCookie(res, newUser);
+    const token = setRefreshTokenCookie(res, newUser);
 
     return res.status(200).json({
       success: true,
       user: newUser,
+      token: token,
+
       message: "User created successfully",
     });
   } catch (error) {
@@ -124,11 +125,12 @@ export const logInWithEmailPassword = async (req: Request, res: Response) => {
         message: "User not allowed to log in",
       });
     }
-    setRefreshTokenCookie(res, user);
+    const token = setRefreshTokenCookie(res, user);
 
     return res.status(200).json({
       success: true,
       user,
+      token,
       message: "User authenticated successfully",
     });
   } catch (error) {
@@ -204,7 +206,7 @@ export const getSingleUserBySlug = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ slug: userSlug }).populate("sellerId");
+    const user = await User.findOne({ slug: userSlug });
 
     if (!user) {
       return res.status(404).json({
@@ -285,10 +287,7 @@ export const getContactInfoOfSingleUserBySlug = async (
       });
     }
 
-    const user = await User.findOne({ slug: userSlug }).populate({
-      path: "sellerId",
-      model: "Seller",
-    });
+    const user = await User.findOne({ slug: userSlug });
 
     if (!user) {
       return res.status(404).json({
@@ -362,20 +361,13 @@ export const updateUser = async (req: Request, res: Response) => {
 
     // Upload image if provided
 
-    const photoUrl = await cloudinaryUpload(photoFile);
-
-    if (photoUrl) {
-      if (previousPhoto && isFromGoogleSite(previousPhoto) === false) {
-        await extractPublicKeyAndDelete(previousPhoto);
-      }
-    }
     // Build the update object dynamically
     const updateData: any = {
       name,
       email,
       phone,
       address,
-      image: photoUrl || photo,
+      image: photo,
     };
 
     if (password) {
@@ -448,6 +440,8 @@ const setRefreshTokenCookie = (res: Response, user: any): string => {
     JWT_SECRET,
     { expiresIn: "10d" } // Adjust expiration as needed
   );
+  console.log("This is refresh token", refreshToken);
+  console.log("This is refresh token", user);
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
@@ -459,18 +453,6 @@ const setRefreshTokenCookie = (res: Response, user: any): string => {
   return refreshToken;
 };
 
-function isFromGoogleSite(url: string) {
-  try {
-    // Create a new URL object
-    const parsedUrl = new URL(url);
-
-    // Check if the hostname ends with 'googleusercontent.com' (common for Google-hosted content)
-    return parsedUrl.hostname.endsWith("googleusercontent.com");
-  } catch (error) {
-    // If the URL is invalid, return false
-    return false;
-  }
-}
 // Get a single order by ID
 export const getOrdersByUserId = async (
   req: Request,
@@ -555,5 +537,24 @@ export const addCoins = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error adding coins:", error);
     res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getAuthenticatedUser = async (req: Request, res: Response) => {
+  try {
+    const email = req.query.email;
+    const item = await User.findOne({ email: email });
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: item,
+    });
+  } catch (error: any) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
   }
 };

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import Subcategory from "./subcategory.model";
 import Category from "../category/category.model";
-import { convertToArray } from "../../shared/convertToArray";
-import { generateSlug } from "../../shared/generateSLug";
+import { convertToArray } from "../shared/convertToArray";
+import { generateSlug } from "../shared/generateSLug";
 
 export const createSubcategory = async (req: Request, res: Response) => {
   try {

@@ -5,11 +5,11 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 import dotenv from "dotenv";
-import ApiResponse from "../../shared/response.type";
+import ApiResponse from "../shared/response.type";
 
 import Category from "../category/category.model";
 
-import { setRefreshTokenCookie } from "../../shared/setToken";
+import { setRefreshTokenCookie } from "../shared/setToken";
 
 // Load environment variables
 // Define color codes

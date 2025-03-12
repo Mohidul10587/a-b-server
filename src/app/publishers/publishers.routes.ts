@@ -1,6 +1,4 @@
 import { Router } from "express";
-
-import multer from "multer";
 import {
   createPublisher,
   deletePublisher,
@@ -13,7 +11,7 @@ import {
   allPublisherForFiltering,
 } from "./publishers.controller";
 
-import { uploadMiddleware } from "../../shared/uploadSingleFileToCloudinary";
+import { uploadMiddleware } from "../shared/uploadSingleFileToCloudinary";
 import verifyToken from "../admin/admin.middleware";
 
 const router = Router();

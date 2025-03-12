@@ -2,8 +2,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
-import Admin, { IAdmin } from "../admin_m/admin/admin.model";
-import Settings from "../admin_m/settings/settings.model";
+import Admin, { IAdmin } from "../admin/admin.model";
+import Settings from "../settings/settings.model";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 export const createDefaultSettings = async (): Promise<void> => {

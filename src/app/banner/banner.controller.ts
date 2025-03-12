@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import cloudinary from "../../shared/cloudinary.config";
+
 import Banner from "./banner.model"; // Ensure the correct path to the model
-import { uploadToCloudinary } from "../../shared/uplCloudinary";
-import { cloudinaryUpload } from "../../shared/uploadSingleFileToCloudinary";
-import { extractPublicKeyAndDelete } from "../../shared/extractPublicKeyAndDelete";
+import { uploadToCloudinary } from "../shared/uplCloudinary";
+
 export const createBanner = async (req: Request, res: Response) => {
   try {
     const { title, bannersInfo } = req.body;

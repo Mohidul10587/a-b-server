@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
 import User from "./user.model";
-import Settings from "../admin_m/settings/settings.model";
 
 // Load environment variables
 dotenv.config();

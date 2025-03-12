@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Cart from "./cart.model";
+import Product from "../product/product.model";
 export const createOrUpdate = async (req: Request, res: Response) => {
   try {
     const { userId, cartItems } = req.body;
@@ -48,26 +49,24 @@ export const createOrUpdate = async (req: Request, res: Response) => {
 
 export const addSingleItemToCart = async (req: Request, res: Response) => {
   try {
-    const { userId, cartItem } = req.body; // Accept a single cart item
+    const { userId, cartItem } = req.body;
 
     if (!userId || !cartItem || typeof cartItem !== "object") {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
-    // Find the cart for the user
+    // Find or create the cart for the user
     let cart = await Cart.findOne({ userId });
 
     if (!cart) {
-      // Create a new cart if none exists
       cart = new Cart({ userId, cartItems: [cartItem] });
     } else {
-      // Check if the item already exists in the cart
       const existingItemIndex = cart.cartItems.findIndex(
         (item) => item.variantId === cartItem.variantId
       );
 
       if (existingItemIndex !== -1) {
-        // Update quantity if item already exists
+        // Increase quantity if item exists
         cart.cartItems[existingItemIndex].quantity += cartItem.quantity;
       } else {
         // Add new item to cart
@@ -75,8 +74,9 @@ export const addSingleItemToCart = async (req: Request, res: Response) => {
       }
     }
 
-    // Save the updated cart
+    // Save the cart
     await cart.save();
+
     res.status(200).json({ message: "Item added to cart successfully", cart });
   } catch (error) {
     console.error(error);

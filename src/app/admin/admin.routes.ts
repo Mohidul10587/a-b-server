@@ -9,7 +9,7 @@ import {
   updateAdminEmail,
 } from "./admin.controller";
 import verifyToken from "./admin.middleware";
-import { logOut } from "../../shared/logOut";
+import { logOut } from "../shared/logOut";
 
 const router = express.Router();
 

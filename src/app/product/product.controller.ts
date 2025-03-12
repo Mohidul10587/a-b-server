@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import Product from "./product.model";
 import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
-import Writer from "../admin_m/writer/writer.model";
-import Category from "../admin_m/category/category.model";
-import Publisher from "../admin_m/publishers/publishers.model";
+import Writer from "../writer/writer.model";
+import Category from "../category/category.model";
+import Publisher from "../publishers/publishers.model";
 import { generateSlug } from "../shared/generateSLug";
 import path from "path";
 
@@ -353,7 +353,6 @@ export const getProductsByPublishersSlug = async (
       .lean();
 
     const reverseProducts = products.reverse();
-
     res
       .status(200)
       .json({ products: reverseProducts, writers, publisher, categories });
@@ -363,4 +362,40 @@ export const getProductsByPublishersSlug = async (
   }
 };
 
+export const getExistingQuantity = async (req: Request, res: Response) => {
+  try {
+    const { type, mainId, variantId } = req.query;
+    console.log(type);
+
+    if (type == "main") {
+      const product = await Product.findOne({ _id: mainId });
+      res.status(200).json({
+        message: "Fetched successfully!",
+        respondedData: product?.existingQnt, // Optionally, include the created category in the response
+      });
+      return;
+    }
+    // if (type == "variant") {
+    //   const product = await Product.findOne(
+    //     {
+    //       _id: mainId,
+    //       "variantSectionInfo._id": variantId,
+    //     },
+    //     { "variantSectionInfo.$": 1 } // Returns only the matching variant section
+    //   );
+
+    //   res.status(200).json({
+    //     message: "Fetched successfully!",
+    //     respondedData: product?.variantSectionInfo[0].variantExistingQnt, // Optionally, include the created category in the response
+    //   });
+    //   return;
+    // }
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json({
+      message: "Failed to Fetch.",
+      error: error.message,
+    });
+  }
+};
 //new
