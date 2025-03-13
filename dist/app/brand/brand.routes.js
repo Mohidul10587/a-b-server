@@ -18,7 +18,7 @@ const upload = (0, multer_1.default)({
   fileFilter: (req, file, cb) => {
     let ext = path_1.default.extname(file.originalname);
     if (ext !== ".jpg" && ext !== ".jpeg" && ext !== ".png") {
-      console.log("Not a valid image");
+      
       return;
     }
     cb(null, true);

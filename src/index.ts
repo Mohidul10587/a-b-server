@@ -39,7 +39,7 @@ const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
-  console.log("Connected to MongoDB");
+  
   registerAdmin("Admin", "admin@gmail.com", "admin123", "image");
   createDefaultSettings();
 });
@@ -78,5 +78,5 @@ app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
 
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  
 });

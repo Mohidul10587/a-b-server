@@ -79,7 +79,7 @@ const create = (req, res) =>
         respondedData: newProduct, // Optionally, include the created product in the response
       });
     } catch (error) {
-      console.log(error);
+      
       // Send error message if there was an issue
       res.status(500).json({
         message: "Failed to create.",

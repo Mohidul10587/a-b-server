@@ -68,7 +68,7 @@ const createWriter = (req, res) =>
         throw new Error("No file provided");
       }
     } catch (err) {
-      console.log(err);
+      
       res.status(500).send({ error: "Internal Server Error" });
     }
   });
@@ -79,7 +79,7 @@ const getAllWriters = (req, res) =>
       const brands = yield brand_model_1.default.find();
       res.status(200).send({ brands });
     } catch (err) {
-      console.log(err);
+      
       res.status(500).send({ error: "Internal Server Error" });
     }
   });
@@ -94,7 +94,7 @@ const getWriterById = (req, res) =>
       }
       res.status(200).send({ brand });
     } catch (err) {
-      console.log(err);
+      
       res.status(500).send({ error: "Internal Server Error" });
     }
   });
@@ -117,7 +117,7 @@ const updateWriter = (req, res) =>
       yield brand.save();
       res.status(200).send({ brand });
     } catch (err) {
-      console.log(err);
+      
       res.status(500).send({ error: "Internal Server Error" });
     }
   });
@@ -134,7 +134,7 @@ const deleteWriter = (req, res) =>
       }
       res.status(200).send({ message: "Writer deleted successfully" });
     } catch (err) {
-      console.log(err);
+      
       res.status(500).send({ error: "Internal Server Error" });
     }
   });

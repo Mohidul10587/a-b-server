@@ -362,10 +362,10 @@ export const getProductsByPublishersSlug = async (
 export const getExistingQuantity = async (req: Request, res: Response) => {
   try {
     const { type, mainId, variantId } = req.query;
-    console.log(mainId);
+    
     if (type == "main") {
       const product = await Product.findOne({ _id: mainId });
-      console.log("This is product", product);
+      
       res.status(200).json({
         message: "Fetched successfully!",
         respondedData: product?.existingQnt, // Optionally, include the created category in the response

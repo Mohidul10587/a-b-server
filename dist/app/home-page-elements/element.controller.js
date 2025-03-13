@@ -47,7 +47,7 @@ const createPageElement = (req, res) => __awaiter(void 0, void 0, void 0, functi
             const imageUrl = yield uploadImageToCloudinary(file); // Await the upload and get the URL
             imageUrls.push(imageUrl); // Push the image URL to the array
         }
-        console.log(imageUrls);
+        
         // Create a new PageElement with the form data and image URLs
         const newPageElement = new element_model_1.HomePageElements({
             sectionTitle,

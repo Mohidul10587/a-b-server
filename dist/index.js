@@ -34,7 +34,6 @@ mongoose_1.default.connect(mongoUri);
 const db = mongoose_1.default.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
-    console.log("Connected to MongoDB");
     (0, defaultInsertion_1.registerAdmin)("Admin", "admin@gmail.com", "admin123", "image");
     (0, defaultInsertion_1.createDefaultSettings)();
 });
@@ -67,5 +66,4 @@ app.use("/gallery", gallery_route_1.default);
 app.use("/user", user_route_1.default);
 app.use("/cart", cart_routes_1.default);
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
 });

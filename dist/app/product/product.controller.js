@@ -312,10 +312,8 @@ exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
 const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { type, mainId, variantId } = req.query;
-        console.log(mainId);
         if (type == "main") {
             const product = yield product_model_1.default.findOne({ _id: mainId });
-            console.log("This is product", product);
             res.status(200).json({
                 message: "Fetched successfully!",
                 respondedData: product === null || product === void 0 ? void 0 : product.existingQnt, // Optionally, include the created category in the response
