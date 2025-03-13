@@ -12,7 +12,7 @@ import verifyUserToken from "../user/user.middleware";
 
 const router = express.Router();
 
-router.post("/create", verifyUserToken, createOrUpdate);
+router.post("/create", createOrUpdate);
 router.post("/addSingleItemToCart", addSingleItemToCart);
 router.post(
   "/updateProductQuantityInDataBase",
@@ -20,7 +20,8 @@ router.post(
   updateProductQuantityInDataBase
 );
 
-router.get("/getUserCart/:userId", verifyUserToken, getUserCart);
+router.get("/getUserCart/:userId", getUserCart);
+
 router.delete("/removeItemFromCart", verifyUserToken, removeItemFromCart);
 router.patch("/update-isChecked", verifyUserToken, updateIsChecked);
 export default router;

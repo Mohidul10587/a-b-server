@@ -15,8 +15,6 @@ export const create = async (req: Request, res: Response) => {
       respondedData: newCategory, // Optionally, include the created category in the response
     });
   } catch (error: any) {
-    console.log(error);
-
     // Send error message if there was an issue
     res.status(500).json({
       message: "Failed to create.",

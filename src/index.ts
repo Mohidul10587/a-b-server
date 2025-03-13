@@ -18,6 +18,8 @@ import suggestionRoutes from "./app/suggestion/suggestion.routes";
 import paymentRoutes from "./app/payment/payment.routes";
 import publishersRoutes from "./app/publishers/publishers.routes";
 import galleryRoutes from "./app/gallery/gallery.route";
+import cartRoutes from "./app/cart/cart.routes";
+
 import {
   createDefaultSettings,
   registerAdmin,
@@ -64,7 +66,6 @@ app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes);
 app.use("/subcategory", subcategoryRoutes);
-
 app.use("/settings", settingsRoutes);
 app.use("/banner", bannerRoutes);
 app.use("/order", orderRoutes);
@@ -74,6 +75,8 @@ app.use("/payment", paymentRoutes);
 app.use("/publishers", publishersRoutes);
 app.use("/gallery", galleryRoutes);
 app.use("/user", userRoutes);
+app.use("/cart", cartRoutes);
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
 });

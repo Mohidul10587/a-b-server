@@ -10,7 +10,7 @@ export const createSubcategory = async (req: Request, res: Response) => {
 
     // Split titles into an array
     const titlesArray = convertToArray(title);
-    console.log(titlesArray);
+
     // Initialize an array to store new subcategory IDs
     const createdItems = [];
 
@@ -34,7 +34,6 @@ export const createSubcategory = async (req: Request, res: Response) => {
     );
 
     if (!updatedCategory) {
-      console.log("Parent category not found.");
       return res.status(404).json({ message: "Parent category not found." });
     }
 

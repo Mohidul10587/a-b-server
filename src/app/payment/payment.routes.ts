@@ -57,7 +57,6 @@ router.post("/success/:transactionId", async (req: Request, res: Response) => {
       { $set: { paymentStatus: true } },
       { new: true }
     );
-    console.log(result);
 
     res.redirect(`${clientSideUrl}/success/${transactionId}`);
   } catch (error) {

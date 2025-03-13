@@ -39,7 +39,7 @@ export const update = async (req: Request, res: Response) => {
     res.status(200).send({ result, message: "Updated successfully" });
   } catch (error) {
     console.error(error);
-    console.log(error);
+
     res.status(500).json({ success: false, message: "Error updating", error });
   }
 };

@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 
 import Order from "../order/order.model";
 import Settings from "../settings/settings.model";
+import Cart from "../cart/cart.model";
 
 declare module "express" {
   interface Request {
@@ -440,8 +441,6 @@ const setRefreshTokenCookie = (res: Response, user: any): string => {
     JWT_SECRET,
     { expiresIn: "10d" } // Adjust expiration as needed
   );
-  console.log("This is refresh token", refreshToken);
-  console.log("This is refresh token", user);
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
@@ -542,12 +541,18 @@ export const addCoins = async (req: Request, res: Response) => {
 
 export const getAuthenticatedUser = async (req: Request, res: Response) => {
   try {
-    const email = req.query.email;
-    const item = await User.findOne({ email: email });
+    const { id } = req.query;
+    const item = await User.findOne({ _id: id });
+    const cart = await Cart.findOne({ userId: id });
+    const cartProductQuantity = cart?.cartItems.reduce(
+      (total: number, item: any) => total + item.quantity,
+      0
+    );
 
     res.status(200).json({
       message: "Fetched successfully!",
       respondedData: item,
+      respondedCartData: cartProductQuantity,
     });
   } catch (error: any) {
     console.error(error);

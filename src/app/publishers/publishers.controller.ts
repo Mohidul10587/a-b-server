@@ -50,8 +50,6 @@ export const createPublisher = async (
       });
     }
   } catch (err) {
-    console.log(err);
-    console.log(err);
     res.status(500).send({ error: "Internal Server Error" });
   }
 };
@@ -125,7 +123,7 @@ export const allForProductUploadPage = async (
 //   res: Response
 // ): Promise<void> => {
 //   try {
-//     console.log("first");
+
 //     const previousPublishers = await Publisher.find()
 //       .select("_id title slug  position  attachedSubCategories")
 //       .lean();
@@ -180,7 +178,7 @@ export const allForProductUploadPage = async (
 //     );
 //     res.status(200).json({ enrichedPublishers: sortedPublishers });
 //   } catch (error: any) {
-//     console.log(error);
+
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // };

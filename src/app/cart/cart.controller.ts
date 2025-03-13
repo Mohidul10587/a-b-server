@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 import Cart from "./cart.model";
-import Product from "../product/product.model";
+import User from "../user/user.model";
+
 export const createOrUpdate = async (req: Request, res: Response) => {
   try {
     const { userId, cartItems } = req.body;
-
     if (!userId || !cartItems || !Array.isArray(cartItems)) {
       return res.status(400).json({ message: "Invalid request data" });
     }
@@ -50,7 +50,7 @@ export const createOrUpdate = async (req: Request, res: Response) => {
 export const addSingleItemToCart = async (req: Request, res: Response) => {
   try {
     const { userId, cartItem } = req.body;
-
+    console.log(cartItem);
     if (!userId || !cartItem || typeof cartItem !== "object") {
       return res.status(400).json({ message: "Invalid request data" });
     }

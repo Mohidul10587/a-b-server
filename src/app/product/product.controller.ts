@@ -21,8 +21,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       respondedData: newProduct, // Optionally, include the created product in the response
     });
   } catch (error: any) {
-    console.log(error);
-
     // Send error message if there was an issue
     res.status(500).json({
       message: "Failed to create.",
@@ -357,7 +355,6 @@ export const getProductsByPublishersSlug = async (
       .status(200)
       .json({ products: reverseProducts, writers, publisher, categories });
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -365,10 +362,10 @@ export const getProductsByPublishersSlug = async (
 export const getExistingQuantity = async (req: Request, res: Response) => {
   try {
     const { type, mainId, variantId } = req.query;
-    console.log(type);
-
+    console.log(mainId);
     if (type == "main") {
       const product = await Product.findOne({ _id: mainId });
+      console.log("This is product", product);
       res.status(200).json({
         message: "Fetched successfully!",
         respondedData: product?.existingQnt, // Optionally, include the created category in the response
@@ -391,7 +388,6 @@ export const getExistingQuantity = async (req: Request, res: Response) => {
     //   return;
     // }
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({
       message: "Failed to Fetch.",
       error: error.message,

@@ -182,7 +182,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
         path: "suggestionId",
         populate: {
           path: "products",
-          select: "_id title slug img price unprice stockStatus",
+          select: "_id title slug img price unprice stockStatus existingQnt",
         },
       });
 
@@ -200,21 +200,21 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
       // Check by category
       const categoryProducts = await Product.find({
         category: element.productSectionId,
-      }).select("_id title slug img price unprice stockStatus");
+      }).select("_id title slug img price unprice stockStatus existingQnt");
       if (categoryProducts.length > 0) {
         products = categoryProducts;
       } else {
         // Check by subcategory if no category products found
         const subCategoryProducts = await Product.find({
           subcategory: element.productSectionId,
-        }).select("_id title slug img price unprice stockStatus");
+        }).select("_id title slug img price unprice stockStatus existingQnt");
         if (subCategoryProducts.length > 0) {
           products = subCategoryProducts;
         } else {
           // Fallback to brand if no category or subcategory products found
           const writerProducts = await Product.find({
             writer: element.productSectionId,
-          }).select("_id title slug img price unprice stockStatus");
+          }).select("_id title slug img price unprice stockStatus existingQnt");
           products = writerProducts;
         }
       }
