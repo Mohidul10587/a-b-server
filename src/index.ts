@@ -39,7 +39,6 @@ const db = mongoose.connection;
 
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
-  
   registerAdmin("Admin", "admin@gmail.com", "admin123", "image");
   createDefaultSettings();
 });
