@@ -14,7 +14,7 @@ const verifyUserToken = async (
   next: NextFunction
 ) => {
   const { refreshToken } = req.cookies;
-  
+  console.log(refreshToken);
   jwt.verify(refreshToken, JWT_SECRET, async (err: any, decoded: any) => {
     if (err) {
       return res
