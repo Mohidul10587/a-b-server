@@ -23,6 +23,7 @@ const suggestion_routes_1 = __importDefault(require("./app/suggestion/suggestion
 const payment_routes_1 = __importDefault(require("./app/payment/payment.routes"));
 const publishers_routes_1 = __importDefault(require("./app/publishers/publishers.routes"));
 const gallery_route_1 = __importDefault(require("./app/gallery/gallery.route"));
+const cart_routes_1 = __importDefault(require("./app/cart/cart.routes"));
 const defaultInsertion_1 = require("./app/shared/defaultInsertion");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -64,6 +65,7 @@ app.use("/payment", payment_routes_1.default);
 app.use("/publishers", publishers_routes_1.default);
 app.use("/gallery", gallery_route_1.default);
 app.use("/user", user_route_1.default);
+app.use("/cart", cart_routes_1.default);
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}`);
 });

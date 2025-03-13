@@ -19,6 +19,7 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const order_model_1 = __importDefault(require("../order/order.model"));
 const settings_model_1 = __importDefault(require("../settings/settings.model"));
+const cart_model_1 = __importDefault(require("../cart/cart.model"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 // Helper function to send a consistent response with success flag and status code
@@ -400,8 +401,6 @@ exports.logOut = logOut;
 const setRefreshTokenCookie = (res, user) => {
     const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: "10d" } // Adjust expiration as needed
     );
-    console.log("This is refresh token", refreshToken);
-    console.log("This is refresh token", user);
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: true, // Only set secure flag in production
@@ -488,11 +487,14 @@ const addCoins = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.addCoins = addCoins;
 const getAuthenticatedUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const email = req.query.email;
-        const item = yield user_model_1.default.findOne({ email: email });
+        const { id } = req.query;
+        const item = yield user_model_1.default.findOne({ _id: id });
+        const cart = yield cart_model_1.default.findOne({ userId: id });
+        const cartProductQuantity = cart === null || cart === void 0 ? void 0 : cart.cartItems.reduce((total, item) => total + item.quantity, 0);
         res.status(200).json({
             message: "Fetched successfully!",
             respondedData: item,
+            respondedCartData: cartProductQuantity,
         });
     }
     catch (error) {

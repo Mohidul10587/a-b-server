@@ -29,7 +29,6 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         // Send error message if there was an issue
         res.status(500).json({
             message: "Failed to create.",
@@ -306,7 +305,6 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
             .json({ products: reverseProducts, writers, publisher, categories });
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -314,9 +312,10 @@ exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
 const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { type, mainId, variantId } = req.query;
-        console.log(type);
+        console.log(mainId);
         if (type == "main") {
             const product = yield product_model_1.default.findOne({ _id: mainId });
+            console.log("This is product", product);
             res.status(200).json({
                 message: "Fetched successfully!",
                 respondedData: product === null || product === void 0 ? void 0 : product.existingQnt, // Optionally, include the created category in the response
@@ -339,7 +338,6 @@ const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, func
         // }
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Failed to Fetch.",
             error: error.message,

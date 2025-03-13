@@ -60,7 +60,6 @@ router.post("/success/:transactionId", (req, res) => __awaiter(void 0, void 0, v
     try {
         const transactionId = req.params.transactionId;
         const result = yield order_model_1.default.findOneAndUpdate({ paymentTnxId: transactionId }, { $set: { paymentStatus: true } }, { new: true });
-        console.log(result);
         res.redirect(`${clientSideUrl}/success/${transactionId}`);
     }
     catch (error) {

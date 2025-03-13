@@ -64,8 +64,6 @@ const createPublisher = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
     }
     catch (err) {
-        console.log(err);
-        console.log(err);
         res.status(500).send({ error: "Internal Server Error" });
     }
 });
@@ -121,7 +119,6 @@ exports.allForProductUploadPage = allForProductUploadPage;
 //   res: Response
 // ): Promise<void> => {
 //   try {
-//     console.log("first");
 //     const previousPublishers = await Publisher.find()
 //       .select("_id title slug  position  attachedSubCategories")
 //       .lean();
@@ -169,7 +166,6 @@ exports.allForProductUploadPage = allForProductUploadPage;
 //     );
 //     res.status(200).json({ enrichedPublishers: sortedPublishers });
 //   } catch (error: any) {
-//     console.log(error);
 //     res.status(500).json({ error: "Internal Server Error" });
 //   }
 // };

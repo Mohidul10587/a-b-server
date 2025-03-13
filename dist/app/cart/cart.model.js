@@ -27,7 +27,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const CartItemSchema = new mongoose_1.Schema({
     _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
     type: { type: String, required: true },
-    photo: { type: String, required: true },
+    img: { type: String, required: true },
     variantId: { type: String, required: true },
     price: { type: Number, required: true },
     title: { type: String },
@@ -35,6 +35,7 @@ const CartItemSchema = new mongoose_1.Schema({
     shippingOutside: { type: Number },
     seller: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
     quantity: { type: Number, required: true },
+    existingQnt: { type: Number, required: true },
     commissionForSeller: { type: Number, required: true },
     isChecked: { type: Boolean, default: true },
 });

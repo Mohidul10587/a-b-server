@@ -41,7 +41,7 @@ const UserSchema = new mongoose_1.Schema({
     email: { type: String, unique: true, required: true },
     password: { type: String, default: "a" },
     image: { type: String, default: "" },
-    isSeller: { type: Boolean, required: true },
+    isSeller: { type: Boolean, default: false },
     isUser: { type: Boolean, default: true },
     oneClickPayStartedAt: { type: String, default: "" },
     coins: { type: Number, default: 0 },

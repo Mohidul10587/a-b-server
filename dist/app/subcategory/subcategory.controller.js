@@ -22,7 +22,6 @@ const createSubcategory = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const { parentCategory, title } = req.body;
         // Split titles into an array
         const titlesArray = (0, convertToArray_1.convertToArray)(title);
-        console.log(titlesArray);
         // Initialize an array to store new subcategory IDs
         const createdItems = [];
         // Iterate through titles and create subcategories
@@ -36,7 +35,6 @@ const createSubcategory = (req, res) => __awaiter(void 0, void 0, void 0, functi
         { new: true } // Return the updated document
         );
         if (!updatedCategory) {
-            console.log("Parent category not found.");
             return res.status(404).json({ message: "Parent category not found." });
         }
         // Send success response

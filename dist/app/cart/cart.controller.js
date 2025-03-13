@@ -55,6 +55,7 @@ exports.createOrUpdate = createOrUpdate;
 const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId, cartItem } = req.body;
+        console.log(cartItem);
         if (!userId || !cartItem || typeof cartItem !== "object") {
             return res.status(400).json({ message: "Invalid request data" });
         }
