@@ -77,5 +77,5 @@ app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
 
 app.listen(port, () => {
-  
+  console.log(port);
 });

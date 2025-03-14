@@ -22,6 +22,6 @@ router.post(
 
 router.get("/getUserCart/:userId", getUserCart);
 
-router.delete("/removeItemFromCart", removeItemFromCart);
+router.delete("/removeItemFromCart", verifyUserToken, removeItemFromCart);
 router.patch("/update-isChecked", verifyUserToken, updateIsChecked);
 export default router;
