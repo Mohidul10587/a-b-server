@@ -16,12 +16,12 @@ router.post("/create", createOrUpdate);
 router.post("/addSingleItemToCart", addSingleItemToCart);
 router.post(
   "/updateProductQuantityInDataBase",
-  verifyUserToken,
+
   updateProductQuantityInDataBase
 );
 
 router.get("/getUserCart/:userId", getUserCart);
 
-router.delete("/removeItemFromCart", verifyUserToken, removeItemFromCart);
-router.patch("/update-isChecked", verifyUserToken, updateIsChecked);
+router.delete("/removeItemFromCart", removeItemFromCart);
+router.patch("/update-isChecked", updateIsChecked);
 export default router;
