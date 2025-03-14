@@ -20,7 +20,7 @@ dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const verifyUserToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { refreshToken } = req.cookies;
-    console.log(refreshToken);
+    console.log("This is refresh token", refreshToken);
     jsonwebtoken_1.default.verify(refreshToken, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
         if (err) {
             return res

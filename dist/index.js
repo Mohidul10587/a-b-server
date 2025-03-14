@@ -66,4 +66,5 @@ app.use("/gallery", gallery_route_1.default);
 app.use("/user", user_route_1.default);
 app.use("/cart", cart_routes_1.default);
 app.listen(port, () => {
+    console.log(port);
 });
