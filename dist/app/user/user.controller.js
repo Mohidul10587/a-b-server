@@ -401,12 +401,6 @@ exports.logOut = logOut;
 const setRefreshTokenCookie = (res, user) => {
     const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: "10d" } // Adjust expiration as needed
     );
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true, // Only set secure flag in production
-        sameSite: "none", // Ensure cross-origin cookies work
-        maxAge: 10 * 24 * 60 * 60 * 1000, // Optional: Set expiration to 10 days
-    });
     return refreshToken;
 };
 // Get a single order by ID
