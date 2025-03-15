@@ -46,6 +46,11 @@ db.once("open", () => {
 // Middleware
 app.use(bodyParser.json()); // Parse JSON bodies
 app.use(cookieParser());
+app.use((req, res, next) => {
+  console.log("Received Cookies:", req.cookies);
+  next();
+});
+
 app.use(
   cors({
     origin: ["http://localhost:3000", "https://book7.vercel.app"],
