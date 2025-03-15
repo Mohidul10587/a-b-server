@@ -39,14 +39,15 @@ const UserSchema = new mongoose_1.Schema({
     slug: { type: String, unique: true },
     phone: { type: String, default: null },
     email: { type: String, unique: true, required: true },
-    password: { type: String, default: "a" },
+    password: { type: String },
     image: { type: String, default: "" },
-    isSeller: { type: Boolean, default: false },
+    isSeller: { type: Boolean, required: true },
     isUser: { type: Boolean, default: true },
     oneClickPayStartedAt: { type: String, default: "" },
     coins: { type: Number, default: 0 },
     toDaysCoins: { type: Number, default: 0 },
     coinsTakingDate: { type: String, default: "" },
+    sellerId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Seller", default: null },
     companyName: { type: String, default: "" },
     companyEmail: { type: String, default: "" },
     country: { type: String, default: "" },
@@ -72,7 +73,6 @@ const UserSchema = new mongoose_1.Schema({
     coverPhoto: { type: String, default: "" },
     contactInfo: { type: String, default: "" },
 }, { timestamps: true });
-UserSchema.index({ email: 1 });
 // Middleware to make the slug unique if it's already taken
 UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {

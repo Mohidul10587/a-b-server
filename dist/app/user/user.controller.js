@@ -12,14 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAuthenticatedUser = exports.addCoins = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.getAllUsers = exports.checkUser_Email = exports.logInWithEmailPassword = exports.createUserByEmailAndPassword = exports.createUser = void 0;
+exports.addCoins = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.getAllUsers = exports.checkUser_Email = exports.logInWithEmailPassword = exports.createUserByEmailAndPassword = exports.createUser = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const order_model_1 = __importDefault(require("../order/order.model"));
+const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
+const extractPublicKeyAndDelete_1 = require("../shared/extractPublicKeyAndDelete");
 const settings_model_1 = __importDefault(require("../settings/settings.model"));
-const cart_model_1 = __importDefault(require("../cart/cart.model"));
+const order_model_1 = __importDefault(require("../order/order.model"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 // Helper function to send a consistent response with success flag and status code
@@ -27,15 +28,16 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { name, email, slug, image } = req.body;
+    console.log("hit on the route");
     const sellerDefaultStatus = (_a = (yield settings_model_1.default.findOne())) === null || _a === void 0 ? void 0 : _a.sellerDefaultStatus;
     try {
         const existingUser = yield user_model_1.default.findOne({ email });
         if (existingUser) {
             const token = setRefreshTokenCookie(res, existingUser);
+            console.log(token);
             return res.status(200).json({
                 success: true,
                 user: existingUser,
-                token: token,
                 message: "User already existed",
             });
         }
@@ -47,10 +49,10 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             image,
         });
         const token = setRefreshTokenCookie(res, newUser);
+        console.log(token);
         return res.status(200).json({
             success: true,
             user: newUser,
-            token: token,
             message: "User created successfully",
         });
     }
@@ -126,10 +128,10 @@ const logInWithEmailPassword = (req, res) => __awaiter(void 0, void 0, void 0, f
             });
         }
         const token = setRefreshTokenCookie(res, user);
+        console.log(token);
         return res.status(200).json({
             success: true,
             user,
-            token,
             message: "User authenticated successfully",
         });
     }
@@ -200,7 +202,7 @@ const getSingleUserBySlug = (req, res) => __awaiter(void 0, void 0, void 0, func
                 message: "User ID is required",
             });
         }
-        const user = yield user_model_1.default.findOne({ slug: userSlug });
+        const user = yield user_model_1.default.findOne({ slug: userSlug }).populate("sellerId");
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -335,13 +337,19 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
             : undefined;
         const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
         // Upload image if provided
+        const photoUrl = yield (0, uploadSingleFileToCloudinary_1.cloudinaryUpload)(photoFile);
+        if (photoUrl) {
+            if (previousPhoto && isFromGoogleSite(previousPhoto) === false) {
+                yield (0, extractPublicKeyAndDelete_1.extractPublicKeyAndDelete)(previousPhoto);
+            }
+        }
         // Build the update object dynamically
         const updateData = {
             name,
             email,
             phone,
             address,
-            image: photo,
+            image: photoUrl || photo,
         };
         if (password) {
             updateData.password = hashedPassword;
@@ -401,8 +409,26 @@ exports.logOut = logOut;
 const setRefreshTokenCookie = (res, user) => {
     const refreshToken = jsonwebtoken_1.default.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: "10d" } // Adjust expiration as needed
     );
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true, // Only set secure flag in production
+        sameSite: "none", // Ensure cross-origin cookies work
+        maxAge: 10 * 24 * 60 * 60 * 1000, // Optional: Set expiration to 10 days
+    });
     return refreshToken;
 };
+function isFromGoogleSite(url) {
+    try {
+        // Create a new URL object
+        const parsedUrl = new URL(url);
+        // Check if the hostname ends with 'googleusercontent.com' (common for Google-hosted content)
+        return parsedUrl.hostname.endsWith("googleusercontent.com");
+    }
+    catch (error) {
+        // If the URL is invalid, return false
+        return false;
+    }
+}
 // Get a single order by ID
 const getOrdersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -479,24 +505,3 @@ const addCoins = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.addCoins = addCoins;
-const getAuthenticatedUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { id } = req.query;
-        const item = yield user_model_1.default.findOne({ _id: id });
-        const cart = yield cart_model_1.default.findOne({ userId: id });
-        const cartProductQuantity = cart === null || cart === void 0 ? void 0 : cart.cartItems.reduce((total, item) => total + item.quantity, 0);
-        res.status(200).json({
-            message: "Fetched successfully!",
-            respondedData: item,
-            respondedCartData: cartProductQuantity,
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Failed to fetch.",
-            error: error.message,
-        });
-    }
-});
-exports.getAuthenticatedUser = getAuthenticatedUser;
