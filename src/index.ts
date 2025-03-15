@@ -46,10 +46,6 @@ db.once("open", () => {
 // Middleware
 app.use(bodyParser.json()); // Parse JSON bodies
 app.use(cookieParser());
-app.use((req, res, next) => {
-  console.log("Received Cookies:", req.cookies);
-  next();
-});
 
 app.use(
   cors({
@@ -80,7 +76,6 @@ app.use("/publishers", publishersRoutes);
 app.use("/gallery", galleryRoutes);
 app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
-
 app.listen(port, () => {
   console.log(port);
 });

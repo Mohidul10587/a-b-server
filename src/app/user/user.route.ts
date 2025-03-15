@@ -7,6 +7,7 @@ import {
   getSingleUser,
   updateUser,
   logOut,
+  createUserByEmailAndPassword,
   logInWithEmailPassword,
   getOrdersByUserId,
   getSingleUserBySlug,
@@ -16,26 +17,18 @@ import {
   addCoins,
   getSingleUserById,
   getSingleUserForAddToCartComponent,
-  getAuthenticatedUser,
-  createUserByEmailAndPassword,
 } from "./user.controller";
 import verifyUserToken from "./user.middleware";
 
-// import Stripe from "stripe";
-// const stripe = new Stripe(
-//   "sk_test_51MSFzbGk3QfbJiMcsqL1UPl95CGQ4zuA9vzlgYy8aodGEOs7jobqIhTQfdnH50XILCQVSJhL5kSDosjGgjT3ZV2v00SYnQOh85"
-// );
 const router = express.Router();
 
 // Route to create a new user
 router.post("/create", createUser);
-router.post("/createUserByEmailAndPassword", createUserByEmailAndPassword);
-router.get("/getAuthenticatedUser", getAuthenticatedUser);
-
+router.post("/logInWithEmailPassword", logInWithEmailPassword);
 router.get("/check-user-email", verifyUserToken, checkUser_Email);
 router.post("/logout", logOut);
-router.post("/logInWithEmailPassword", logInWithEmailPassword);
 
+router.post("/signUpWithEmailPassword", createUserByEmailAndPassword);
 router.post("/logout", logOut);
 router.get("/allOrdersOfUser", verifyUserToken, getOrdersByUserId);
 router.get("/getSingleOrder/:id", verifyUserToken, getSingleOrder);
@@ -53,21 +46,12 @@ router.get(
   "/getSingleUserForAddToCartComponent/:id",
   getSingleUserForAddToCartComponent
 );
-router.post("/updateUserInfo/:userId", verifyUserToken, updateUser);
+router.post(
+  "/updateUserInfo/:userId",
+  verifyUserToken,
 
-// router.post("/create-payment-intent", async (req, res) => {
-//   const price = req.body.price;
-//   const amount = price * 100;
-
-//   const paymentIntent = await stripe.paymentIntents.create({
-//     currency: "usd",
-//     amount: amount,
-//     payment_method_types: ["card"],
-//   });
-//   res.send({
-//     clientSecret: paymentIntent.client_secret,
-//   });
-// });
+  updateUser
+);
 
 router.post("/add-coins", addCoins);
 
