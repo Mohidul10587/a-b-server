@@ -3,7 +3,7 @@ import express from "express";
 import {
   create,
   getAllProducts,
-  getProductDetails,
+  singleForUserFoDetailsPageBySlug,
   getSingleProduct,
   deleteProduct,
   update,
@@ -15,6 +15,8 @@ import {
   getExistingQuantity,
 } from "./product.controller";
 import verifyToken from "../admin/admin.middleware";
+import Product from "./product.model";
+import { getAllSlugsForSitemap } from "../shared/reusableControllers";
 
 const router = express.Router();
 
@@ -33,7 +35,10 @@ router.get("/products_by_punishers_slug/:slug", getProductsByPublishersSlug);
 
 router.get("/writer_products_by_slug/:slug", getProductsByWriterSlug);
 
-router.get("/productDetails/:slug", getProductDetails);
+router.get(
+  "/singleForUserFoDetailsPageBySlug/:slug",
+  singleForUserFoDetailsPageBySlug
+);
 // // Route for getting a single product by ID
 router.get("/:productId", getSingleProduct);
 
@@ -43,4 +48,5 @@ router.delete("/:productId", verifyToken, deleteProduct);
 // // Route for updating a product by ID
 router.put("/update/:productId", verifyToken, update);
 
+router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
 export default router;

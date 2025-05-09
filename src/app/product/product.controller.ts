@@ -55,7 +55,7 @@ export const update = async (req: Request, res: Response) => {
     });
   }
 };
-export const getProductDetails = async (
+export const singleForUserFoDetailsPageBySlug = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -123,10 +123,12 @@ export const getProductDetails = async (
 
     // Step 3: Respond with the product and suggestion data
     res.status(200).json({
-      ...product.toObject(),
-      // subcategory: subcategory || {},
-      // suggestion: suggestionData,
-      productsOfSameCategory: categoryProducts,
+      success: true,
+      message: "Fetched successfully",
+      resData: {
+        ...product.toObject(),
+        productsOfSameCategory: categoryProducts,
+      },
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
@@ -362,10 +364,10 @@ export const getProductsByPublishersSlug = async (
 export const getExistingQuantity = async (req: Request, res: Response) => {
   try {
     const { type, mainId, variantId } = req.query;
-    
+
     if (type == "main") {
       const product = await Product.findOne({ _id: mainId });
-      
+
       res.status(200).json({
         message: "Fetched successfully!",
         respondedData: product?.existingQnt, // Optionally, include the created category in the response
