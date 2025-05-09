@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const product_controller_1 = require("./product.controller");
 const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
+const product_model_1 = __importDefault(require("./product.model"));
+const reusableControllers_1 = require("../shared/reusableControllers");
 const router = express_1.default.Router();
 router.post("/create", product_controller_1.create);
 // // Route for getting all products
@@ -17,11 +19,12 @@ router.get("/getAllProductsForOfferPage", product_controller_1.getAllProductsFor
 router.get("/products_by_category_slug/:slug", product_controller_1.getProductsByCategorySlug);
 router.get("/products_by_punishers_slug/:slug", product_controller_1.getProductsByPublishersSlug);
 router.get("/writer_products_by_slug/:slug", product_controller_1.getProductsByWriterSlug);
-router.get("/productDetails/:slug", product_controller_1.getProductDetails);
+router.get("/singleForUserFoDetailsPageBySlug/:slug", product_controller_1.singleForUserFoDetailsPageBySlug);
 // // Route for getting a single product by ID
 router.get("/:productId", product_controller_1.getSingleProduct);
 // // Route for deleting a product by ID
 router.delete("/:productId", admin_middleware_1.default, product_controller_1.deleteProduct);
 // // Route for updating a product by ID
 router.put("/update/:productId", admin_middleware_1.default, product_controller_1.update);
+router.get("/getAllSlugsForSitemap", (0, reusableControllers_1.getAllSlugsForSitemap)(product_model_1.default));
 exports.default = router;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.getProductDetails = exports.update = exports.create = void 0;
+exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllProductsForAdmin = exports.getSingleProduct = exports.getAllProducts = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const product_model_1 = __importDefault(require("./product.model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -63,7 +63,7 @@ const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.update = update;
-const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const singleForUserFoDetailsPageBySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Step 1: Find the product by slug
         const product = yield product_model_1.default.findOne({ slug: req.params.slug })
@@ -124,16 +124,17 @@ const getProductDetails = (req, res) => __awaiter(void 0, void 0, void 0, functi
             },
         ]);
         // Step 3: Respond with the product and suggestion data
-        res.status(200).json(Object.assign(Object.assign({}, product.toObject()), { 
-            // subcategory: subcategory || {},
-            // suggestion: suggestionData,
-            productsOfSameCategory: categoryProducts }));
+        res.status(200).json({
+            success: true,
+            message: "Fetched successfully",
+            resData: Object.assign(Object.assign({}, product.toObject()), { productsOfSameCategory: categoryProducts }),
+        });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-exports.getProductDetails = getProductDetails;
+exports.singleForUserFoDetailsPageBySlug = singleForUserFoDetailsPageBySlug;
 const getAllProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield product_model_1.default.find()
