@@ -9,9 +9,7 @@ interface ICartItem {
   title: string;
   shippingInside?: number;
   shippingOutside?: number;
-  seller: ObjectId;
   quantity: number;
-  commissionForSeller: number;
   isChecked: boolean;
   existingQnt: number;
 }
@@ -30,10 +28,8 @@ const CartItemSchema = new Schema<ICartItem>({
   title: { type: String },
   shippingInside: { type: Number },
   shippingOutside: { type: Number },
-  seller: { type: Schema.Types.ObjectId, ref: "User" },
   quantity: { type: Number, required: true },
   existingQnt: { type: Number, required: true },
-  commissionForSeller: { type: Number, required: true },
   isChecked: { type: Boolean, default: true },
 });
 

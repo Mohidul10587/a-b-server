@@ -33,10 +33,8 @@ const CartItemSchema = new mongoose_1.Schema({
     title: { type: String },
     shippingInside: { type: Number },
     shippingOutside: { type: Number },
-    seller: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
     quantity: { type: Number, required: true },
     existingQnt: { type: Number, required: true },
-    commissionForSeller: { type: Number, required: true },
     isChecked: { type: Boolean, default: true },
 });
 const CartSchema = new mongoose_1.Schema({

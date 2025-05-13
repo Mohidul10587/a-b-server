@@ -14,17 +14,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getSingleOrders = exports.updateOrderStatus = exports.getOrders = exports.createOrder = void 0;
 const order_model_1 = __importDefault(require("./order.model"));
-// Create a new order
+const mongoose_1 = __importDefault(require("mongoose"));
+const cart_model_1 = __importDefault(require("../cart/cart.model"));
 const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const session = yield mongoose_1.default.startSession();
     try {
+        session.startTransaction();
         const orderInfo = req.body;
-        const newOrder = yield order_model_1.default.create(orderInfo);
-        res
-            .status(201)
-            .json({ message: "Order placed successfully!", order: newOrder });
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized: user not found" });
+        }
+        // 1. Create the new order
+        const newOrder = yield order_model_1.default.create([orderInfo], { session });
+        // 2. Clear the user's cart
+        yield cart_model_1.default.findOneAndUpdate({ userId }, { $set: { cartItems: [] } }, { session });
+        // 3. Commit the transaction
+        yield session.commitTransaction();
+        session.endSession();
+        res.status(201).json({
+            message: "Order placed successfully!",
+            order: newOrder[0],
+        });
     }
     catch (error) {
-        res.status(500).json({ message: "Failed to place order.", error });
+        yield session.abortTransaction();
+        session.endSession();
+        console.error("Order transaction error:", error);
+        res.status(500).json({
+            message: "Failed to place order.",
+            error: error instanceof Error ? error.message : error,
+        });
     }
 });
 exports.createOrder = createOrder;

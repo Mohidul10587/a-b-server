@@ -6,11 +6,12 @@ import {
   getSingleOrders,
   updateOrderStatus,
 } from "./order.controller";
+import verifyUserToken from "../user/user.middleware";
 
 const router = express.Router();
 
 // Create a new order
-router.post("/create", createOrder);
+router.post("/create", verifyUserToken, createOrder);
 
 // Get all orders
 router.get("/all", getOrders);

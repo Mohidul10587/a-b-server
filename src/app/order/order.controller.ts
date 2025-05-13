@@ -1,19 +1,49 @@
 // controllers/orderController.ts
 import { Request, Response } from "express";
 import Order from "./order.model";
+import mongoose from "mongoose";
+import Cart from "../cart/cart.model";
 
-// Create a new order
 export const createOrder = async (req: Request, res: Response) => {
+  const session = await mongoose.startSession();
+
   try {
+    session.startTransaction();
+
     const orderInfo = req.body;
+    const userId = req.user?._id;
 
-    const newOrder = await Order.create(orderInfo);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: user not found" });
+    }
 
-    res
-      .status(201)
-      .json({ message: "Order placed successfully!", order: newOrder });
+    // 1. Create the new order
+    const newOrder = await Order.create([orderInfo], { session });
+
+    // 2. Clear the user's cart
+    await Cart.findOneAndUpdate(
+      { userId },
+      { $set: { cartItems: [] } },
+      { session }
+    );
+
+    // 3. Commit the transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      message: "Order placed successfully!",
+      order: newOrder[0],
+    });
   } catch (error) {
-    res.status(500).json({ message: "Failed to place order.", error });
+    await session.abortTransaction();
+    session.endSession();
+    console.error("Order transaction error:", error);
+
+    res.status(500).json({
+      message: "Failed to place order.",
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
