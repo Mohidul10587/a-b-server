@@ -2,8 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import dotenv from "dotenv";
-import Admin, { IAdmin } from "../admin/admin.model";
+
 import Settings from "../settings/settings.model";
+import User, { IUser } from "../user/user.model";
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET as string;
 export const createDefaultSettings = async (): Promise<void> => {
@@ -65,11 +66,12 @@ export const registerAdmin = async (
   name: string,
   email: string,
   password: string,
-  image: string
+  image: string,
+  slug: string
 ): Promise<void> => {
   try {
     // Check if admin already exists
-    const existingAdmin = await Admin.findOne({ email });
+    const existingAdmin = await User.findOne({ email });
     if (existingAdmin) {
       return;
     }
@@ -78,11 +80,15 @@ export const registerAdmin = async (
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new admin
-    const admin: IAdmin = new Admin({
+    const admin: IUser = new User({
       name,
+      slug,
       email,
       password: hashedPassword,
       image,
+      role: "admin",
+      isUser: true,
+      isSeller: true,
     });
 
     // Save admin to database

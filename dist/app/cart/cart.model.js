@@ -23,8 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CartItemSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const CartItemSchema = new mongoose_1.Schema({
+exports.CartItemSchema = new mongoose_1.Schema({
     _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
     type: { type: String, required: true },
     img: { type: String, required: true },
@@ -39,7 +40,7 @@ const CartItemSchema = new mongoose_1.Schema({
 });
 const CartSchema = new mongoose_1.Schema({
     userId: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
-    cartItems: { type: [CartItemSchema], default: [] }, // Embedded array of cart items
+    cartItems: { type: [exports.CartItemSchema], default: [] }, // Embedded array of cart items
 }, { timestamps: true } // Adds createdAt and updatedAt fields
 );
 const Cart = mongoose_1.default.model("Cart", CartSchema);

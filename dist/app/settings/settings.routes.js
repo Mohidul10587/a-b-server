@@ -5,13 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const settings_controller_1 = require("./settings.controller");
-const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
+const middlewares_1 = require("../user/middlewares");
 const multer_1 = __importDefault(require("../shared/multer"));
 const router = (0, express_1.Router)();
 router.get("/", settings_controller_1.getSettings);
 router.get("/getPrivacyPoliciesOfSettings", settings_controller_1.getPrivacyPoliciesOfSettings);
 router.put("/updateSellerDefaultStatus/:id", settings_controller_1.updateDefaultSellerStatus);
-router.put("/update", admin_middleware_1.default, multer_1.default.fields([
+router.put("/update", middlewares_1.verifyAdminToken, multer_1.default.fields([
     { name: "logo", maxCount: 1 },
     { name: "favicon", maxCount: 1 },
     { name: "loto", maxCount: 1 },

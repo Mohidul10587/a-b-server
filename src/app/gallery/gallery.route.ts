@@ -8,7 +8,7 @@ import {
   // searchGallery,
 } from "./gallery.controller";
 
-import verifyToken from "../admin/admin.middleware";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = express.Router();
 

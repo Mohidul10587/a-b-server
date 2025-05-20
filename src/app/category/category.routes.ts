@@ -10,12 +10,12 @@ import {
   allCategoryForFiltering,
   getAllCategoriesForCatMainPage,
 } from "./category.controller";
-import verifyToken from "../admin/admin.middleware";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = Router();
 
 //Admin routes
-router.post("/create", verifyToken, create);
+router.post("/create", verifyAdminToken, create);
 router.get(
   "/allCategoriesForSubCatAddPage",
 
@@ -42,7 +42,7 @@ router.get(
   singleCategoryForCategoryEditPage
 );
 
-router.put("/update/:id", verifyToken, update);
+router.put("/update/:id", verifyAdminToken, update);
 
 // common routes
 

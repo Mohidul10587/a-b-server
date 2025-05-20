@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const product_controller_1 = require("./product.controller");
-const admin_middleware_1 = __importDefault(require("../admin/admin.middleware"));
 const product_model_1 = __importDefault(require("./product.model"));
 const reusableControllers_1 = require("../shared/reusableControllers");
+const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
 router.post("/create", product_controller_1.create);
 // // Route for getting all products
@@ -23,8 +23,8 @@ router.get("/singleForUserFoDetailsPageBySlug/:slug", product_controller_1.singl
 // // Route for getting a single product by ID
 router.get("/:productId", product_controller_1.getSingleProduct);
 // // Route for deleting a product by ID
-router.delete("/:productId", admin_middleware_1.default, product_controller_1.deleteProduct);
+router.delete("/:productId", middlewares_1.verifyAdminToken, product_controller_1.deleteProduct);
 // // Route for updating a product by ID
-router.put("/update/:productId", admin_middleware_1.default, product_controller_1.update);
+router.put("/update/:productId", middlewares_1.verifyAdminToken, product_controller_1.update);
 router.get("/getAllSlugsForSitemap", (0, reusableControllers_1.getAllSlugsForSitemap)(product_model_1.default));
 exports.default = router;

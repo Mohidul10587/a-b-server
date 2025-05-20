@@ -16,8 +16,8 @@ exports.registerAdmin = exports.createDefaultSettings = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const admin_model_1 = __importDefault(require("../admin/admin.model"));
 const settings_model_1 = __importDefault(require("../settings/settings.model"));
+const user_model_1 = __importDefault(require("../user/user.model"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 const createDefaultSettings = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -72,21 +72,25 @@ const createDefaultSettings = () => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createDefaultSettings = createDefaultSettings;
-const registerAdmin = (name, email, password, image) => __awaiter(void 0, void 0, void 0, function* () {
+const registerAdmin = (name, email, password, image, slug) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Check if admin already exists
-        const existingAdmin = yield admin_model_1.default.findOne({ email });
+        const existingAdmin = yield user_model_1.default.findOne({ email });
         if (existingAdmin) {
             return;
         }
         // Hash password
         const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
         // Create new admin
-        const admin = new admin_model_1.default({
+        const admin = new user_model_1.default({
             name,
+            slug,
             email,
             password: hashedPassword,
             image,
+            role: "admin",
+            isUser: true,
+            isSeller: true,
         });
         // Save admin to database
         yield admin.save();

@@ -7,7 +7,8 @@ import {
   getPrivacyPoliciesOfSettings,
   updateDefaultSellerStatus,
 } from "./settings.controller";
-import verifyToken from "../admin/admin.middleware";
+import { verifyAdminToken } from "../user/middlewares";
+
 import upload from "../shared/multer";
 
 const router = Router();
@@ -19,7 +20,7 @@ router.put("/updateSellerDefaultStatus/:id", updateDefaultSellerStatus);
 
 router.put(
   "/update",
-  verifyToken,
+  verifyAdminToken,
   upload.fields([
     { name: "logo", maxCount: 1 },
     { name: "favicon", maxCount: 1 },

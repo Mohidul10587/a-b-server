@@ -12,11 +12,11 @@ import {
 } from "./publishers.controller";
 
 import { uploadMiddleware } from "../shared/uploadSingleFileToCloudinary";
-import verifyToken from "../admin/admin.middleware";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = Router();
 
-router.post("/create", verifyToken, uploadMiddleware, createPublisher);
+router.post("/create", verifyAdminToken, uploadMiddleware, createPublisher);
 // Route to get all publisher IDs
 router.get("/allPublisherIds", getAllPublisherIds);
 router.get("/all", getAllPublishers);
@@ -30,8 +30,8 @@ router.get("/singlePublisherBySlug/:slug", getPublisherBySlug);
 router.get("/singlePublisher/:id", getPublisherById);
 router.get("/allForIndexPage", allForIndexPage);
 
-// router.put("/updatePublisher/:id", verifyToken, uploadMiddleware, updatePublisher);
-router.delete("/:id", verifyToken, deletePublisher);
+// router.put("/updatePublisher/:id", verifyAdminToken, uploadMiddleware, updatePublisher);
+router.delete("/:id", verifyAdminToken, deletePublisher);
 
 router.get(
   "/allPublisherForFiltering",

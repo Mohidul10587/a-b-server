@@ -25,14 +25,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // models/Order.ts
 const mongoose_1 = __importStar(require("mongoose"));
+const cart_model_1 = require("../cart/cart.model");
 const OrderSchema = new mongoose_1.Schema({
-    cart: [
-        {
-            id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
-            priceWhenSubmitOrder: { type: Number, required: true },
-            quantity: { type: Number, required: true },
-        },
-    ],
+    cart: [cart_model_1.CartItemSchema],
     deliveryInfo: {
         name: { type: String, required: true },
         email: { type: String, required: true },

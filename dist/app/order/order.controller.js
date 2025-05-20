@@ -52,13 +52,7 @@ exports.createOrder = createOrder;
 // Get all orders
 const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const orders = yield order_model_1.default.find()
-            .select("deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status")
-            .populate({
-            path: "cart.id",
-            model: "Product",
-            select: "title  photo  -_id",
-        });
+        const orders = yield order_model_1.default.find().select("deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart");
         const updatedOrders = orders.map((order) => ({
             customersName: order.deliveryInfo.name,
             address: order.deliveryInfo.address,
@@ -66,12 +60,13 @@ const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
             paymentMethod: order.paymentMethod,
             _id: order._id,
-            firstProduct: order.cart[0].id,
+            firstProduct: order.cart[0],
             status: order.status,
         }));
         res.status(200).json({ orders: updatedOrders });
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Failed to fetch orders.", error });
     }
 });

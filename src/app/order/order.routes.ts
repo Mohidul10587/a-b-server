@@ -6,7 +6,7 @@ import {
   getSingleOrders,
   updateOrderStatus,
 } from "./order.controller";
-import verifyUserToken from "../user/user.middleware";
+import { verifyUserToken } from "../user/middlewares";
 
 const router = express.Router();
 

@@ -4,7 +4,6 @@ import mongoose from "mongoose"; // Import Mongoose
 import cors from "cors";
 import bodyParser from "body-parser"; // Import body-parser
 import cookieParser from "cookie-parser";
-import adminRoutes from "./app/admin/admin.routes";
 import writerRoutes from "./app/writer/writer.routes";
 import productRoutes from "./app/product/product.routes";
 import categoryRoutes from "./app/category/category.routes";
@@ -40,7 +39,13 @@ const db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
   console.log("Connected to MongoDB");
-  registerAdmin("Admin", "admin@gmail.com", "admin123", "image");
+  registerAdmin(
+    "Admin",
+    "admin@gmail.com",
+    "admin123",
+    "/defaultUser.jpg",
+    "admin"
+  );
   createDefaultSettings();
 });
 
@@ -62,7 +67,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Routes
-app.use("/admin", adminRoutes);
+
 app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes);

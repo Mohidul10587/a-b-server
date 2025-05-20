@@ -11,11 +11,11 @@ import {
   // getAllBrandIds,
 } from "./writer.controller";
 
-import verifyToken from "../admin/admin.middleware";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = Router();
 
-router.post("/create", verifyToken, create);
+router.post("/create", verifyAdminToken, create);
 // Route to get all writer IDs
 router.get(
   "/singleWriterForWriterEditPage/:id",
@@ -23,7 +23,7 @@ router.get(
   singleWriterForWriterEditPage
 );
 
-router.put("/update/:id", verifyToken, update);
+router.put("/update/:id", verifyAdminToken, update);
 
 router.get("/all", getAllBrands);
 

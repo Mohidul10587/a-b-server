@@ -10,7 +10,7 @@ export const setRefreshTokenCookie = (res: Response, user: any): string => {
     { expiresIn: "10d" } // Adjust expiration as needed
   );
 
-  res.cookie("_", refreshToken, {
+  res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: true, // Only set secure flag in production
     sameSite: "none", // Ensure cross-origin cookies work

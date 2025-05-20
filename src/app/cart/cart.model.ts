@@ -14,12 +14,12 @@ interface ICartItem {
   existingQnt: number;
 }
 
-interface ICart extends Document {
+export interface ICart extends Document {
   userId: mongoose.Types.ObjectId;
   cartItems: ICartItem[]; // Corrected field name to `cartItems`
 }
 
-const CartItemSchema = new Schema<ICartItem>({
+export const CartItemSchema = new Schema<ICartItem>({
   _id: { type: Schema.Types.ObjectId, ref: "Product" },
   type: { type: String, required: true },
   img: { type: String, required: true },

@@ -14,9 +14,10 @@ import {
   getProductsByPublishersSlug,
   getExistingQuantity,
 } from "./product.controller";
-import verifyToken from "../admin/admin.middleware";
+
 import Product from "./product.model";
 import { getAllSlugsForSitemap } from "../shared/reusableControllers";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = express.Router();
 
@@ -43,10 +44,10 @@ router.get(
 router.get("/:productId", getSingleProduct);
 
 // // Route for deleting a product by ID
-router.delete("/:productId", verifyToken, deleteProduct);
+router.delete("/:productId", verifyAdminToken, deleteProduct);
 
 // // Route for updating a product by ID
-router.put("/update/:productId", verifyToken, update);
+router.put("/update/:productId", verifyAdminToken, update);
 
 router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
 export default router;

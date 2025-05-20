@@ -1,12 +1,9 @@
 // models/Order.ts
 import mongoose, { Schema, Document } from "mongoose";
+import { CartItemSchema, ICart } from "../cart/cart.model";
 
 interface IOrder extends Document {
-  cart: {
-    id: Schema.Types.ObjectId;
-    priceWhenSubmitOrder: number;
-    quantity: number;
-  }[];
+  cart: ICart[];
   deliveryInfo: {
     name: string;
     email: string;
@@ -24,13 +21,7 @@ interface IOrder extends Document {
 
 const OrderSchema = new Schema<IOrder>(
   {
-    cart: [
-      {
-        id: { type: Schema.Types.ObjectId, ref: "Product" },
-        priceWhenSubmitOrder: { type: Number, required: true },
-        quantity: { type: Number, required: true },
-      },
-    ],
+    cart: [CartItemSchema],
     deliveryInfo: {
       name: { type: String, required: true },
       email: { type: String, required: true },

@@ -8,7 +8,7 @@ import {
   removeItemFromCart,
   updateIsChecked,
 } from "./cart.controller";
-import verifyUserToken from "../user/user.middleware";
+import { verifyUserToken } from "../user/middlewares";
 
 const router = express.Router();
 

@@ -50,15 +50,10 @@ export const createOrder = async (req: Request, res: Response) => {
 // Get all orders
 export const getOrders = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find()
-      .select(
-        "deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status"
-      )
-      .populate({
-        path: "cart.id",
-        model: "Product",
-        select: "title  photo  -_id",
-      });
+    const orders = await Order.find().select(
+      "deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart"
+    );
+
     const updatedOrders = orders.map((order) => ({
       customersName: order.deliveryInfo.name,
       address: order.deliveryInfo.address,
@@ -66,12 +61,13 @@ export const getOrders = async (req: Request, res: Response) => {
       paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
       paymentMethod: order.paymentMethod,
       _id: order._id,
-      firstProduct: order.cart[0].id,
+      firstProduct: order.cart[0],
       status: order.status,
     }));
 
     res.status(200).json({ orders: updatedOrders });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to fetch orders.", error });
   }
 };
