@@ -14,7 +14,7 @@ declare module "express" {
 }
 
 // 🔄 Reusable Token Verifier by Allowed Roles
-const verifyAdminTokenByRoles = (allowedRoles: string[]) => {
+const verifyTokenByRoles = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.cookies;
 
@@ -58,29 +58,29 @@ const verifyAdminTokenByRoles = (allowedRoles: string[]) => {
 };
 
 // ✅ Middleware for all valid stuff (admin, customerManager, seller)
-export const verifyStuffToken = verifyAdminTokenByRoles([
+export const verifyStuffToken = verifyTokenByRoles([
   "admin",
   "seller",
   "customerManager",
 ]);
 
 // ✅ Middleware for individual roles
-export const verifyUserToken = verifyAdminTokenByRoles([
+export const verifyUserToken = verifyTokenByRoles([
   "admin",
   "seller",
   "customerManager",
   "user",
 ]);
-export const verifyAdminToken = verifyAdminTokenByRoles(["admin"]);
-export const verifySellerToken = verifyAdminTokenByRoles(["seller"]);
-export const verifyCustomerManagerToken = verifyAdminTokenByRoles([
+export const verifyAdminToken = verifyTokenByRoles(["admin"]);
+export const verifySellerToken = verifyTokenByRoles(["seller"]);
+export const verifyCustomerManagerToken = verifyTokenByRoles([
   "customerManager",
 ]);
-export const verifyCustomerManagerAndAdminToken = verifyAdminTokenByRoles([
+export const verifyCustomerManagerAndAdminToken = verifyTokenByRoles([
   "admin",
   "customerManager",
 ]);
-export const verifySellerAndAdminToken = verifyAdminTokenByRoles([
+export const verifySellerAndAdminToken = verifyTokenByRoles([
   "admin",
   "seller",
 ]);

@@ -7,6 +7,8 @@ import {
   updateOrderStatus,
 } from "./order.controller";
 import { verifyUserToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import Order from "./order.model";
 
 const router = express.Router();
 
@@ -19,5 +21,6 @@ router.get("/getSingleOrder/:id", getSingleOrders);
 
 // Update order status
 router.patch("/updateOrderStatus/:id", updateOrderStatus);
+router.delete("/delete/:id", deleteById(Order));
 
 export default router;

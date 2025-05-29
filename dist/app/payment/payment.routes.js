@@ -15,47 +15,72 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const axios_1 = __importDefault(require("axios"));
 const order_model_1 = __importDefault(require("../order/order.model"));
+const cart_model_1 = __importDefault(require("../cart/cart.model"));
+const middlewares_1 = require("../user/middlewares");
+const mongoose_1 = __importDefault(require("mongoose"));
 const router = express_1.default.Router();
-// Environment variables (use your real credentials in .env)
+// Environment variables
 const MERCHANT_ID = process.env.AMARPAY_MERCHANT_ID;
 const SIGNATURE_KEY = process.env.AMARPAY_SIGNATURE_KEY;
 const BASE_URL = "https://sandbox.aamarpay.com";
-// const redirectUrl = "http://localhost:5000";
-// const clientSideUrl = "http://localhost:3000";
-const redirectUrl = "https://a-b-server.onrender.com";
-const clientSideUrl = "https://book7.vercel.app";
-router.post("/initialize-payment", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const redirectUrl = "http://localhost:5000";
+const clientSideUrl = "http://localhost:3000";
+// Initialize Payment Route
+router.post("/initialize-payment", middlewares_1.verifyUserToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { amount, transactionId, name, email, phone, orderInfoForStore } = req.body;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
     if (!amount || !transactionId) {
         return res.status(400).json({ message: "Required fields are missing" });
     }
+    const session = yield mongoose_1.default.startSession();
     try {
+        session.startTransaction();
+        console.log(orderInfoForStore);
+        // 1. Create order in DB
+        yield order_model_1.default.create([orderInfoForStore], { session });
+        // 2. Prepare payment data
         const paymentData = {
-            store_id: "aamarpaytest",
-            signature_key: "dbb74894e82415a2f7ff0ec3a97e4183",
+            store_id: MERCHANT_ID || "aamarpaytest",
+            signature_key: SIGNATURE_KEY || "dbb74894e82415a2f7ff0ec3a97e4183",
             amount,
             desc: "This is description",
             payment_type: "VISA", // or MOBILE_BANKING, etc.
             currency: "BDT",
             tran_id: transactionId,
             cus_name: name,
-            cus_email: email ? email : "example@gmail.com",
+            cus_email: email || "example@gmail.com",
             cus_phone: phone,
             success_url: `${redirectUrl}/payment/success/${transactionId}`,
             fail_url: `${redirectUrl}/payment/fail/${transactionId}`,
             cancel_url: `${clientSideUrl}/checkout`,
             type: "json",
         };
-        // Send request to AmarPay
+        // 3. Send request to AmarPay
         const response = yield axios_1.default.post(`${BASE_URL}/jsonpost.php`, paymentData);
-        order_model_1.default.create(orderInfoForStore);
-        // AmarPay returns a payment URL
+        if (!response.data.payment_url) {
+            throw new Error("Failed to receive payment URL");
+        }
+        // 4. Clear cart after payment initialization is successful
+        yield cart_model_1.default.findOneAndUpdate({ userId }, { $set: { cartItems: [] } }, { session });
+        // 5. Commit transaction
+        yield session.commitTransaction();
+        // 6. Respond with payment URL
         res.json({ paymentUrl: response.data.payment_url });
     }
     catch (error) {
-        res.status(500).json({ message: "Payment initialization failed" });
+        console.log(error);
+        yield session.abortTransaction();
+        res.status(500).json({
+            message: "Payment initialization failed",
+            error: error.message || "Unknown error",
+        });
+    }
+    finally {
+        session.endSession();
     }
 }));
+// Payment Success
 router.post("/success/:transactionId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transactionId = req.params.transactionId;
@@ -63,16 +88,17 @@ router.post("/success/:transactionId", (req, res) => __awaiter(void 0, void 0, v
         res.redirect(`${clientSideUrl}/success/${transactionId}`);
     }
     catch (error) {
-        res.status(500).json({ message: "Payment initialization failed" });
+        res.status(500).json({ message: "Payment success processing failed" });
     }
 }));
+// Payment Fail
 router.post("/fail/:transactionId", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transactionId = req.params.transactionId;
         res.redirect(`${clientSideUrl}/fail/${transactionId}`);
     }
     catch (error) {
-        res.status(500).json({ message: "Payment initialization failed" });
+        res.status(500).json({ message: "Payment fail processing failed" });
     }
 }));
 exports.default = router;

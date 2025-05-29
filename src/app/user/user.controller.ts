@@ -619,8 +619,8 @@ export const getOrdersByUserId = async (
   res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user?._id;
-    const orders = await Order.find({ userId });
+    const user = req.user?._id;
+    const orders = await Order.find({ user });
 
     if (!orders) {
       res
@@ -673,7 +673,6 @@ export const addCoins = async (req: Request, res: Response) => {
     ) {
       return res.status(400).json({ message: "Invalid request data" });
     }
-
     // Find user and update coins and coinsTakingDate
     const user = await User.findByIdAndUpdate(
       userId,

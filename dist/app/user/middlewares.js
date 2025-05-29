@@ -20,7 +20,7 @@ const user_model_1 = __importDefault(require("./user.model"));
 dotenv_1.default.config();
 const JWT_SECRET = process.env.JWT_SECRET;
 // 🔄 Reusable Token Verifier by Allowed Roles
-const verifyAdminTokenByRoles = (allowedRoles) => {
+const verifyTokenByRoles = (allowedRoles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { refreshToken } = req.cookies;
         if (!refreshToken) {
@@ -56,28 +56,28 @@ const verifyAdminTokenByRoles = (allowedRoles) => {
     });
 };
 // ✅ Middleware for all valid stuff (admin, customerManager, seller)
-exports.verifyStuffToken = verifyAdminTokenByRoles([
+exports.verifyStuffToken = verifyTokenByRoles([
     "admin",
     "seller",
     "customerManager",
 ]);
 // ✅ Middleware for individual roles
-exports.verifyUserToken = verifyAdminTokenByRoles([
+exports.verifyUserToken = verifyTokenByRoles([
     "admin",
     "seller",
     "customerManager",
     "user",
 ]);
-exports.verifyAdminToken = verifyAdminTokenByRoles(["admin"]);
-exports.verifySellerToken = verifyAdminTokenByRoles(["seller"]);
-exports.verifyCustomerManagerToken = verifyAdminTokenByRoles([
+exports.verifyAdminToken = verifyTokenByRoles(["admin"]);
+exports.verifySellerToken = verifyTokenByRoles(["seller"]);
+exports.verifyCustomerManagerToken = verifyTokenByRoles([
     "customerManager",
 ]);
-exports.verifyCustomerManagerAndAdminToken = verifyAdminTokenByRoles([
+exports.verifyCustomerManagerAndAdminToken = verifyTokenByRoles([
     "admin",
     "customerManager",
 ]);
-exports.verifySellerAndAdminToken = verifyAdminTokenByRoles([
+exports.verifySellerAndAdminToken = verifyTokenByRoles([
     "admin",
     "seller",
 ]);

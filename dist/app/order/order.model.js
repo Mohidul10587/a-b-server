@@ -28,12 +28,12 @@ const mongoose_1 = __importStar(require("mongoose"));
 const cart_model_1 = require("../cart/cart.model");
 const OrderSchema = new mongoose_1.Schema({
     cart: [cart_model_1.CartItemSchema],
+    user: { type: mongoose_1.default.Types.ObjectId, ref: "User", required: true },
     deliveryInfo: {
         name: { type: String, required: true },
         email: { type: String, required: true },
         address: { type: String, required: true },
         city: { type: String, required: true },
-        postalCode: { type: String, required: true },
         phone: { type: String, required: true },
     },
     paidAmount: { type: Number, required: true },

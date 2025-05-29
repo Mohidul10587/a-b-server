@@ -1,15 +1,15 @@
 // models/Order.ts
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { ObjectId, Schema, Document } from "mongoose";
 import { CartItemSchema, ICart } from "../cart/cart.model";
 
 interface IOrder extends Document {
   cart: ICart[];
+  user: ObjectId;
   deliveryInfo: {
     name: string;
     email: string;
     address: string;
     city: string;
-    postalCode: string;
     phone: string;
   };
   paidAmount: number;
@@ -22,12 +22,12 @@ interface IOrder extends Document {
 const OrderSchema = new Schema<IOrder>(
   {
     cart: [CartItemSchema],
+    user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
     deliveryInfo: {
       name: { type: String, required: true },
       email: { type: String, required: true },
       address: { type: String, required: true },
       city: { type: String, required: true },
-      postalCode: { type: String, required: true },
       phone: { type: String, required: true },
     },
     paidAmount: { type: Number, required: true },

@@ -93,11 +93,7 @@ export const updateOrderStatus = async (req: Request, res: Response) => {
 };
 export const getSingleOrders = async (req: Request, res: Response) => {
   try {
-    const order = await Order.findOne({ _id: req.params.id }).populate({
-      path: "cart.id",
-      model: "Product",
-      select: "title  photo price -_id",
-    });
+    const order = await Order.findOne({ _id: req.params.id });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found." });
@@ -105,6 +101,7 @@ export const getSingleOrders = async (req: Request, res: Response) => {
 
     res.status(200).json(order);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Failed to fetch order.", error });
   }
 };

@@ -91,17 +91,14 @@ const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
 exports.updateOrderStatus = updateOrderStatus;
 const getSingleOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const order = yield order_model_1.default.findOne({ _id: req.params.id }).populate({
-            path: "cart.id",
-            model: "Product",
-            select: "title  photo price -_id",
-        });
+        const order = yield order_model_1.default.findOne({ _id: req.params.id });
         if (!order) {
             return res.status(404).json({ message: "Order not found." });
         }
         res.status(200).json(order);
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Failed to fetch order.", error });
     }
 });

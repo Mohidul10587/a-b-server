@@ -552,8 +552,8 @@ exports.logOut = logOut;
 const getOrdersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
-        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-        const orders = yield order_model_1.default.find({ userId });
+        const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+        const orders = yield order_model_1.default.find({ user });
         if (!orders) {
             res
                 .status(200)
