@@ -67,7 +67,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Routes
-
 app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes);
