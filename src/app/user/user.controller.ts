@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
 import User, { IUser } from "./user.model";
 import bcrypt from "bcryptjs";
-
 import dotenv from "dotenv";
-
-import Order from "../order/order.model";
 
 import mongoose from "mongoose";
 import Settings from "../settings/settings.model";
 import { setRefreshTokenCookie } from "../shared/setToken";
 import Category from "../category/category.model";
-
+import Writer from "../writer/writer.model";
+import Product from "../product/product.model";
+import Order from "../order/order.model";
 declare module "express" {
   interface Request {
     user?: IUser; // Adjust the type based on your User model
@@ -529,24 +528,17 @@ export const getSingleUserForAddToCartComponent = async (
 export const updateUser = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const { name, email, phone, photo, address, password, previousPhoto } =
-      req.body;
+    const { name, address, password, image } = req.body;
 
-    const files = req.files as { photo?: Express.Multer.File[] };
     const hashedPassword = password
       ? await bcrypt.hash(password, 10)
       : undefined;
-    const photoFile = files?.photo?.[0];
-
-    // Upload image if provided
 
     // Build the update object dynamically
     const updateData: any = {
       name,
-      email,
-      phone,
       address,
-      image: photo,
+      image,
     };
 
     if (password) {
@@ -567,7 +559,6 @@ export const updateUser = async (req: Request, res: Response) => {
       });
     }
     setRefreshTokenCookie(res, updatedUser);
-
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
@@ -575,26 +566,6 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error(error);
-
-    // Handle duplicate key errors (code 11000)
-    if (error.code === 11000) {
-      const duplicateField = Object.keys(error.keyValue)[0]; // Identify the conflicting field
-      const duplicateValue = error.keyValue[duplicateField]; // The value causing the conflict
-
-      let message = `Duplicate value for ${duplicateField}: ${duplicateValue}.`;
-      if (duplicateField === "phone") {
-        message = "The phone number is already in use.";
-      } else if (duplicateField === "email") {
-        message = "The email address is already in use.";
-      }
-
-      return res.status(400).json({
-        success: false,
-        message,
-        field: duplicateField, // Send the field for frontend handling if needed
-      });
-    }
-
     return res.status(500).json({
       success: false,
       message: "User update failed, please try again",
@@ -620,7 +591,8 @@ export const getOrdersByUserId = async (
 ): Promise<void> => {
   try {
     const user = req.user?._id;
-    const orders = await Order.find({ user });
+    console.log("user", user);
+    const orders = await Order.find({ user }).sort({ createdAt: -1 });
 
     if (!orders) {
       res
@@ -631,7 +603,7 @@ export const getOrdersByUserId = async (
     res.status(200).json({
       success: true,
       message: "Order received successfully",
-      orders: orders.reverse(),
+      orders: orders,
     });
   } catch (error) {
     res
@@ -876,22 +848,5 @@ export const updatePassword = async (req: Request, res: Response) => {
       message: "Error updating User status",
       error: error.message,
     });
-  }
-};
-
-export const getCountsOfDocuments = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const categoriesCount = await Category.countDocuments();
-
-    res.status(200).json({
-      success: true,
-      message: "Fetched successfully",
-      resData: categoriesCount,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error retrieving counts", error });
   }
 };

@@ -27,7 +27,6 @@ import {
   getSummaryOfActivity,
   getDetailsOFSingleUserForAdminCustomerDetailsComponent,
   updatePassword,
-  getCountsOfDocuments,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 
@@ -97,5 +96,5 @@ router.post(
   verifyAdminToken,
   createUserByEmailAndPassword
 );
-router.get("/getOrdersCount", getCountsOfDocuments);
+
 export default router;

@@ -12,15 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCountsOfDocuments = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.addCoins = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.logInStuffWithEmailPassword = exports.logInUserWithEmailPassword = exports.createStuffByEmailAndPassword = exports.createUserByEmailAndPassword = exports.createUserBySocialMethod = void 0;
+exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.addCoins = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.logInStuffWithEmailPassword = exports.logInUserWithEmailPassword = exports.createStuffByEmailAndPassword = exports.createUserByEmailAndPassword = exports.createUserBySocialMethod = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const order_model_1 = __importDefault(require("../order/order.model"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const settings_model_1 = __importDefault(require("../settings/settings.model"));
 const setToken_1 = require("../shared/setToken");
-const category_model_1 = __importDefault(require("../category/category.model"));
+const order_model_1 = __importDefault(require("../order/order.model"));
 dotenv_1.default.config();
 // Helper function to send a consistent response with success flag and status code
 // Create a new user with Google login
@@ -475,23 +474,17 @@ const getSingleUserForAddToCartComponent = (req, res) => __awaiter(void 0, void 
 });
 exports.getSingleUserForAddToCartComponent = getSingleUserForAddToCartComponent;
 const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
         const userId = req.params.userId;
-        const { name, email, phone, photo, address, password, previousPhoto } = req.body;
-        const files = req.files;
+        const { name, address, password, image } = req.body;
         const hashedPassword = password
             ? yield bcryptjs_1.default.hash(password, 10)
             : undefined;
-        const photoFile = (_a = files === null || files === void 0 ? void 0 : files.photo) === null || _a === void 0 ? void 0 : _a[0];
-        // Upload image if provided
         // Build the update object dynamically
         const updateData = {
             name,
-            email,
-            phone,
             address,
-            image: photo,
+            image,
         };
         if (password) {
             updateData.password = hashedPassword;
@@ -514,23 +507,6 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
     catch (error) {
         console.error(error);
-        // Handle duplicate key errors (code 11000)
-        if (error.code === 11000) {
-            const duplicateField = Object.keys(error.keyValue)[0]; // Identify the conflicting field
-            const duplicateValue = error.keyValue[duplicateField]; // The value causing the conflict
-            let message = `Duplicate value for ${duplicateField}: ${duplicateValue}.`;
-            if (duplicateField === "phone") {
-                message = "The phone number is already in use.";
-            }
-            else if (duplicateField === "email") {
-                message = "The email address is already in use.";
-            }
-            return res.status(400).json({
-                success: false,
-                message,
-                field: duplicateField, // Send the field for frontend handling if needed
-            });
-        }
         return res.status(500).json({
             success: false,
             message: "User update failed, please try again",
@@ -553,7 +529,8 @@ const getOrdersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, functi
     var _a;
     try {
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-        const orders = yield order_model_1.default.find({ user });
+        console.log("user", user);
+        const orders = yield order_model_1.default.find({ user }).sort({ createdAt: -1 });
         if (!orders) {
             res
                 .status(200)
@@ -563,7 +540,7 @@ const getOrdersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, functi
         res.status(200).json({
             success: true,
             message: "Order received successfully",
-            orders: orders.reverse(),
+            orders: orders,
         });
     }
     catch (error) {
@@ -793,17 +770,3 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.updatePassword = updatePassword;
-const getCountsOfDocuments = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const categoriesCount = yield category_model_1.default.countDocuments();
-        res.status(200).json({
-            success: true,
-            message: "Fetched successfully",
-            resData: categoriesCount,
-        });
-    }
-    catch (error) {
-        res.status(500).json({ message: "Error retrieving counts", error });
-    }
-});
-exports.getCountsOfDocuments = getCountsOfDocuments;

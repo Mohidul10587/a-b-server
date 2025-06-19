@@ -11,9 +11,9 @@ const reusableControllers_1 = require("../shared/reusableControllers");
 const order_model_1 = __importDefault(require("./order.model"));
 const router = express_1.default.Router();
 // Create a new order
-router.post("/create", middlewares_1.verifyUserToken, order_controller_1.createOrder);
+router.post("/create", middlewares_1.verifyUserToken, order_controller_1.create);
 // Get all orders
-router.get("/all", order_controller_1.getOrders);
+router.get("/allForAdmin", order_controller_1.allForAdmin);
 router.get("/getSingleOrder/:id", order_controller_1.getSingleOrders);
 // Update order status
 router.patch("/updateOrderStatus/:id", order_controller_1.updateOrderStatus);

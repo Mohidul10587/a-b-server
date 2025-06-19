@@ -12,17 +12,20 @@ interface IBanner extends Document {
   banners: BannerItem[];
 }
 
-const BannerSchema: Schema = new Schema({
-  title: { type: String },
+const BannerSchema: Schema = new Schema(
+  {
+    title: { type: String },
 
-  banners: [
-    {
-      img: { type: String, required: true },
-      title: { type: String },
-      link: { type: String },
-    },
-  ],
-});
+    banners: [
+      {
+        img: { type: String, required: true },
+        title: { type: String },
+        link: { type: String },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 const Banner = mongoose.model<IBanner>("Banner", BannerSchema);
 

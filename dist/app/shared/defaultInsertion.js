@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAdmin = exports.createDefaultSettings = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const settings_model_1 = __importDefault(require("../settings/settings.model"));
 const user_model_1 = __importDefault(require("../user/user.model"));
@@ -94,8 +93,6 @@ const registerAdmin = (name, email, password, image, slug) => __awaiter(void 0, 
         });
         // Save admin to database
         yield admin.save();
-        // Generate JWT token
-        const token = jsonwebtoken_1.default.sign({ adminId: admin._id, email: admin.email }, JWT_SECRET, { expiresIn: "1h" });
     }
     catch (error) {
         console.error("Admin registration failed", error);

@@ -12,11 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSingleOrders = exports.updateOrderStatus = exports.getOrders = exports.createOrder = void 0;
-const order_model_1 = __importDefault(require("./order.model"));
+exports.getSingleOrders = exports.updateOrderStatus = exports.allForAdmin = exports.create = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const cart_model_1 = __importDefault(require("../cart/cart.model"));
-const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const category_model_1 = __importDefault(require("../category/category.model"));
+const writer_model_1 = __importDefault(require("../writer/writer.model"));
+const product_model_1 = __importDefault(require("../product/product.model"));
+const order_model_1 = __importDefault(require("../order/order.model"));
+const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
+const user_model_1 = __importDefault(require("../user/user.model"));
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const session = yield mongoose_1.default.startSession();
     try {
@@ -48,11 +53,13 @@ const createOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
 });
-exports.createOrder = createOrder;
+exports.create = create;
 // Get all orders
-const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const orders = yield order_model_1.default.find().select("deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart");
+        const orders = yield order_model_1.default.find()
+            .select("deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart")
+            .sort({ createdAt: -1 });
         const updatedOrders = orders.map((order) => ({
             customersName: order.deliveryInfo.name,
             address: order.deliveryInfo.address,
@@ -63,14 +70,32 @@ const getOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             firstProduct: order.cart[0],
             status: order.status,
         }));
-        res.status(200).json({ orders: updatedOrders });
+        const [categoriesCount, writersCount, ordersCount, productsCount, publishersCount, usersCount,] = yield Promise.all([
+            category_model_1.default.countDocuments(),
+            writer_model_1.default.countDocuments(),
+            order_model_1.default.countDocuments(),
+            product_model_1.default.countDocuments(),
+            publishers_model_1.default.countDocuments(),
+            user_model_1.default.countDocuments(),
+        ]);
+        res.status(200).json({
+            orders: updatedOrders,
+            counts: {
+                categoriesCount,
+                writersCount,
+                ordersCount,
+                productsCount,
+                publishersCount,
+                usersCount,
+            },
+        });
     }
     catch (error) {
         console.log(error);
         res.status(500).json({ message: "Failed to fetch orders.", error });
     }
 });
-exports.getOrders = getOrders;
+exports.allForAdmin = allForAdmin;
 // Update order status
 const updateOrderStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

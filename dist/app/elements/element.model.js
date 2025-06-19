@@ -51,5 +51,5 @@ const pageElementsSchema = new mongoose_1.Schema({
     images: { type: [String], default: [] }, // Array of image URLs
     width: { type: Number, required: true },
     height: { type: Number, required: true },
-});
+}, { timestamps: true });
 exports.PageElements = (0, mongoose_1.model)("Elements", pageElementsSchema);

@@ -55,7 +55,7 @@ const CategorySchema = new mongoose_1.Schema({
             description: { type: String },
         },
     ],
-});
+}, { timestamps: true });
 // Middleware to make the category slug unique if it's already taken
 CategorySchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -1,8 +1,8 @@
 // routes/orderRoutes.ts
 import express from "express";
 import {
-  createOrder,
-  getOrders,
+  create,
+  allForAdmin,
   getSingleOrders,
   updateOrderStatus,
 } from "./order.controller";
@@ -13,10 +13,10 @@ import Order from "./order.model";
 const router = express.Router();
 
 // Create a new order
-router.post("/create", verifyUserToken, createOrder);
+router.post("/create", verifyUserToken, create);
 
 // Get all orders
-router.get("/all", getOrders);
+router.get("/allForAdmin", allForAdmin);
 router.get("/getSingleOrder/:id", getSingleOrders);
 
 // Update order status

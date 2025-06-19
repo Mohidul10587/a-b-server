@@ -92,14 +92,8 @@ export const registerAdmin = async (
     });
 
     // Save admin to database
-    await admin.save();
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { adminId: admin._id, email: admin.email },
-      JWT_SECRET,
-      { expiresIn: "1h" }
-    );
+    await admin.save();
   } catch (error) {
     console.error("Admin registration failed", error);
   }

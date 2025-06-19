@@ -27,6 +27,6 @@ const mongoose_1 = __importStar(require("mongoose"));
 const SuggestionSchema = new mongoose_1.Schema({
     title: { type: String },
     products: [{ type: mongoose_1.default.Schema.Types.ObjectId, ref: "Product" }],
-});
+}, { timestamps: true });
 const Suggestion = (0, mongoose_1.model)("Suggestion", SuggestionSchema);
 exports.default = Suggestion;

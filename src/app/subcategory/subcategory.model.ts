@@ -16,24 +16,27 @@ interface Subcategory extends Document {
   parentCategory: mongoose.Types.ObjectId;
 }
 
-const SubcategorySchema = new Schema<Subcategory>({
-  title: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
-  description: { type: String },
-  shortDescription: { type: String },
-  display: { type: Boolean },
-  img: { type: String, required: true },
-  metaTitle: { type: String },
-  metaDescription: { type: String },
-  keywords: { type: [String] },
-  metaImg: { type: String },
-  position: { type: Number, default: 0 },
-  parentCategory: {
-    type: Schema.Types.ObjectId,
-    ref: "Category",
-    required: true,
+const SubcategorySchema = new Schema<Subcategory>(
+  {
+    title: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    description: { type: String },
+    shortDescription: { type: String },
+    display: { type: Boolean },
+    img: { type: String, required: true },
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    keywords: { type: [String] },
+    metaImg: { type: String },
+    position: { type: Number, default: 0 },
+    parentCategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      required: true,
+    },
   },
-});
+  { timestamps: true }
+);
 
 // Middleware to make the category slug unique if it's already taken
 SubcategorySchema.pre("save", async function (next) {

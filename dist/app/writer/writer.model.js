@@ -43,7 +43,7 @@ const writerSchema = new mongoose_1.Schema({
     metaDescription: { type: String }, // New field
     tags: { type: [String] }, // New field
     metaImg: { type: String },
-});
+}, { timestamps: true });
 const Writer = (0, mongoose_1.model)("Writer", writerSchema);
 // Middleware to make the slug unique if it's already taken
 writerSchema.pre("save", function (next) {

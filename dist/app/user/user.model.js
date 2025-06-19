@@ -70,7 +70,6 @@ const UserSchema = new mongoose_1.Schema({
     display: { type: Boolean, default: true },
     email: { type: String, unique: true, required: true },
     facebook: { type: String, default: "" },
-    friday_openingHours: { type: String, default: "" },
     gender: { type: String, default: "" },
     gmail: { type: String, default: "" },
     image: { type: String, default: "" },
@@ -78,7 +77,6 @@ const UserSchema = new mongoose_1.Schema({
     isUser: { type: Boolean, default: true },
     linkedin: { type: String, default: "" },
     lastName: { type: String, default: "" },
-    monday_openingHours: { type: String, default: "" },
     name: { type: String, default: "" },
     notifications: {
         type: [
@@ -105,17 +103,12 @@ const UserSchema = new mongoose_1.Schema({
     postalCode: { type: String, default: "" },
     region: { type: String, default: "" },
     role: { type: String, default: "user" },
-    saturday_openingHours: { type: String, default: "" },
     skype: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
     street: { type: String, default: "" },
-    sunday_openingHours: { type: String, default: "" },
-    thursday_openingHours: { type: String, default: "" },
     toDaysCoins: { type: Number, default: 0 },
-    tuesday_openingHours: { type: String, default: "" },
     twitter: { type: String, default: "" },
     userCity: { type: String, default: "" },
-    wednesday_openingHours: { type: String, default: "" },
     whatsapp: { type: String, default: "" },
 }, { timestamps: true });
 UserSchema.index({ email: 1 });

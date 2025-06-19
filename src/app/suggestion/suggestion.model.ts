@@ -5,10 +5,13 @@ interface ISuggestion extends Document {
   products: mongoose.Schema.Types.ObjectId[];
 }
 
-const SuggestionSchema = new Schema({
-  title: { type: String },
-  products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
-});
+const SuggestionSchema = new Schema(
+  {
+    title: { type: String },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+  },
+  { timestamps: true }
+);
 
 const Suggestion = model<ISuggestion>("Suggestion", SuggestionSchema);
 

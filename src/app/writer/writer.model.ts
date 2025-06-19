@@ -14,17 +14,20 @@ interface IWriter extends Document {
   rating: number;
 }
 
-const writerSchema = new Schema<IWriter>({
-  title: { type: String, required: true },
-  slug: { type: String, required: true, unique: true },
-  description: { type: String },
-  img: { type: String, required: true },
-  rating: { type: Number, default: 4 },
-  metaTitle: { type: String }, // New field
-  metaDescription: { type: String }, // New field
-  tags: { type: [String] }, // New field
-  metaImg: { type: String },
-});
+const writerSchema = new Schema<IWriter>(
+  {
+    title: { type: String, required: true },
+    slug: { type: String, required: true, unique: true },
+    description: { type: String },
+    img: { type: String, required: true },
+    rating: { type: Number, default: 4 },
+    metaTitle: { type: String }, // New field
+    metaDescription: { type: String }, // New field
+    tags: { type: [String] }, // New field
+    metaImg: { type: String },
+  },
+  { timestamps: true }
+);
 const Writer = model<IWriter>("Writer", writerSchema);
 // Middleware to make the slug unique if it's already taken
 writerSchema.pre("save", async function (next) {

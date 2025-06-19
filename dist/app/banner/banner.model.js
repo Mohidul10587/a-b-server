@@ -33,6 +33,6 @@ const BannerSchema = new mongoose_1.Schema({
             link: { type: String },
         },
     ],
-});
+}, { timestamps: true });
 const Banner = mongoose_1.default.model("Banner", BannerSchema);
 exports.default = Banner;

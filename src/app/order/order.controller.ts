@@ -1,10 +1,16 @@
 // controllers/orderController.ts
 import { Request, Response } from "express";
-import Order from "./order.model";
+
 import mongoose from "mongoose";
 import Cart from "../cart/cart.model";
-
-export const createOrder = async (req: Request, res: Response) => {
+import Category from "../category/category.model";
+import Writer from "../writer/writer.model";
+import Product from "../product/product.model";
+import Order from "../order/order.model";
+import Publisher from "../publishers/publishers.model";
+import { count } from "console";
+import User from "../user/user.model";
+export const create = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
 
   try {
@@ -12,7 +18,6 @@ export const createOrder = async (req: Request, res: Response) => {
 
     const orderInfo = req.body;
     const userId = req.user?._id;
-
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
     }
@@ -48,11 +53,13 @@ export const createOrder = async (req: Request, res: Response) => {
 };
 
 // Get all orders
-export const getOrders = async (req: Request, res: Response) => {
+export const allForAdmin = async (req: Request, res: Response) => {
   try {
-    const orders = await Order.find().select(
-      "deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart"
-    );
+    const orders = await Order.find()
+      .select(
+        "deliveryInfo.name deliveryInfo.address paymentStatus paymentMethod deliveryInfo.phone status cart"
+      )
+      .sort({ createdAt: -1 });
 
     const updatedOrders = orders.map((order) => ({
       customersName: order.deliveryInfo.name,
@@ -64,8 +71,33 @@ export const getOrders = async (req: Request, res: Response) => {
       firstProduct: order.cart[0],
       status: order.status,
     }));
+    const [
+      categoriesCount,
+      writersCount,
+      ordersCount,
+      productsCount,
+      publishersCount,
+      usersCount,
+    ] = await Promise.all([
+      Category.countDocuments(),
+      Writer.countDocuments(),
+      Order.countDocuments(),
+      Product.countDocuments(),
+      Publisher.countDocuments(),
+      User.countDocuments(),
+    ]);
 
-    res.status(200).json({ orders: updatedOrders });
+    res.status(200).json({
+      orders: updatedOrders,
+      counts: {
+        categoriesCount,
+        writersCount,
+        ordersCount,
+        productsCount,
+        publishersCount,
+        usersCount,
+      },
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Failed to fetch orders.", error });

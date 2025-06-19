@@ -44,5 +44,4 @@ router.patch("/updateStatus/:id", middlewares_2.verifyAdminToken, user_controlle
 router.patch("/updatePassword/:id", middlewares_2.verifyAdminToken, user_controller_1.updatePassword);
 router.delete("/delete/:id", middlewares_2.verifyAdminToken, (0, reusableControllers_1.deleteById)(user_model_1.default));
 router.post("/createUserAsStuffByEmailAndPasswordByAdmin", middlewares_2.verifyAdminToken, user_controller_1.createUserByEmailAndPassword);
-router.get("/getOrdersCount", user_controller_1.getCountsOfDocuments);
 exports.default = router;

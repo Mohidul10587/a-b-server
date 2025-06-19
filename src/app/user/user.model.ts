@@ -26,7 +26,6 @@ export interface IUser extends Document {
   display?: boolean;
   email?: string;
   facebook: string;
-  friday_openingHours: string;
   gender: string;
   gmail: string;
   image?: string;
@@ -34,8 +33,6 @@ export interface IUser extends Document {
   isUser: boolean;
   linkedin: string;
   lastName: string;
-
-  monday_openingHours: string;
   name?: string;
   notifications: {
     _id: string;
@@ -52,17 +49,13 @@ export interface IUser extends Document {
   img?: string;
   postalCode: string;
   region: string;
-  saturday_openingHours: string;
   skype: string;
   slug: string;
   street: string;
-  sunday_openingHours: string;
-  thursday_openingHours: string;
   toDaysCoins: number;
   tuesday_openingHours: string;
   twitter: string;
   userCity: string;
-  wednesday_openingHours: string;
   whatsapp: string;
   password: string;
   role: "user" | "admin" | "seller" | "customerManager";
@@ -105,7 +98,6 @@ const UserSchema = new Schema<IUser>(
     display: { type: Boolean, default: true },
     email: { type: String, unique: true, required: true },
     facebook: { type: String, default: "" },
-    friday_openingHours: { type: String, default: "" },
     gender: { type: String, default: "" },
     gmail: { type: String, default: "" },
     image: { type: String, default: "" },
@@ -113,9 +105,7 @@ const UserSchema = new Schema<IUser>(
     isUser: { type: Boolean, default: true },
     linkedin: { type: String, default: "" },
     lastName: { type: String, default: "" },
-    monday_openingHours: { type: String, default: "" },
     name: { type: String, default: "" },
-
     notifications: {
       type: [
         {
@@ -134,7 +124,6 @@ const UserSchema = new Schema<IUser>(
       ],
       default: [],
     },
-
     oneClickPayStartedAt: { type: String, default: "" },
     password: { type: String, default: "a" },
     phone: { type: String, default: null },
@@ -142,17 +131,12 @@ const UserSchema = new Schema<IUser>(
     postalCode: { type: String, default: "" },
     region: { type: String, default: "" },
     role: { type: String, default: "user" },
-    saturday_openingHours: { type: String, default: "" },
     skype: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
     street: { type: String, default: "" },
-    sunday_openingHours: { type: String, default: "" },
-    thursday_openingHours: { type: String, default: "" },
     toDaysCoins: { type: Number, default: 0 },
-    tuesday_openingHours: { type: String, default: "" },
     twitter: { type: String, default: "" },
     userCity: { type: String, default: "" },
-    wednesday_openingHours: { type: String, default: "" },
     whatsapp: { type: String, default: "" },
   },
   { timestamps: true }

@@ -50,7 +50,7 @@ const SubcategorySchema = new mongoose_1.Schema({
         ref: "Category",
         required: true,
     },
-});
+}, { timestamps: true });
 // Middleware to make the category slug unique if it's already taken
 SubcategorySchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
