@@ -73,7 +73,7 @@ export const singleForUserFoDetailsPageBySlug = async (
         populate: {
           path: "products",
           model: "Product",
-          select: "title img slug price  rating",
+          select: "title img slug sellingPrice  rating",
           populate: {
             path: "writer",
             model: "Writer",
@@ -111,9 +111,9 @@ export const singleForUserFoDetailsPageBySlug = async (
           _id: 1,
           title: 1,
           writer: 1,
-          price: 1,
+          sellingPrice: 1,
           rating: 1,
-          unprice: 1,
+          regularPrice: 1,
           img: 1,
           slug: 1,
           stockStatus: 1,
@@ -141,7 +141,7 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id img title featured sele price")
+      .select("_id img title featured sele sellingPrice")
       .populate("writer")
       .populate("category");
     const products = result.reverse();
@@ -174,7 +174,7 @@ export const getAllProductsForAdmin = async (
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id img title price slug")
+      .select("_id img title sellingPrice slug")
       .populate("writer", "title");
 
     const products = result.reverse();
@@ -191,7 +191,7 @@ export const getAllProductsForOfferPage = async (
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id img title price slug subcategory ")
+      .select("_id img title sellingPrice slug subcategory ")
       .populate("writer", "title")
       .populate("category", "title");
     const products = result.reverse();
@@ -224,7 +224,7 @@ export const getProductsByWriterSlug = async (
   try {
     const writer = await Writer.find({ slug });
     const result = await Product.find({ writer }).select(
-      "_id img title featured sele price slug category subcategory publisher language"
+      "_id img title featured sele sellingPrice slug category subcategory publisher language"
     );
 
     const products = result.reverse();
@@ -242,7 +242,7 @@ export const getProductsByWriter = async (
 
   try {
     const result = await Product.find({ writer: writerId })
-      .select("_id img title featured sele price slug")
+      .select("_id img title featured sele sellingPrice slug")
       .populate("writer")
       .populate("category");
     const products = result.reverse();
@@ -310,7 +310,7 @@ export const getProductsByCategorySlug = async (
     const products = await Product.find({
       category: categoryId,
     }).select(
-      "_id img title featured sele price slug stockStatus writer publisher  subcategory language"
+      "_id img title featured sele sellingPrice slug stockStatus writer publisher  subcategory language"
     );
 
     const writers = await Writer.find().select("_id title slug img").lean();
@@ -340,7 +340,7 @@ export const getProductsByPublishersSlug = async (
     const products = await Product.find({
       publisher: publisherId,
     }).select(
-      "_id img title category subcategory writer  featured sele price slug stockStatus language "
+      "_id img title category subcategory writer  featured sele sellingPrice slug stockStatus language "
     );
 
     const writers = await Writer.find().select("title").lean();

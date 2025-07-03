@@ -41,7 +41,7 @@ export const createDefaultSettings = async (): Promise<void> => {
           "Bihi Towers, Ground Floor, Suite G8, Moi Avenue, Nairobi CBD.",
         whatsapp: "",
         telegram: "",
-        note: "That though we strive to keep all products up to date, price and availability are subject to change without prior notice.",
+        note: "That though we strive to keep all products up to date, sellingPrice and availability are subject to change without prior notice.",
         order: "Order",
         orderText:
           "From Price in Kenya with fast delivery across the country and in-store pickup in Nairobi.",

@@ -5,7 +5,7 @@ interface ICartItem {
   type: string;
   img: string;
   variantId: string;
-  price: number;
+  sellingPrice: number;
   title: string;
   shippingInside?: number;
   shippingOutside?: number;
@@ -24,7 +24,7 @@ export const CartItemSchema = new Schema<ICartItem>({
   type: { type: String, required: true },
   img: { type: String, required: true },
   variantId: { type: String, required: true },
-  price: { type: Number, required: true },
+  sellingPrice: { type: Number, required: true },
   title: { type: String },
   shippingInside: { type: Number },
   shippingOutside: { type: Number },

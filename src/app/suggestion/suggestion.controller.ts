@@ -9,7 +9,7 @@ export const getAllSuggestions = async (
   try {
     const suggestions = await Suggestion.find().populate({
       path: "products",
-      select: "_id title price photo",
+      select: "_id title sellingPrice photo",
     });
     if (suggestions.length === 0) {
       res.status(200).json({ suggestions, message: "Suggestions not found" });
@@ -33,7 +33,7 @@ export const getSuggestionById = async (
 
     const suggestion = await Suggestion.findById(id).populate({
       path: "products",
-      select: "_id title price photo shippingInside shippingOutside",
+      select: "_id title sellingPrice photo shippingInside shippingOutside",
     });
 
     if (!suggestion) {

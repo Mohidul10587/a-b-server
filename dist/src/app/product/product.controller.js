@@ -79,7 +79,6 @@ const create = (req, res) =>
         respondedData: newProduct, // Optionally, include the created product in the response
       });
     } catch (error) {
-      
       // Send error message if there was an issue
       res.status(500).json({
         message: "Failed to create.",
@@ -135,7 +134,7 @@ const getProductDetails = (req, res) =>
           populate: {
             path: "products",
             model: "Product",
-            select: "title img slug price  rating",
+            select: "title img slug sellingPrice  rating",
             populate: {
               path: "writer",
               model: "Writer",
@@ -171,9 +170,9 @@ const getProductDetails = (req, res) =>
             _id: 1,
             title: 1,
             writer: 1,
-            price: 1,
+            sellingPrice: 1,
             rating: 1,
-            unprice: 1,
+            regularPrice: 1,
             img: 1,
             slug: 1,
             stockStatus: 1,
@@ -198,7 +197,7 @@ const getAllProducts = (req, res) =>
     try {
       const result = yield product_model_1.default
         .find()
-        .select("_id img title featured sele price")
+        .select("_id img title featured sele sellingPrice")
         .populate("writer")
         .populate("category");
       const products = result.reverse();
@@ -226,7 +225,7 @@ const getAllProductsForAdmin = (req, res) =>
     try {
       const result = yield product_model_1.default
         .find()
-        .select("_id img title price slug")
+        .select("_id img title sellingPrice slug")
         .populate("writer", "title");
       const products = result.reverse();
       res.status(200).json(products);
@@ -240,7 +239,7 @@ const getAllProductsForOfferPage = (req, res) =>
     try {
       const result = yield product_model_1.default
         .find()
-        .select("_id img title price slug subcategory ")
+        .select("_id img title sellingPrice slug subcategory ")
         .populate("writer", "title")
         .populate("category", "title");
       const products = result.reverse();
@@ -271,7 +270,7 @@ const getProductsByWriterSlug = (req, res) =>
       const result = yield product_model_1.default
         .find({ writer })
         .select(
-          "_id img title featured sele price slug category subcategory publisher language"
+          "_id img title featured sele sellingPrice slug category subcategory publisher language"
         );
       const products = result.reverse();
       res.status(200).json(products);
@@ -286,7 +285,7 @@ const getProductsByWriter = (req, res) =>
     try {
       const result = yield product_model_1.default
         .find({ writer: writerId })
-        .select("_id img title featured sele price slug")
+        .select("_id img title featured sele sellingPrice slug")
         .populate("writer")
         .populate("category");
       const products = result.reverse();
@@ -351,7 +350,7 @@ const getProductsByCategorySlug = (req, res) =>
           category: categoryId,
         })
         .select(
-          "_id img title featured sele price slug stockStatus writer publisher  subcategory language"
+          "_id img title featured sele sellingPrice slug stockStatus writer publisher  subcategory language"
         );
       const writers = yield writer_model_1.default
         .find()
@@ -381,7 +380,7 @@ const getProductsByPublishersSlug = (req, res) =>
           publisher: publisherId,
         })
         .select(
-          "_id img title category subcategory writer  featured sele price slug stockStatus language "
+          "_id img title category subcategory writer  featured sele sellingPrice slug stockStatus language "
         );
       const writers = yield writer_model_1.default
         .find()

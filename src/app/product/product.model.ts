@@ -8,8 +8,8 @@ export interface IProduct extends Document {
   shortDescription: string;
   category: Schema.Types.ObjectId;
   subcategory: Schema.Types.ObjectId;
-  price: number;
-  unprice: number;
+  sellingPrice: number;
+  regularPrice: number;
   existingQnt: number;
   stockStatus: string;
   writer: Schema.Types.ObjectId;
@@ -52,8 +52,8 @@ const ProductSchema = new Schema<IProduct>(
       default: null,
     },
 
-    price: { type: Number },
-    unprice: { type: Number },
+    sellingPrice: { type: Number },
+    regularPrice: { type: Number },
     existingQnt: { type: Number, default: 100 },
     stockStatus: { type: String },
     writer: { type: Schema.Types.ObjectId, ref: "Writer", required: true },
