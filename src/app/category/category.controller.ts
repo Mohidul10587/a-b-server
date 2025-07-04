@@ -218,17 +218,15 @@ export const getCatsWritersPublishersForNavbar = async (
   res: Response
 ) => {
   try {
-    const categories = await Category.find()
-      .select("img title slug subcategories")
-      .populate({ path: "subcategories", select: "img title slug" });
-    const writers = await Writer.find().select("title slug");
-    const publishers = await Publisher.find().select("title slug");
+    const [categories, writers, publishers] = await Promise.all([
+      Category.find()
+        .select("img title slug subcategories")
+        .populate({ path: "subcategories", select: "img title slug" }),
+      Writer.find().select("title slug"),
+      Publisher.find().select("title slug"),
+    ]);
 
-    res.json({
-      categories,
-      writers,
-      publishers,
-    });
+    res.json({ categories, writers, publishers });
   } catch (err) {
     console.error("Failed to fetch common data:", err);
     res.status(500).json({ message: "Something went wrong" });

@@ -9,10 +9,10 @@ router.post("/create", middlewares_1.verifyAdminToken, category_controller_1.cre
 router.get("/singleForEditPage/:id", middlewares_1.verifyAdminToken, category_controller_1.singleForEditPage);
 router.get("/allCategoriesForSubCatAddPage", category_controller_1.allCategoriesForSubCatAddPage);
 router.get("/getAllCatWithSubCat", category_controller_1.getAllCatWithSubCat);
-router.get("/allCategoriesForNavBar", category_controller_1.allCategoriesForNavBar);
 router.get("/allCategoriesForAdminCatIndexPage", category_controller_1.allCategoriesForAdminCatIndexPage);
 router.get("/allCategoryForProductAddPage", category_controller_1.allCategoryForProductAddPage);
 router.get("/singleCategoryForCategoryEditPage/:id", category_controller_1.singleCategoryForCategoryEditPage);
+router.get("/getCatsWritersPublishersForNavbar", category_controller_1.getCatsWritersPublishersForNavbar);
 router.put("/update/:id", middlewares_1.verifyAdminToken, category_controller_1.update);
 // common routes
 router.get("/allCategoryForFiltering", category_controller_1.allCategoryForFiltering);

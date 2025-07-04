@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
+exports.getCatsWritersPublishersForNavbar = exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../shared/generateSLug");
+const writer_model_1 = __importDefault(require("../writer/writer.model"));
+const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const item = yield category_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
@@ -91,24 +93,6 @@ const allCategoriesForSubCatAddPage = (req, res) => __awaiter(void 0, void 0, vo
     }
 });
 exports.allCategoriesForSubCatAddPage = allCategoriesForSubCatAddPage;
-// Get all
-const allCategoriesForNavBar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const items = yield category_model_1.default.find().select("title slug");
-        res.status(200).json({
-            message: "Fetched successfully!",
-            respondedData: items.reverse(),
-        });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Failed to fetch.",
-            error: error.message,
-        });
-    }
-});
-exports.allCategoriesForNavBar = allCategoriesForNavBar;
 // Get all
 const allCategoryForProductAddPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -220,3 +204,22 @@ const getAllCatWithSubCat = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getAllCatWithSubCat = getAllCatWithSubCat;
+const getCatsWritersPublishersForNavbar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const categories = yield category_model_1.default.find()
+            .select("img title slug subcategories")
+            .populate({ path: "subcategories", select: "img title slug" });
+        const writers = yield writer_model_1.default.find().select("title slug");
+        const publishers = yield publishers_model_1.default.find().select("title slug");
+        res.json({
+            categories,
+            writers,
+            publishers,
+        });
+    }
+    catch (err) {
+        console.error("Failed to fetch common data:", err);
+        res.status(500).json({ message: "Something went wrong" });
+    }
+});
+exports.getCatsWritersPublishersForNavbar = getCatsWritersPublishersForNavbar;
