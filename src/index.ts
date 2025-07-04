@@ -5,7 +5,7 @@ import cors from "cors";
 import bodyParser from "body-parser"; // Import body-parser
 import cookieParser from "cookie-parser";
 import writerRoutes from "./app/writer/writer.routes";
-import productRoutes from "./app/product/product.routes";
+import productRoutes from "./app/product/routes";
 import categoryRoutes from "./app/category/category.routes";
 import subcategoryRoutes from "./app/subcategory/subcategory.routes";
 import userRoutes from "./app/user/user.route";

@@ -9,16 +9,16 @@ import {
   updatePageElement,
   getElementByIdForUpdate,
 } from "./element.controller"; // Your controller function
-import { upload_c } from "../banner/banner.routes";
+
 import { verifyAdminToken } from "../user/middlewares";
 
 const router = Router();
-const uploadFields = upload_c.fields([{ name: "images", maxCount: 20 }]);
+
 // Route to handle form submission and image upload
 router.post(
   "/create-page-element",
   verifyAdminToken,
-  uploadFields, // 'images' is the field name for the file inputs, allowing up to 10 files
+
   createPageElement
 );
 
@@ -38,7 +38,7 @@ router.delete("/delete/:id", verifyAdminToken, deletePageElementById);
 router.put(
   "/updateElement/:elementId",
   verifyAdminToken,
-  uploadFields,
+
   updatePageElement
 );
 

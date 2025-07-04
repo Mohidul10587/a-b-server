@@ -5,7 +5,6 @@ interface IPublishers extends Document {
   slug: string;
   description: string;
   shortDescription: string;
-  tags: { type: [String] };
   rating: number;
   img: string | null;
   metaTitle: string;
@@ -32,7 +31,6 @@ const publishersSchema = new Schema<IPublishers>(
     position: { type: Number, default: 0 },
     video: { type: String },
     link: { type: String, default: "#" },
-    tags: { type: [String] },
   },
   { timestamps: true }
 );

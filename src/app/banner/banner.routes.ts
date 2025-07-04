@@ -1,40 +1,25 @@
 import express from "express";
-import multer from "multer";
-import path from "path";
+
 import {
-  createBanner,
+  create,
   getAllBanners,
   getBannerById,
   deleteBannerById,
-  updateBannerById,
+  update,
+  singleForEditPage,
+  allForAdminIndexPage,
 } from "./banner.controller";
 import { verifyAdminToken } from "../user/middlewares";
 
 const router = express.Router();
 
-const storage = multer.memoryStorage();
-export const upload_c = multer({
-  storage: storage,
-  fileFilter: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    if (
-      ext !== ".jpg" &&
-      ext !== ".jpeg" &&
-      ext !== ".webp" &&
-      ext !== ".png"
-    ) {
-      return cb(new Error("Only images are allowed"));
-    }
-    cb(null, true);
-  },
-});
+router.post("/create", verifyAdminToken, create);
+router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
+router.put("/update/:id", verifyAdminToken, update);
+router.get("/allForAdminIndexPage", allForAdminIndexPage);
 
-const uploadFields = upload_c.fields([{ name: "bannerImages", maxCount: 20 }]);
-
-router.post("/create", verifyAdminToken, uploadFields, createBanner);
-router.get("/all", getAllBanners);
 router.get("/singleBanner/:id", getBannerById);
 router.delete("/:id", deleteBannerById);
-router.put("/update/:id", uploadFields, updateBannerById);
+router.get("/all", getAllBanners);
 
 export default router;

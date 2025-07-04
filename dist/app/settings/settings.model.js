@@ -35,7 +35,7 @@ const settingsSchema = new mongoose_1.Schema({
     termsAndConditions: String,
     otherPolicies: String,
     sellerDefaultStatus: Boolean,
-    tags: {
+    keywords: {
         type: [String],
         default: [],
     },

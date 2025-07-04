@@ -12,16 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.create = void 0;
+exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForNavBar = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newCategory = yield category_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
+        const item = yield category_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
         // Send success message along with the created category data
         res.status(201).json({
             message: "Created successfully!",
-            respondedData: newCategory, // Optionally, include the created category in the response
+            item,
         });
     }
     catch (error) {
@@ -33,6 +33,46 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.create = create;
+const singleForEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const item = yield category_model_1.default.findOne({ _id: req.params.id });
+        res.status(200).json({ message: "Category fetched successfully!", item });
+    }
+    catch (error) {
+        console.error(error);
+        res
+            .status(500)
+            .json({ message: "Failed to fetch Category.", error: error.message });
+    }
+});
+exports.singleForEditPage = singleForEditPage;
+// Update
+const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id } = req.params;
+        const updatedItem = yield category_model_1.default.findByIdAndUpdate(id, req.body, {
+            new: true, // Return the updated document
+            runValidators: true, // Run validation on the updated data
+        });
+        if (!updatedItem) {
+            return res.status(404).json({
+                message: "Not found.",
+            });
+        }
+        res.status(200).json({
+            message: "Updated successfully!",
+            respondedData: updatedItem,
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to update.",
+            error: error.message,
+        });
+    }
+});
+exports.update = update;
 // Get all
 const allCategoriesForSubCatAddPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -162,30 +202,21 @@ const singleCategoryForCategoryEditPage = (req, res) => __awaiter(void 0, void 0
     }
 });
 exports.singleCategoryForCategoryEditPage = singleCategoryForCategoryEditPage;
-// Update
-const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllCatWithSubCat = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.params;
-        const updatedItem = yield category_model_1.default.findByIdAndUpdate(id, req.body, {
-            new: true, // Return the updated document
-            runValidators: true, // Run validation on the updated data
+        const categories = yield category_model_1.default.find()
+            .select("title  subcategories")
+            .populate({
+            path: "subcategories",
+            select: "title",
         });
-        if (!updatedItem) {
-            return res.status(404).json({
-                message: "Not found.",
-            });
-        }
-        res.status(200).json({
-            message: "Updated successfully!",
-            respondedData: updatedItem,
-        });
+        res.status(200).json(categories);
     }
     catch (error) {
-        console.error(error);
-        res.status(500).json({
-            message: "Failed to update.",
-            error: error.message,
-        });
+        console.error("Failed to fetch categories:", error);
+        res
+            .status(500)
+            .json({ message: "Server error while fetching categories." });
     }
 });
-exports.update = update;
+exports.getAllCatWithSubCat = getAllCatWithSubCat;

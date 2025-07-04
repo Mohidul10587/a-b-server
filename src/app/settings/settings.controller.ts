@@ -127,9 +127,9 @@ export const updateSettings = async (
       settings.sellerDefaultStatus =
         req.body.sellerDefaultStatus || settings.sellerDefaultStatus;
       settings.phone = req.body.phone || settings.phone;
-      settings.tags =
-        req.body.tags.split(",").map((tag: string) => tag.trim()) ||
-        settings.tags;
+      settings.keywords =
+        req.body.keywords.split(",").map((tag: string) => tag.trim()) ||
+        settings.keywords;
 
       const result = await settings.save();
 

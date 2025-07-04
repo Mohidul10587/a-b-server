@@ -9,6 +9,8 @@ import {
   allCategoryForProductAddPage,
   allCategoryForFiltering,
   getAllCategoriesForCatMainPage,
+  singleForEditPage,
+  getAllCatWithSubCat,
 } from "./category.controller";
 import { verifyAdminToken } from "../user/middlewares";
 
@@ -16,11 +18,13 @@ const router = Router();
 
 //Admin routes
 router.post("/create", verifyAdminToken, create);
+router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
 router.get(
   "/allCategoriesForSubCatAddPage",
 
   allCategoriesForSubCatAddPage
 );
+router.get("/getAllCatWithSubCat", getAllCatWithSubCat);
 
 router.get("/allCategoriesForNavBar", allCategoriesForNavBar);
 

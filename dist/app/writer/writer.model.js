@@ -41,7 +41,7 @@ const writerSchema = new mongoose_1.Schema({
     rating: { type: Number, default: 4 },
     metaTitle: { type: String }, // New field
     metaDescription: { type: String }, // New field
-    tags: { type: [String] }, // New field
+    keywords: { type: [String] }, // New field
     metaImg: { type: String },
 }, { timestamps: true });
 const Writer = (0, mongoose_1.model)("Writer", writerSchema);

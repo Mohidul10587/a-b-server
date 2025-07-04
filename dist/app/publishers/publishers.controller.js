@@ -24,7 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.allPublisherForFiltering = exports.getAllPublisherIds = exports.deletePublisher = exports.allForIndexPage = exports.getPublisherBySlug = exports.allForProductUploadPage = exports.getAllPublishers = exports.getPublisherById = exports.createPublisher = void 0;
-const product_model_1 = __importDefault(require("../product/product.model"));
+const model_1 = __importDefault(require("../product/model"));
 const uploadSingleFileToCloudinary_1 = require("../shared/uploadSingleFileToCloudinary");
 const publishers_model_1 = __importDefault(require("./publishers.model"));
 const createPublisher = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -88,7 +88,7 @@ const getAllPublishers = (req, res) => __awaiter(void 0, void 0, void 0, functio
         const previousPublishers = yield publishers_model_1.default.find();
         // Fetch products and count products per publisher
         const publishers = yield Promise.all(previousPublishers.map((publisher) => __awaiter(void 0, void 0, void 0, function* () {
-            const productCount = yield product_model_1.default.countDocuments({
+            const productCount = yield model_1.default.countDocuments({
                 publisher: publisher._id,
             });
             return Object.assign(Object.assign({}, publisher.toJSON()), { publisherProducts: productCount });

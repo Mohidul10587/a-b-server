@@ -1,24 +1,22 @@
 import { Request, Response } from "express";
-import Product from "./product.model";
-import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
+import Product from "./model";
 import Writer from "../writer/writer.model";
 import Category from "../category/category.model";
 import Publisher from "../publishers/publishers.model";
 import { generateSlug } from "../shared/generateSLug";
-import path from "path";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = req.body;
-    const newProduct = await Product.create({
+    const item = await Product.create({
       ...data,
-      slug: generateSlug(data.title),
+      slug: generateSlug(data.titleEn),
     });
 
     // Send success message along with the created product data
     res.status(201).json({
       message: "Created successfully!",
-      respondedData: newProduct, // Optionally, include the created product in the response
+      item, // Optionally, include the created product in the response
     });
   } catch (error: any) {
     // Send error message if there was an issue
@@ -32,13 +30,13 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
-    const updatedItem = await Product.findByIdAndUpdate(id, req.body, {
+    console.log("This is id from update", req.params.id);
+    const item = await Product.findByIdAndUpdate(id, req.body, {
       new: true, // Return the updated document
       runValidators: true, // Run validation on the updated data
     });
 
-    if (!updatedItem) {
+    if (!item) {
       return res.status(404).json({
         message: "Not found.",
       });
@@ -46,9 +44,10 @@ export const update = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Updated successfully!",
-      respondedData: updatedItem,
+      item,
     });
   } catch (error: any) {
+    console.log(error);
     res.status(500).json({
       message: "Failed to update.",
       error: error,
@@ -134,6 +133,17 @@ export const singleForUserFoDetailsPageBySlug = async (
     res.status(500).json({ error: error.message });
   }
 };
+export const singleForEditPage = async (req: Request, res: Response) => {
+  try {
+    const item = await Product.findOne({ _id: req.params.id });
+    res.status(200).json({ message: "Product fetched successfully!", item });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch Product.", error: error.message });
+  }
+};
 
 export const getAllProducts = async (
   req: Request,
@@ -141,7 +151,7 @@ export const getAllProducts = async (
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id img title featured sele sellingPrice")
+      .select("_id img title featured  sellingPrice")
       .populate("writer")
       .populate("category");
     const products = result.reverse();
@@ -168,13 +178,13 @@ export const getSingleProduct = async (
   }
 };
 
-export const getAllProductsForAdmin = async (
+export const allForAdminIndexPage = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const result = await Product.find()
-      .select("_id img title sellingPrice slug")
+      .select("_id img titleEn sellingPrice slug")
       .populate("writer", "title");
 
     const products = result.reverse();
@@ -184,7 +194,41 @@ export const getAllProductsForAdmin = async (
     res.status(500).json({ error: error.message });
   }
 };
+// Get all data with optional filtering
+export const getAllForSeriesAddPage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const { category, subcategory } = req.query;
 
+    // Build filter dynamically
+    const filter: any = {
+      display: true,
+    };
+
+    if (category) filter.category = category;
+    if (subcategory) filter.subcategory = subcategory;
+
+    if (req.user?.role === "seller") {
+      filter.seller = req.user._id;
+    }
+
+    const items = await Product.find(filter).select(
+      "titleEn sellingPrice img slug display seller"
+    );
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      resData: items.reverse(),
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};
 export const getAllProductsForOfferPage = async (
   req: Request,
   res: Response
@@ -224,7 +268,7 @@ export const getProductsByWriterSlug = async (
   try {
     const writer = await Writer.find({ slug });
     const result = await Product.find({ writer }).select(
-      "_id img title featured sele sellingPrice slug category subcategory publisher language"
+      "_id img title featured  sellingPrice slug category subcategory publisher language"
     );
 
     const products = result.reverse();
@@ -242,7 +286,7 @@ export const getProductsByWriter = async (
 
   try {
     const result = await Product.find({ writer: writerId })
-      .select("_id img title featured sele sellingPrice slug")
+      .select("_id img title featured  sellingPrice slug")
       .populate("writer")
       .populate("category");
     const products = result.reverse();
@@ -298,7 +342,7 @@ export const getProductsByCategorySlug = async (
   try {
     const category = await Category.findOne({ slug: slug })
       .select(
-        "_id title slug img metaTitle metaDescription description shortDescription tags"
+        "_id title slug img metaTitle metaDescription description shortDescription keywords"
       )
       .populate({
         path: "subcategories",
@@ -332,7 +376,7 @@ export const getProductsByPublishersSlug = async (
   try {
     const publisher = await Publisher.findOne({ slug: slug })
       .select(
-        "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags "
+        "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription keywords "
       )
       .lean();
 
@@ -340,7 +384,7 @@ export const getProductsByPublishersSlug = async (
     const products = await Product.find({
       publisher: publisherId,
     }).select(
-      "_id img title category subcategory writer  featured sele sellingPrice slug stockStatus language "
+      "_id img title category subcategory writer  featured  sellingPrice slug stockStatus language "
     );
 
     const writers = await Writer.find().select("title").lean();

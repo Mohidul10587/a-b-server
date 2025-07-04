@@ -47,7 +47,6 @@ const publishersSchema = new mongoose_1.Schema({
     position: { type: Number, default: 0 },
     video: { type: String },
     link: { type: String, default: "#" },
-    tags: { type: [String] },
 }, { timestamps: true });
 // Middleware to make the slug unique if it's already taken
 publishersSchema.pre("save", function (next) {

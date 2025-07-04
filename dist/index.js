@@ -10,7 +10,7 @@ const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser")); // Import body-parser
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const writer_routes_1 = __importDefault(require("./app/writer/writer.routes"));
-const product_routes_1 = __importDefault(require("./app/product/product.routes"));
+const routes_1 = __importDefault(require("./app/product/routes"));
 const category_routes_1 = __importDefault(require("./app/category/category.routes"));
 const subcategory_routes_1 = __importDefault(require("./app/subcategory/subcategory.routes"));
 const user_route_1 = __importDefault(require("./app/user/user.route"));
@@ -51,7 +51,7 @@ app.get("/", (req, res) => {
 });
 // Routes
 app.use("/writer", writer_routes_1.default);
-app.use("/product", product_routes_1.default);
+app.use("/product", routes_1.default);
 app.use("/category", category_routes_1.default);
 app.use("/subcategory", subcategory_routes_1.default);
 app.use("/settings", settings_routes_1.default);

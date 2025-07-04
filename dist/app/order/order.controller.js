@@ -17,7 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const cart_model_1 = __importDefault(require("../cart/cart.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
-const product_model_1 = __importDefault(require("../product/product.model"));
+const model_1 = __importDefault(require("../product/model"));
 const order_model_1 = __importDefault(require("../order/order.model"));
 const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
 const user_model_1 = __importDefault(require("../user/user.model"));
@@ -74,7 +74,7 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             category_model_1.default.countDocuments(),
             writer_model_1.default.countDocuments(),
             order_model_1.default.countDocuments(),
-            product_model_1.default.countDocuments(),
+            model_1.default.countDocuments(),
             publishers_model_1.default.countDocuments(),
             user_model_1.default.countDocuments(),
         ]);

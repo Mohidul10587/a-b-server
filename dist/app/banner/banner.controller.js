@@ -12,96 +12,71 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBannersWithHomePageChecked = exports.updatePagesInBanners = exports.getBannersByBrand = exports.getBannersByCategory = exports.deleteBannerById = exports.getBannerById = exports.getAllBanners = exports.updateBannerById = exports.createBanner = void 0;
+exports.getBannersWithHomePageChecked = exports.updatePagesInBanners = exports.getBannersByBrand = exports.getBannersByCategory = exports.deleteBannerById = exports.getBannerById = exports.getAllBanners = exports.allForAdminIndexPage = exports.singleForEditPage = exports.update = exports.create = void 0;
 const banner_model_1 = __importDefault(require("./banner.model")); // Ensure the correct path to the model
-const uplCloudinary_1 = require("../shared/uplCloudinary");
-const createBanner = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, bannersInfo } = req.body;
-        // Extract banners data from JSON string in request body
-        const bannersData = JSON.parse(bannersInfo);
-        // Handle file uploads and map them with banner data
-        const bannerUploads = yield Promise.all(bannersData.map((banner, index) => __awaiter(void 0, void 0, void 0, function* () {
-            const file = req.files.bannerImages[index];
-            if (file) {
-                const result = yield (0, uplCloudinary_1.uploadToCloudinary)(file.buffer);
-                return {
-                    img: result.secure_url,
-                    title: banner.title,
-                    link: banner.link,
-                };
-            }
-            return null;
-        })));
-        // Filter out any null values in bannerUploads
-        const filteredBannerUploads = bannerUploads.filter((upload) => upload !== null);
-        // Create a new banner document
-        const newBanner = new banner_model_1.default({
-            title,
-            banners: filteredBannerUploads,
+        const item = yield banner_model_1.default.create(req.body);
+        // Send success message along with the created product data
+        res.status(201).json({
+            message: "Created successfully!",
+            item, // Optionally, include the created product in the response
         });
-        // Save the banner document to MongoDB
-        yield newBanner.save();
-        // Respond with the saved banner data
-        res.status(201).json(newBanner);
     }
     catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        console.log(error);
+        // Send error message if there was an issue
+        res.status(500).json({
+            message: "Failed to create.",
+            error: error.message,
+        });
     }
 });
-exports.createBanner = createBanner;
+exports.create = create;
 // Controller function to update a banner by ID
-const updateBannerById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { title, bannersInfo } = req.body;
-        const parsedBannersInfo = JSON.parse(bannersInfo);
-        const existingBanner = yield banner_model_1.default.findById(req.params.id);
-        if (!existingBanner) {
-            return res.status(404).json({ error: "Banner not found" });
-        }
-        const files = req.files;
-        // Array to hold secure URLs of uploaded images, initialized with existing img values
-        let secureUrlArray = [];
-        if (files && files.bannerImages && files.bannerImages.length > 0) {
-            // Upload images and collect secure URLs in the same order
-            yield Promise.all(files.bannerImages.map((file, index) => __awaiter(void 0, void 0, void 0, function* () {
-                try {
-                    const result = yield (0, uplCloudinary_1.uploadToCloudinary)(file.buffer);
-                    // Assign secure_url to the correct index
-                    secureUrlArray[index] = result.secure_url;
-                }
-                catch (error) {
-                    console.error("Error uploading image:", error);
-                    throw new Error("Error uploading image");
-                }
-            })));
-        }
-        // Update parsedBannersInfo by filling in empty img fields with URLs from secureUrlArray
-        let urlIndex = 0; // To track which collected URL to use
-        const Updated_Banner_info = parsedBannersInfo.map((banner) => {
-            // Check if the img is empty and we still have collected URLs left to use
-            if (banner.img === "" && urlIndex < secureUrlArray.length) {
-                // Replace the empty img with the next collected URL
-                banner.img = secureUrlArray[urlIndex];
-                urlIndex++; // Move to the next URL for the next empty img
-            }
-            return banner;
+        const { id } = req.params;
+        console.log("THis is id");
+        const item = yield banner_model_1.default.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true,
         });
-        const updatedBanner = yield banner_model_1.default.findByIdAndUpdate(req.params.id, {
-            title,
-            banners: Updated_Banner_info,
-        }, { new: true });
-        if (!updatedBanner) {
-            return res.status(404).json({ error: "Banner not found" });
-        }
-        res.status(200).json(updatedBanner);
+        if (!item)
+            return res.status(404).json({ message: "Banner not found." });
+        res.status(200).json({ message: "Banner updated successfully!", item });
     }
     catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ error: "Internal Server Error" });
+        console.error(error);
+        res
+            .status(500)
+            .json({ message: "Failed to update Banner.", error: error.message });
     }
 });
-exports.updateBannerById = updateBannerById;
+exports.update = update;
+const singleForEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const item = yield banner_model_1.default.findOne({ _id: req.params.id });
+        res.status(200).json({ message: "Banner fetched successfully!", item });
+    }
+    catch (error) {
+        console.error(error);
+        res
+            .status(500)
+            .json({ message: "Failed to fetch Banner.", error: error.message });
+    }
+});
+exports.singleForEditPage = singleForEditPage;
+const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield banner_model_1.default.find().select("title").sort({ createdAt: -1 });
+        res.status(200).json({ message: "Fetched Successfully", items });
+    }
+    catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+exports.allForAdminIndexPage = allForAdminIndexPage;
 const getAllBanners = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const banners = (yield banner_model_1.default.find()).reverse();

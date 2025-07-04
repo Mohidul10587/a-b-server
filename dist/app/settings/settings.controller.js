@@ -128,9 +128,9 @@ const updateSettings = (req, res) => __awaiter(void 0, void 0, void 0, function*
             settings.sellerDefaultStatus =
                 req.body.sellerDefaultStatus || settings.sellerDefaultStatus;
             settings.phone = req.body.phone || settings.phone;
-            settings.tags =
-                req.body.tags.split(",").map((tag) => tag.trim()) ||
-                    settings.tags;
+            settings.keywords =
+                req.body.keywords.split(",").map((tag) => tag.trim()) ||
+                    settings.keywords;
             const result = yield settings.save();
             res.status(200).json(settings);
         }

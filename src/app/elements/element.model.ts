@@ -29,7 +29,7 @@ export interface IPageElements extends Document {
   images: string[]; // Array of image URLs
   width: number;
   height: number;
-  suggestionId: Types.ObjectId | null;
+  suggestion: Types.ObjectId | null;
 }
 
 const pageElementsSchema = new Schema<IPageElements>(
@@ -70,7 +70,7 @@ const pageElementsSchema = new Schema<IPageElements>(
     position: { type: Number, required: true },
     selectionType: { type: String, required: true },
     bannerId: { type: Schema.Types.ObjectId, ref: "Banner", default: null }, // Reference to banner
-    suggestionId: {
+    suggestion: {
       type: Schema.Types.ObjectId,
       ref: "Suggestion",
       default: null,

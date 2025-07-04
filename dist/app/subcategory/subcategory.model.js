@@ -33,13 +33,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const isObjectId_1 = require("../shared/isObjectId");
 const SubcategorySchema = new mongoose_1.Schema({
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     description: { type: String },
     shortDescription: { type: String },
     display: { type: Boolean },
-    img: { type: String, required: true },
+    img: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
     keywords: { type: [String] },
@@ -47,8 +48,9 @@ const SubcategorySchema = new mongoose_1.Schema({
     position: { type: Number, default: 0 },
     parentCategory: {
         type: mongoose_1.Schema.Types.ObjectId,
+        set: (value) => ((0, isObjectId_1.isObjectId)(value) ? value : null),
         ref: "Category",
-        required: true,
+        default: null,
     },
 }, { timestamps: true });
 // Middleware to make the category slug unique if it's already taken

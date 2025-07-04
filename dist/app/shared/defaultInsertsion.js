@@ -95,7 +95,7 @@ const createDefaultSettings = () =>
           otherPolicies: "",
           sellerDefalutStatus: true,
           phone: "Your phone no",
-          tags: ["keyword1", "keyword2"],
+          keywords: ["keyword1", "keyword2"],
         });
         yield settings.save();
       }

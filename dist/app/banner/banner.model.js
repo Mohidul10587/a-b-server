@@ -25,10 +25,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const BannerSchema = new mongoose_1.Schema({
-    title: { type: String },
+    title: { type: String, required: true },
     banners: [
         {
-            img: { type: String, required: true },
+            img: { type: String },
             title: { type: String },
             link: { type: String },
         },

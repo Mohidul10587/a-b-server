@@ -1,4 +1,5 @@
 import mongoose, { Schema, model, Document, ObjectId } from "mongoose";
+import { isObjectId } from "../shared/isObjectId";
 
 // Subcategory schema with subcategories
 interface Subcategory extends Document {
@@ -23,7 +24,7 @@ const SubcategorySchema = new Schema<Subcategory>(
     description: { type: String },
     shortDescription: { type: String },
     display: { type: Boolean },
-    img: { type: String, required: true },
+    img: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
     keywords: { type: [String] },
@@ -31,8 +32,9 @@ const SubcategorySchema = new Schema<Subcategory>(
     position: { type: Number, default: 0 },
     parentCategory: {
       type: Schema.Types.ObjectId,
+      set: (value: string | null) => (isObjectId(value) ? value : null),
       ref: "Category",
-      required: true,
+      default: null,
     },
   },
   { timestamps: true }

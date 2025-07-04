@@ -47,7 +47,7 @@ exports.getAllWriterIds =
   exports.createWriter =
     void 0;
 const brand_model_1 = __importDefault(require("./brand.model"));
-const product_model_1 = __importDefault(require("../product/product.model"));
+const product_model_1 = __importDefault(require("../product/model"));
 const cloudinary_config_1 = __importDefault(
   require("../shared/cloudinary.config")
 );

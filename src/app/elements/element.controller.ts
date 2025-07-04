@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { PageElements } from "./element.model"; // Your Mongoose model
 import cloudinary from "../shared/cloudinary.config";
-import Product from "../product/product.model";
+import Product from "../product/model";
 import { uploadToCloudinary } from "../shared/uplCloudinary";
 
 // Helper function to upload images to Cloudinary using promises
@@ -60,7 +60,7 @@ export const createPageElement = async (req: Request, res: Response) => {
     productSectionId,
     width,
     height,
-    suggestionId,
+    suggestion,
   } = req.body;
 
   try {
@@ -106,7 +106,7 @@ export const createPageElement = async (req: Request, res: Response) => {
       images: imageUrls, // Store image URLs in the database
       width,
       height,
-      suggestionId: suggestionId ? suggestionId : null,
+      suggestion: suggestion ? suggestion : null,
     });
 
     // Save the new PageElement to the database
@@ -179,7 +179,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
     })
       .populate("bannerId")
       .populate({
-        path: "suggestionId",
+        path: "suggestion",
         populate: {
           path: "products",
           select:
@@ -347,11 +347,11 @@ export const updatePageElement = async (req: Request, res: Response) => {
     width,
     height,
     images,
-    suggestionId,
+    suggestion,
   } = req.body;
 
   const parsedBannerId = bannerId === "null" ? null : bannerId;
-  const parsedSuggestionId = suggestionId === "null" ? null : suggestionId;
+  const parsedSuggestionId = suggestion === "null" ? null : suggestion;
 
   const parsedImages = JSON.parse(images);
 
@@ -437,16 +437,16 @@ export const updatePageElement = async (req: Request, res: Response) => {
 
     if (selectionType == "productSection") {
       pageElement.productSectionId = productSectionId;
-      pageElement.suggestionId = null;
+      pageElement.suggestion = null;
       pageElement.bannerId = null;
     } else if (selectionType == "suggestionSection") {
-      pageElement.suggestionId = parsedSuggestionId;
+      pageElement.suggestion = parsedSuggestionId;
       pageElement.productSectionId = "";
       pageElement.bannerId = null;
     } else {
       pageElement.bannerId = parsedBannerId;
       pageElement.productSectionId = "";
-      pageElement.suggestionId = null;
+      pageElement.suggestion = null;
     }
 
     pageElement.productSectionId = productSectionId;

@@ -6,7 +6,9 @@ const middlewares_1 = require("../user/middlewares");
 const router = (0, express_1.Router)();
 //Admin routes
 router.post("/create", middlewares_1.verifyAdminToken, category_controller_1.create);
+router.get("/singleForEditPage/:id", middlewares_1.verifyAdminToken, category_controller_1.singleForEditPage);
 router.get("/allCategoriesForSubCatAddPage", category_controller_1.allCategoriesForSubCatAddPage);
+router.get("/getAllCatWithSubCat", category_controller_1.getAllCatWithSubCat);
 router.get("/allCategoriesForNavBar", category_controller_1.allCategoriesForNavBar);
 router.get("/allCategoriesForAdminCatIndexPage", category_controller_1.allCategoriesForAdminCatIndexPage);
 router.get("/allCategoryForProductAddPage", category_controller_1.allCategoryForProductAddPage);

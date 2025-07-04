@@ -28,7 +28,7 @@ const CategorySchema = new Schema<Category>(
     description: { type: String },
     shortDescription: { type: String },
     display: { type: Boolean },
-    img: { type: String, required: true },
+    img: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
     keywords: { type: [String] },

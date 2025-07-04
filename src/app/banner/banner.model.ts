@@ -8,17 +8,15 @@ interface BannerItem {
 
 interface IBanner extends Document {
   title: string;
-
   banners: BannerItem[];
 }
 
 const BannerSchema: Schema = new Schema(
   {
-    title: { type: String },
-
+    title: { type: String, required: true },
     banners: [
       {
-        img: { type: String, required: true },
+        img: { type: String },
         title: { type: String },
         link: { type: String },
       },

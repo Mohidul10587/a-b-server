@@ -39,7 +39,7 @@ const CategorySchema = new mongoose_1.Schema({
     description: { type: String },
     shortDescription: { type: String },
     display: { type: Boolean },
-    img: { type: String, required: true },
+    img: { type: String },
     metaTitle: { type: String },
     metaDescription: { type: String },
     keywords: { type: [String] },

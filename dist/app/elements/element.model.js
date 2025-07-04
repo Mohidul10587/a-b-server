@@ -39,7 +39,7 @@ const pageElementsSchema = new mongoose_1.Schema({
     position: { type: Number, required: true },
     selectionType: { type: String, required: true },
     bannerId: { type: mongoose_1.Schema.Types.ObjectId, ref: "Banner", default: null }, // Reference to banner
-    suggestionId: {
+    suggestion: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "Suggestion",
         default: null,

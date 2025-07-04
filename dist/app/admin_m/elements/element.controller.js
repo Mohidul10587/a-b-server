@@ -50,7 +50,7 @@ const element_model_1 = require("./element.model"); // Your Mongoose model
 const cloudinary_config_1 = __importDefault(
   require("../../shared/cloudinary.config")
 );
-const product_model_1 = __importDefault(require("../../product/product.model"));
+const product_model_1 = __importDefault(require("../../product/model"));
 const uplCloudinary_1 = require("../../shared/uplCloudinary");
 // Helper function to upload images to Cloudinary using promises
 const uploadImageToCloudinary = (file) => {
@@ -104,7 +104,7 @@ const createPageElement = (req, res) =>
       productSectionId,
       width,
       height,
-      suggestionId,
+      suggested,
     } = req.body;
     try {
       // Handle uploaded images
@@ -150,7 +150,7 @@ const createPageElement = (req, res) =>
         images: imageUrls, // Store image URLs in the database
         width,
         height,
-        suggestionId: suggestionId ? suggestionId : null,
+        suggested: suggested ? suggested : null,
       });
       // Save the new PageElement to the database
       const savedPageElement = yield newPageElement.save();
@@ -221,7 +221,7 @@ const getElementsByIdAndPage = (req, res) =>
       })
         .populate("bannerId")
         .populate({
-          path: "suggestionId",
+          path: "suggested",
           populate: {
             path: "products",
             select: "_id title slug img sellingPrice regularPrice stockStatus",
@@ -387,10 +387,10 @@ const updatePageElement = (req, res) =>
       width,
       height,
       images,
-      suggestionId,
+      suggested,
     } = req.body;
     const parsedBannerId = bannerId === "null" ? null : bannerId;
-    const parsedSuggestionId = suggestionId === "null" ? null : suggestionId;
+    const parsedSuggestionId = suggested === "null" ? null : suggested;
     const parsedImages = JSON.parse(images);
     try {
       // Find the existing PageElement by ID
@@ -473,16 +473,16 @@ const updatePageElement = (req, res) =>
       pageElement.height = height || pageElement.height;
       if (selectionType == "productSection") {
         pageElement.productSectionId = productSectionId;
-        pageElement.suggestionId = null;
+        pageElement.suggested = null;
         pageElement.bannerId = null;
       } else if (selectionType == "suggestionSection") {
-        pageElement.suggestionId = parsedSuggestionId;
+        pageElement.suggested = parsedSuggestionId;
         pageElement.productSectionId = "";
         pageElement.bannerId = null;
       } else {
         pageElement.bannerId = parsedBannerId;
         pageElement.productSectionId = "";
-        pageElement.suggestionId = null;
+        pageElement.suggested = null;
       }
       pageElement.productSectionId = productSectionId;
       // Only update images if new images are uploaded

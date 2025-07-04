@@ -5,10 +5,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const suggestion_controller_1 = require("./suggestion.controller");
+const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
 router.get("/", suggestion_controller_1.getAllSuggestions);
+router.get("/allForAdminIndexPage", suggestion_controller_1.allForAdminIndexPage);
+router.get("/singleForEditPage/:id", middlewares_1.verifyAdminToken, suggestion_controller_1.singleForEditPage);
 router.get("/getSingleSuggestion/:id", suggestion_controller_1.getSuggestionById);
-router.post("/", suggestion_controller_1.create);
+router.post("/create", suggestion_controller_1.create);
 router.delete("/:id", suggestion_controller_1.deleteSuggestion);
-router.post("/updateSuggestion/:id", suggestion_controller_1.updateSuggestion);
+router.put("/update/:id", suggestion_controller_1.update);
 exports.default = router;

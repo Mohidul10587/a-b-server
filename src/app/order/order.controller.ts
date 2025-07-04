@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import Cart from "../cart/cart.model";
 import Category from "../category/category.model";
 import Writer from "../writer/writer.model";
-import Product from "../product/product.model";
+import Product from "../product/model";
 import Order from "../order/order.model";
 import Publisher from "../publishers/publishers.model";
 import { count } from "console";

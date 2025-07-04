@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import Product from "../product/product.model";
+import Product from "../product/model";
 import { cloudinaryUpload } from "../shared/uploadSingleFileToCloudinary";
 import Publisher from "./publishers.model";
 export const createPublisher = async (

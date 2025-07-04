@@ -4,15 +4,20 @@ import {
   getSuggestionById,
   create,
   deleteSuggestion,
-  updateSuggestion,
+  update,
+  allForAdminIndexPage,
+  singleForEditPage,
 } from "./suggestion.controller";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = express.Router();
-
 router.get("/", getAllSuggestions);
+router.get("/allForAdminIndexPage", allForAdminIndexPage);
+router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
+
 router.get("/getSingleSuggestion/:id", getSuggestionById);
-router.post("/", create);
+router.post("/create", create);
 router.delete("/:id", deleteSuggestion);
-router.post("/updateSuggestion/:id", updateSuggestion);
+router.put("/update/:id", update);
 
 export default router;

@@ -4,7 +4,7 @@ import { generateSlug } from "../shared/generateSLug";
 
 export const create = async (req: Request, res: Response) => {
   try {
-    const newCategory = await Category.create({
+    const item = await Category.create({
       ...req.body,
       slug: generateSlug(req.body.title),
     });
@@ -12,12 +12,51 @@ export const create = async (req: Request, res: Response) => {
     // Send success message along with the created category data
     res.status(201).json({
       message: "Created successfully!",
-      respondedData: newCategory, // Optionally, include the created category in the response
+      item,
     });
   } catch (error: any) {
     // Send error message if there was an issue
     res.status(500).json({
       message: "Failed to create.",
+      error: error.message,
+    });
+  }
+};
+export const singleForEditPage = async (req: Request, res: Response) => {
+  try {
+    const item = await Category.findOne({ _id: req.params.id });
+    res.status(200).json({ message: "Category fetched successfully!", item });
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch Category.", error: error.message });
+  }
+};
+// Update
+export const update = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const updatedItem = await Category.findByIdAndUpdate(id, req.body, {
+      new: true, // Return the updated document
+      runValidators: true, // Run validation on the updated data
+    });
+
+    if (!updatedItem) {
+      return res.status(404).json({
+        message: "Not found.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Updated successfully!",
+      respondedData: updatedItem,
+    });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to update.",
       error: error.message,
     });
   }
@@ -44,6 +83,7 @@ export const allCategoriesForSubCatAddPage = async (
     });
   }
 };
+
 // Get all
 export const allCategoriesForNavBar = async (req: Request, res: Response) => {
   try {
@@ -172,31 +212,20 @@ export const singleCategoryForCategoryEditPage = async (
   }
 };
 
-// Update
-export const update = async (req: Request, res: Response) => {
+export const getAllCatWithSubCat = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-
-    const updatedItem = await Category.findByIdAndUpdate(id, req.body, {
-      new: true, // Return the updated document
-      runValidators: true, // Run validation on the updated data
-    });
-
-    if (!updatedItem) {
-      return res.status(404).json({
-        message: "Not found.",
+    const categories = await Category.find()
+      .select("title  subcategories")
+      .populate({
+        path: "subcategories",
+        select: "title",
       });
-    }
 
-    res.status(200).json({
-      message: "Updated successfully!",
-      respondedData: updatedItem,
-    });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({
-      message: "Failed to update.",
-      error: error.message,
-    });
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while fetching categories." });
   }
 };

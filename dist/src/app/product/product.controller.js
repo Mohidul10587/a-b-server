@@ -336,7 +336,7 @@ const getProductsByCategorySlug = (req, res) =>
       const category = yield category_model_1.default
         .findOne({ slug: slug })
         .select(
-          "_id title slug img metaTitle metaDescription description shortDescription tags"
+          "_id title slug img metaTitle metaDescription description shortDescription keywords"
         )
         .populate({
           path: "subcategories",
@@ -370,7 +370,7 @@ const getProductsByPublishersSlug = (req, res) =>
       const publisher = yield publishers_model_1.default
         .findOne({ slug: slug })
         .select(
-          "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription tags "
+          "_id title slug imgUrl keywords metaTitle metaDescription description shortDescription keywords "
         )
         .lean();
       const publisherId =

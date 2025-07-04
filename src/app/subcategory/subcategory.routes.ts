@@ -1,31 +1,24 @@
 import { Router } from "express";
 import {
   allSubcategoriesForAdminSubCatIndexPage,
-  allSubcategoriesForChildCatAddPage,
-  createSubcategory,
-  singleSubcategoryForSubcategoryEditPage,
+  create,
+  singleForEditPage,
   update,
 } from "./subcategory.controller";
+import { verifyAdminToken } from "../user/middlewares";
 
 const router = Router();
 
 // Route to create a new category
-router.post("/create", createSubcategory);
-router.get(
-  "/allSubcategoriesForChildCatAddPage",
+router.post("/create", create);
+router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
 
-  allSubcategoriesForChildCatAddPage
-);
 router.get(
   "/allSubcategoriesForAdminSubCatIndexPage",
 
   allSubcategoriesForAdminSubCatIndexPage
 );
-router.get(
-  "/singleSubcategoryForSubcategoryEditPage/:id",
 
-  singleSubcategoryForSubcategoryEditPage
-);
 router.put("/update/:id", update);
 
 export default router;

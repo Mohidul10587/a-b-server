@@ -34,7 +34,7 @@ interface ISettings extends Document {
   termsAndConditions: string; // Added field
   otherPolicies: string; // Added field
   sellerDefaultStatus: boolean;
-  tags: string[];
+  keywords: string[];
   phone: string;
 }
 
@@ -72,7 +72,7 @@ const settingsSchema = new Schema({
   termsAndConditions: String,
   otherPolicies: String,
   sellerDefaultStatus: Boolean,
-  tags: {
+  keywords: {
     type: [String],
     default: [],
   },
