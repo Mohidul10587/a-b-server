@@ -48,11 +48,9 @@ publishersSchema.pre("save", async function (next) {
   while (await mongoose.models.Publisher.exists({ slug })) {
     slug = `${doc.slug}-${counter++}`;
   }
-
   doc.slug = slug;
   next();
 });
 
 const Publisher = model<IPublishers>("Publisher", publishersSchema);
-
 export default Publisher;

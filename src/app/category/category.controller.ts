@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Category from "./category.model";
 import { generateSlug } from "../shared/generateSLug";
+import Writer from "../writer/writer.model";
+import Publisher from "../publishers/publishers.model";
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -67,25 +69,6 @@ export const allCategoriesForSubCatAddPage = async (
   req: Request,
   res: Response
 ) => {
-  try {
-    const items = await Category.find().select("title slug");
-
-    res.status(200).json({
-      message: "Fetched successfully!",
-      respondedData: items.reverse(),
-    });
-  } catch (error: any) {
-    console.error(error);
-
-    res.status(500).json({
-      message: "Failed to fetch.",
-      error: error.message,
-    });
-  }
-};
-
-// Get all
-export const allCategoriesForNavBar = async (req: Request, res: Response) => {
   try {
     const items = await Category.find().select("title slug");
 
@@ -227,5 +210,27 @@ export const getAllCatWithSubCat = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Server error while fetching categories." });
+  }
+};
+
+export const getCatsWritersPublishersForNavbar = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const categories = await Category.find()
+      .select("img title slug subcategories")
+      .populate({ path: "subcategories", select: "img title slug" });
+    const writers = await Writer.find().select("title slug");
+    const publishers = await Publisher.find().select("title slug");
+
+    res.json({
+      categories,
+      writers,
+      publishers,
+    });
+  } catch (err) {
+    console.error("Failed to fetch common data:", err);
+    res.status(500).json({ message: "Something went wrong" });
   }
 };

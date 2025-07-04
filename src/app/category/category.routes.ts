@@ -5,12 +5,12 @@ import {
   allCategoriesForAdminCatIndexPage,
   update,
   singleCategoryForCategoryEditPage,
-  allCategoriesForNavBar,
   allCategoryForProductAddPage,
   allCategoryForFiltering,
   getAllCategoriesForCatMainPage,
   singleForEditPage,
   getAllCatWithSubCat,
+  getCatsWritersPublishersForNavbar,
 } from "./category.controller";
 import { verifyAdminToken } from "../user/middlewares";
 
@@ -25,40 +25,26 @@ router.get(
   allCategoriesForSubCatAddPage
 );
 router.get("/getAllCatWithSubCat", getAllCatWithSubCat);
-
-router.get("/allCategoriesForNavBar", allCategoriesForNavBar);
-
 router.get(
   "/allCategoriesForAdminCatIndexPage",
-
   allCategoriesForAdminCatIndexPage
 );
 
-router.get(
-  "/allCategoryForProductAddPage",
-
-  allCategoryForProductAddPage
-);
+router.get("/allCategoryForProductAddPage", allCategoryForProductAddPage);
 
 router.get(
   "/singleCategoryForCategoryEditPage/:id",
-
   singleCategoryForCategoryEditPage
 );
-
+router.get(
+  "/getCatsWritersPublishersForNavbar",
+  getCatsWritersPublishersForNavbar
+);
 router.put("/update/:id", verifyAdminToken, update);
 
 // common routes
 
-router.get(
-  "/allCategoryForFiltering",
+router.get("/allCategoryForFiltering", allCategoryForFiltering);
 
-  allCategoryForFiltering
-);
-
-router.get(
-  "/getAllCategoriesForCatMainPage",
-
-  getAllCategoriesForCatMainPage
-);
+router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
 export default router;
