@@ -206,16 +206,14 @@ const getAllCatWithSubCat = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.getAllCatWithSubCat = getAllCatWithSubCat;
 const getCatsWritersPublishersForNavbar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const categories = yield category_model_1.default.find()
-            .select("img title slug subcategories")
-            .populate({ path: "subcategories", select: "img title slug" });
-        const writers = yield writer_model_1.default.find().select("title slug");
-        const publishers = yield publishers_model_1.default.find().select("title slug");
-        res.json({
-            categories,
-            writers,
-            publishers,
-        });
+        const [categories, writers, publishers] = yield Promise.all([
+            category_model_1.default.find()
+                .select("img title slug subcategories")
+                .populate({ path: "subcategories", select: "img title slug" }),
+            writer_model_1.default.find().select("title slug"),
+            publishers_model_1.default.find().select("title slug"),
+        ]);
+        res.json({ categories, writers, publishers });
     }
     catch (err) {
         console.error("Failed to fetch common data:", err);
