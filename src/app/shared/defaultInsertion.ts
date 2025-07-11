@@ -89,6 +89,7 @@ export const registerAdmin = async (
       role: "admin",
       isUser: true,
       isSeller: true,
+      authProvider: "email",
     });
 
     // Save admin to database

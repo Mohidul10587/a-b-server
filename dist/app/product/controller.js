@@ -29,6 +29,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
+        console.log(error);
         // Send error message if there was an issue
         res.status(500).json({
             message: "Failed to create.",

@@ -12,22 +12,19 @@ const user_model_1 = __importDefault(require("./user.model"));
 const middlewares_2 = require("./middlewares");
 const router = express_1.default.Router();
 //-----------------for user-----------------------------------
-router.post("/create", user_controller_1.createUserBySocialMethod);
-router.post("/createUserByEmailAndPassword", user_controller_1.createUserByEmailAndPassword);
+router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
+router.post("/logInByCredentials", user_controller_1.logInByCredentials);
+router.post("/googleUpsertUser", user_controller_1.googleUpsertUser);
 router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/logout", user_controller_1.logOut);
-router.post("/logInUserWithEmailPassword", user_controller_1.logInUserWithEmailPassword);
-router.post("/logInStuffWithEmailPassword", user_controller_1.logInStuffWithEmailPassword);
 router.get("/singleUser/:userId", user_controller_1.getSingleUser);
 router.get("/getSingleUserBySlug/:userSlug", user_controller_1.getSingleUserBySlug);
 router.get("/getSingleUserById/:id", user_controller_1.getSingleUserById);
 router.get("/sellerStatus/:userSlug", user_controller_1.getStatus);
 router.get("/singleForEditPage/:id", middlewares_1.verifyUserToken, user_controller_1.singleForEditPage);
 router.get("/getSummaryOfActivity", middlewares_1.verifyUserToken, user_controller_1.getSummaryOfActivity);
-router.post("/add-coins", user_controller_1.addCoins);
 router.put("/update/:id", middlewares_1.verifyUserToken, user_controller_1.update);
 //-----------------for Admin-----------------------------------
-router.post("/createStuffByEmailAndPassword", middlewares_2.verifyAdminToken, user_controller_1.createStuffByEmailAndPassword);
 router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id", 
 // verifyAdminToken,
 user_controller_1.getDetailsOFSingleUserForAdminCustomerDetailsComponent);
@@ -43,5 +40,9 @@ router.post("/updateUserInfo/:userId", middlewares_1.verifyUserToken, user_contr
 router.patch("/updateStatus/:id", middlewares_2.verifyAdminToken, user_controller_1.updateStatus);
 router.patch("/updatePassword/:id", middlewares_2.verifyAdminToken, user_controller_1.updatePassword);
 router.delete("/delete/:id", middlewares_2.verifyAdminToken, (0, reusableControllers_1.deleteById)(user_model_1.default));
-router.post("/createUserAsStuffByEmailAndPasswordByAdmin", middlewares_2.verifyAdminToken, user_controller_1.createUserByEmailAndPassword);
+// router.post(
+//   "/createUserAsStuffByEmailAndPasswordByAdmin",
+//   verifyAdminToken,
+//   signUp
+// );
 exports.default = router;

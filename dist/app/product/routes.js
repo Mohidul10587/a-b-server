@@ -9,7 +9,7 @@ const model_1 = __importDefault(require("./model"));
 const reusableControllers_1 = require("../shared/reusableControllers");
 const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
-router.post("/create", controller_1.create);
+router.post("/create", middlewares_1.verifyAdminToken, controller_1.create);
 router.get("/singleForEditPage/:id", controller_1.singleForEditPage);
 // // Route for getting all products
 router.get("/all", controller_1.getAllProducts);

@@ -27,10 +27,7 @@ router.post(
   "/logInWithEmailPassword",
   user_controller_1.logInWithEmailPassword
 );
-router.post(
-  "/signUpWithEmailPassword",
-  user_controller_1.createUserByEmailAndPassword
-);
+router.post("/signUpWithEmailPassword", user_controller_1.signUp);
 router.post("/logout", user_controller_1.logOut);
 router.get(
   "/allOrdersOfUser",
