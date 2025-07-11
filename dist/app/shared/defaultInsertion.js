@@ -90,6 +90,7 @@ const registerAdmin = (name, email, password, image, slug) => __awaiter(void 0, 
             role: "admin",
             isUser: true,
             isSeller: true,
+            authProvider: "email",
         });
         // Save admin to database
         yield admin.save();

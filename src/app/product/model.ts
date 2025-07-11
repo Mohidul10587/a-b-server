@@ -37,7 +37,7 @@ export interface IProduct extends Document {
   titleEn: string;
   translator: string;
   writer: Schema.Types.ObjectId;
-  youtubeVideo: string;
+  youtubeVideo: string[];
 }
 
 // Schema
@@ -135,7 +135,7 @@ const ProductSchema = new Schema<IProduct>(
     },
 
     // Y
-    youtubeVideo: { type: String, default: "" },
+    youtubeVideo: { type: [String], default: [] },
   },
   { timestamps: true }
 );

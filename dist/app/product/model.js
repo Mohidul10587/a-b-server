@@ -112,7 +112,7 @@ const ProductSchema = new mongoose_1.Schema({
         default: null,
     },
     // Y
-    youtubeVideo: { type: String, default: "" },
+    youtubeVideo: { type: [String], default: [] },
 }, { timestamps: true });
 // Slug uniqueness middleware
 ProductSchema.pre("save", function (next) {

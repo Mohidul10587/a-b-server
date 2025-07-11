@@ -2,12 +2,8 @@ import { Request, Response } from "express";
 import User, { IUser } from "./user.model";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-
 import mongoose from "mongoose";
-import Settings from "../settings/settings.model";
 import { setRefreshTokenCookie } from "../shared/setToken";
-import Category from "../category/category.model";
-import Writer from "../writer/writer.model";
 import Order from "../order/order.model";
 declare module "express" {
   interface Request {
@@ -16,229 +12,169 @@ declare module "express" {
 }
 dotenv.config();
 
-// Helper function to send a consistent response with success flag and status code
+// controllers/authController.ts
 
-// Create a new user with Google login
-export const createUserBySocialMethod = async (req: Request, res: Response) => {
-  const { name, email, slug, image } = req.body;
-  const sellerDefaultStatus = (await Settings.findOne())?.sellerDefaultStatus;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      const token = setRefreshTokenCookie(res, existingUser);
-      res.status(200).json({
-        success: true,
-        user: existingUser,
-        token: token,
-        message: "User already existed",
-      });
-      return;
+export const signUpByCredentials = async (req: Request, res: Response) => {
+  const body = req.body;
+  if (!["email", "phone"].includes(body.authProvider)) {
+    return res
+      .status(400)
+      .json({ message: "Auth Provider must be 'email' or 'phone'" });
+  }
+  if (body.authProvider === "email") {
+    if (!body.email) {
+      return res
+        .status(400)
+        .json({ message: "Provide  email  for email signup" });
     }
+  } else {
+    if (!body.phone) {
+      return res
+        .status(400)
+        .json({ message: "Provide  phone for phone signup" });
+    }
+  }
+  if (!body.password) {
+    return res
+      .status(400)
+      .json({ message: "Password is required for credential signup" });
+  }
 
-    const newUser = await User.create({
-      name,
-      email,
-      isSeller: sellerDefaultStatus,
-      slug: slug ?? "my-slug",
-      image,
-    });
+  const data = {
+    name: body.name,
+    slug: body.slug,
+    password: await bcrypt.hash(body.password, 10),
+  };
+  /* -------- 3. ডুপ্লিকেট চেক ---------- */
+  try {
+    if (body.authProvider === "email") {
+      if (await User.findOne({ email: body.email })) {
+        return res.status(409).json({ message: "Email already in use" });
+      }
 
-    const token = setRefreshTokenCookie(res, newUser);
-
-    return res.status(200).json({
-      success: true,
-      user: newUser,
-      token: token,
-
-      message: "User created successfully",
-    });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return res.status(200).json({
-      success: false,
-      user: {},
-      message: "Creating user failed",
-    });
+      const user = await User.create({
+        ...data,
+        email: body.email,
+      });
+      const refreshToken = setRefreshTokenCookie(res, user);
+      return res
+        .status(201)
+        .json({ user, refreshToken, message: "Created successfully" });
+    } else {
+      // phone
+      if (await User.findOne({ phone: body.phone })) {
+        return res.status(409).json({ message: "Phone already in use" });
+      }
+      const user = await User.create({
+        ...data,
+        phone: body.phone,
+      });
+      const refreshToken = setRefreshTokenCookie(res, user);
+      return res
+        .status(201)
+        .json({ user, refreshToken, message: "Created successfully" });
+    }
+  } catch (err) {
+    console.error("Error creating user:", err);
+    return res.status(500).json({ message: "Failed to create user" });
   }
 };
 
-// Create a new user with email and password
-export const createUserByEmailAndPassword = async (
-  req: Request,
-  res: Response
-) => {
-  const { name, email, slug, password, role } = req.body;
-  const sellerDefaultStatus = (await Settings.findOne())?.sellerDefaultStatus;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
+// controllers/authController.ts
 
-        message: "Email already in use",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      name,
-      email,
-      slug: slug ?? "my-slug",
-      role: role ?? "user",
-      isSeller: sellerDefaultStatus,
-      password: hashedPassword,
-    });
-    setRefreshTokenCookie(res, newUser);
-    return res.status(201).json({
-      success: true,
-      user: newUser,
-      message: "Created successfully",
-    });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to create",
-    });
+export const logInByCredentials = async (req: Request, res: Response) => {
+  const { authProvider, identifier, password } = req.body;
+  /* -------- 1. ভ্যালিডেশন ---------- */
+  if (!["email", "phone"].includes(authProvider)) {
+    return res
+      .status(400)
+      .json({ message: "Auth Provider must be 'email' or 'phone'" });
   }
-};
 
-// Create a new user with email and password
-export const createStuffByEmailAndPassword = async (
-  req: Request,
-  res: Response
-) => {
-  const { name, email, slug, password, role } = req.body;
-  const sellerDefaultStatus = (await Settings.findOne())?.sellerDefaultStatus;
-  try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-
-        message: "Email already in use",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
-      name,
-      email,
-      slug: slug ?? "my-slug",
-      role: role ?? "user",
-      isSeller: sellerDefaultStatus,
-      password: hashedPassword,
-    });
-    setRefreshTokenCookie(res, newUser);
-    return res.status(201).json({
-      success: true,
-      user: newUser,
-      message: "Created successfully",
-    });
-  } catch (error) {
-    console.error("Error creating user:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to create",
-    });
+  if (!identifier || !password) {
+    return res
+      .status(400)
+      .json({ message: "Identifier & password are required" });
   }
-};
 
-// Authenticate user with email and password
-export const logInUserWithEmailPassword = async (
-  req: Request,
-  res: Response
-) => {
-  const { email, password } = req.body;
+  const query =
+    authProvider === "email" ? { email: identifier } : { phone: identifier };
 
   try {
-    const user = await User.findOne({ email });
+    /* -------- 2. ইউজার খুঁজে আনা ---------- */
+    const user = await User.findOne(query).select("+password");
     if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
+    /* -------- 3. পাসওয়ার্ড যাচাই ---------- */
+    const isMatch = await bcrypt.compare(password, user.password!);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
+
+    /* -------- 4. এক্সেস কন্ট্রোল (ঐচ্ছিক) ---------- */
     if (user.isUser === false) {
-      return res.status(401).json({
-        success: false,
-        message: "User not allowed to log in",
-      });
+      return res.status(403).json({ message: "User is blocked" });
     }
-    const token = setRefreshTokenCookie(res, user);
 
-    return res.status(200).json({
-      success: true,
-      user,
-      token,
-      message: "User authenticated successfully",
-    });
-  } catch (error) {
-    console.error("Error authenticating user:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Authentication failed",
-    });
+    /* -------- 5. রিফ্রেশ‑টোকেন কুকি সেট ---------- */
+    const refreshToken = setRefreshTokenCookie(res, user);
+
+    /* -------- 6. সফল রেসপন্স ---------- */
+    return res
+      .status(200)
+      .json({ user, refreshToken, message: "Login successful" });
+  } catch (err) {
+    console.error("Login error:", err);
+    return res.status(500).json({ message: "Failed to log in" });
   }
 };
 
-// Authenticate user with email and password
-export const logInStuffWithEmailPassword = async (
-  req: Request,
-  res: Response
-) => {
-  const { email, password } = req.body;
+// controllers/authController.ts
+
+export const googleUpsertUser = async (req: Request, res: Response) => {
+  const { name, email, image, slug, role = "user" } = req.body;
+
+  // 1. Check required fields
+  if (!email || !name) {
+    return res.status(400).json({ message: "Name and email are required" });
+  }
 
   try {
-    const user = await User.findOne({ email });
+    // 2. Find by email & update OR insert new user
+    const user = await User.findOneAndUpdate(
+      { email },
+      {
+        $setOnInsert: {
+          slug: slug ?? "default-slug",
+          role,
+          authProvider: "google",
+        },
+        $set: {
+          name,
+          image,
+          lastLoginAt: new Date(),
+        },
+      },
+      {
+        new: true,
+        upsert: true,
+      }
+    );
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+    // 3. Set Refresh Token Cookie
+    const refreshToken = setRefreshTokenCookie(res, user);
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(isPasswordValid);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
-
-    if (user.isUser === false || user.role === "user") {
-      return res.status(401).json({
-        success: false,
-        message: "User not allowed to log in",
-      });
-    }
-
-    const token = setRefreshTokenCookie(res, user);
-
-    return res.status(200).json({
-      success: true,
-      user,
-      token,
-      message: "User authenticated successfully",
-    });
-  } catch (error) {
-    console.error("Error authenticating user:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Authentication failed",
-    });
+    return res
+      .status(200)
+      .json({ user, refreshToken, message: "Google sign-in/up success" });
+  } catch (err) {
+    console.error("Google upsert error:", err);
+    return res.status(500).json({ message: "Failed to upsert user" });
   }
 };
+
 // Route to check user authentication
 export const checkUser_Email = async (req: Request, res: Response) => {
   res.status(200).json({
@@ -590,7 +526,6 @@ export const getOrdersByUserId = async (
 ): Promise<void> => {
   try {
     const user = req.user?._id;
-    console.log("user", user);
     const orders = await Order.find({ user }).sort({ createdAt: -1 });
 
     if (!orders) {
@@ -629,44 +564,6 @@ export const getSingleOrder = async (
     res.status(200).json(order);
   } catch (error) {
     res.status(500).json({ message: "Error retrieving order", error });
-  }
-};
-// Function to add coins to a user
-export const addCoins = async (req: Request, res: Response) => {
-  try {
-    const { userId, coins, coinsTakingDate, toDaysCoins } = req.body;
-
-    if (
-      !userId ||
-      typeof coins !== "number" ||
-      typeof toDaysCoins !== "number" ||
-      !coinsTakingDate
-    ) {
-      return res.status(400).json({ message: "Invalid request data" });
-    }
-    // Find user and update coins and coinsTakingDate
-    const user = await User.findByIdAndUpdate(
-      userId,
-      {
-        $inc: { coins }, // Increment coins
-        coinsTakingDate,
-        toDaysCoins,
-      },
-      { new: true } // Return the updated document
-    );
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({
-      message: "Coins added successfully",
-      coins: user.coins,
-      coinsTakingDate: user.coinsTakingDate,
-    });
-  } catch (error) {
-    console.error("Error adding coins:", error);
-    res.status(500).json({ message: "Internal server error" });
   }
 };
 

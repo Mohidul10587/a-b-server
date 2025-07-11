@@ -12,217 +12,155 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.addCoins = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.logInStuffWithEmailPassword = exports.logInUserWithEmailPassword = exports.createStuffByEmailAndPassword = exports.createUserByEmailAndPassword = exports.createUserBySocialMethod = void 0;
+exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
-const settings_model_1 = __importDefault(require("../settings/settings.model"));
 const setToken_1 = require("../shared/setToken");
 const order_model_1 = __importDefault(require("../order/order.model"));
 dotenv_1.default.config();
-// Helper function to send a consistent response with success flag and status code
-// Create a new user with Google login
-const createUserBySocialMethod = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { name, email, slug, image } = req.body;
-    const sellerDefaultStatus = (_a = (yield settings_model_1.default.findOne())) === null || _a === void 0 ? void 0 : _a.sellerDefaultStatus;
-    try {
-        const existingUser = yield user_model_1.default.findOne({ email });
-        if (existingUser) {
-            const token = (0, setToken_1.setRefreshTokenCookie)(res, existingUser);
-            res.status(200).json({
-                success: true,
-                user: existingUser,
-                token: token,
-                message: "User already existed",
-            });
-            return;
-        }
-        const newUser = yield user_model_1.default.create({
-            name,
-            email,
-            isSeller: sellerDefaultStatus,
-            slug: slug !== null && slug !== void 0 ? slug : "my-slug",
-            image,
-        });
-        const token = (0, setToken_1.setRefreshTokenCookie)(res, newUser);
-        return res.status(200).json({
-            success: true,
-            user: newUser,
-            token: token,
-            message: "User created successfully",
-        });
+// controllers/authController.ts
+const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    if (!["email", "phone"].includes(body.authProvider)) {
+        return res
+            .status(400)
+            .json({ message: "Auth Provider must be 'email' or 'phone'" });
     }
-    catch (error) {
-        console.error("Error creating user:", error);
-        return res.status(200).json({
-            success: false,
-            user: {},
-            message: "Creating user failed",
-        });
+    if (body.authProvider === "email") {
+        if (!body.email) {
+            return res
+                .status(400)
+                .json({ message: "Provide  email  for email signup" });
+        }
+    }
+    else {
+        if (!body.phone) {
+            return res
+                .status(400)
+                .json({ message: "Provide  phone for phone signup" });
+        }
+    }
+    if (!body.password) {
+        return res
+            .status(400)
+            .json({ message: "Password is required for credential signup" });
+    }
+    const data = {
+        name: body.name,
+        slug: body.slug,
+        password: yield bcryptjs_1.default.hash(body.password, 10),
+    };
+    /* -------- 3. ডুপ্লিকেট চেক ---------- */
+    try {
+        if (body.authProvider === "email") {
+            if (yield user_model_1.default.findOne({ email: body.email })) {
+                return res.status(409).json({ message: "Email already in use" });
+            }
+            const user = yield user_model_1.default.create(Object.assign(Object.assign({}, data), { email: body.email }));
+            const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
+            return res
+                .status(201)
+                .json({ user, refreshToken, message: "Created successfully" });
+        }
+        else {
+            // phone
+            if (yield user_model_1.default.findOne({ phone: body.phone })) {
+                return res.status(409).json({ message: "Phone already in use" });
+            }
+            const user = yield user_model_1.default.create(Object.assign(Object.assign({}, data), { phone: body.phone }));
+            const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
+            return res
+                .status(201)
+                .json({ user, refreshToken, message: "Created successfully" });
+        }
+    }
+    catch (err) {
+        console.error("Error creating user:", err);
+        return res.status(500).json({ message: "Failed to create user" });
     }
 });
-exports.createUserBySocialMethod = createUserBySocialMethod;
-// Create a new user with email and password
-const createUserByEmailAndPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { name, email, slug, password, role } = req.body;
-    const sellerDefaultStatus = (_a = (yield settings_model_1.default.findOne())) === null || _a === void 0 ? void 0 : _a.sellerDefaultStatus;
+exports.signUpByCredentials = signUpByCredentials;
+// controllers/authController.ts
+const logInByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { authProvider, identifier, password } = req.body;
+    /* -------- 1. ভ্যালিডেশন ---------- */
+    if (!["email", "phone"].includes(authProvider)) {
+        return res
+            .status(400)
+            .json({ message: "Auth Provider must be 'email' or 'phone'" });
+    }
+    if (!identifier || !password) {
+        return res
+            .status(400)
+            .json({ message: "Identifier & password are required" });
+    }
+    const query = authProvider === "email" ? { email: identifier } : { phone: identifier };
     try {
-        const existingUser = yield user_model_1.default.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message: "Email already in use",
-            });
-        }
-        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-        const newUser = yield user_model_1.default.create({
-            name,
-            email,
-            slug: slug !== null && slug !== void 0 ? slug : "my-slug",
-            role: role !== null && role !== void 0 ? role : "user",
-            isSeller: sellerDefaultStatus,
-            password: hashedPassword,
-        });
-        (0, setToken_1.setRefreshTokenCookie)(res, newUser);
-        return res.status(201).json({
-            success: true,
-            user: newUser,
-            message: "Created successfully",
-        });
-    }
-    catch (error) {
-        console.error("Error creating user:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to create",
-        });
-    }
-});
-exports.createUserByEmailAndPassword = createUserByEmailAndPassword;
-// Create a new user with email and password
-const createStuffByEmailAndPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const { name, email, slug, password, role } = req.body;
-    const sellerDefaultStatus = (_a = (yield settings_model_1.default.findOne())) === null || _a === void 0 ? void 0 : _a.sellerDefaultStatus;
-    try {
-        const existingUser = yield user_model_1.default.findOne({ email });
-        if (existingUser) {
-            return res.status(409).json({
-                success: false,
-                message: "Email already in use",
-            });
-        }
-        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
-        const newUser = yield user_model_1.default.create({
-            name,
-            email,
-            slug: slug !== null && slug !== void 0 ? slug : "my-slug",
-            role: role !== null && role !== void 0 ? role : "user",
-            isSeller: sellerDefaultStatus,
-            password: hashedPassword,
-        });
-        (0, setToken_1.setRefreshTokenCookie)(res, newUser);
-        return res.status(201).json({
-            success: true,
-            user: newUser,
-            message: "Created successfully",
-        });
-    }
-    catch (error) {
-        console.error("Error creating user:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Failed to create",
-        });
-    }
-});
-exports.createStuffByEmailAndPassword = createStuffByEmailAndPassword;
-// Authenticate user with email and password
-const logInUserWithEmailPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
-    try {
-        const user = yield user_model_1.default.findOne({ email });
+        /* -------- 2. ইউজার খুঁজে আনা ---------- */
+        const user = yield user_model_1.default.findOne(query).select("+password");
         if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
+            return res.status(404).json({ message: "User not found" });
         }
-        const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid credentials",
-            });
+        /* -------- 3. পাসওয়ার্ড যাচাই ---------- */
+        const isMatch = yield bcryptjs_1.default.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
         }
+        /* -------- 4. এক্সেস কন্ট্রোল (ঐচ্ছিক) ---------- */
         if (user.isUser === false) {
-            return res.status(401).json({
-                success: false,
-                message: "User not allowed to log in",
-            });
+            return res.status(403).json({ message: "User is blocked" });
         }
-        const token = (0, setToken_1.setRefreshTokenCookie)(res, user);
-        return res.status(200).json({
-            success: true,
-            user,
-            token,
-            message: "User authenticated successfully",
-        });
+        /* -------- 5. রিফ্রেশ‑টোকেন কুকি সেট ---------- */
+        const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
+        /* -------- 6. সফল রেসপন্স ---------- */
+        return res
+            .status(200)
+            .json({ user, refreshToken, message: "Login successful" });
     }
-    catch (error) {
-        console.error("Error authenticating user:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Authentication failed",
-        });
+    catch (err) {
+        console.error("Login error:", err);
+        return res.status(500).json({ message: "Failed to log in" });
     }
 });
-exports.logInUserWithEmailPassword = logInUserWithEmailPassword;
-// Authenticate user with email and password
-const logInStuffWithEmailPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = req.body;
+exports.logInByCredentials = logInByCredentials;
+// controllers/authController.ts
+const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, email, image, slug, role = "user" } = req.body;
+    // 1. Check required fields
+    if (!email || !name) {
+        return res.status(400).json({ message: "Name and email are required" });
+    }
     try {
-        const user = yield user_model_1.default.findOne({ email });
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found",
-            });
-        }
-        const isPasswordValid = yield bcryptjs_1.default.compare(password, user.password);
-        console.log(isPasswordValid);
-        if (!isPasswordValid) {
-            return res.status(401).json({
-                success: false,
-                message: "Invalid credentials",
-            });
-        }
-        if (user.isUser === false || user.role === "user") {
-            return res.status(401).json({
-                success: false,
-                message: "User not allowed to log in",
-            });
-        }
-        const token = (0, setToken_1.setRefreshTokenCookie)(res, user);
-        return res.status(200).json({
-            success: true,
-            user,
-            token,
-            message: "User authenticated successfully",
+        // 2. Find by email & update OR insert new user
+        const user = yield user_model_1.default.findOneAndUpdate({ email }, {
+            $setOnInsert: {
+                slug: slug !== null && slug !== void 0 ? slug : "default-slug",
+                role,
+                authProvider: "google",
+            },
+            $set: {
+                name,
+                image,
+                lastLoginAt: new Date(),
+            },
+        }, {
+            new: true,
+            upsert: true,
         });
+        // 3. Set Refresh Token Cookie
+        const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
+        return res
+            .status(200)
+            .json({ user, refreshToken, message: "Google sign-in/up success" });
     }
-    catch (error) {
-        console.error("Error authenticating user:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Authentication failed",
-        });
+    catch (err) {
+        console.error("Google upsert error:", err);
+        return res.status(500).json({ message: "Failed to upsert user" });
     }
 });
-exports.logInStuffWithEmailPassword = logInStuffWithEmailPassword;
+exports.googleUpsertUser = googleUpsertUser;
 // Route to check user authentication
 const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(200).json({
@@ -529,7 +467,6 @@ const getOrdersByUserId = (req, res) => __awaiter(void 0, void 0, void 0, functi
     var _a;
     try {
         const user = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
-        console.log("user", user);
         const orders = yield order_model_1.default.find({ user }).sort({ createdAt: -1 });
         if (!orders) {
             res
@@ -569,38 +506,6 @@ const getSingleOrder = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.getSingleOrder = getSingleOrder;
-// Function to add coins to a user
-const addCoins = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const { userId, coins, coinsTakingDate, toDaysCoins } = req.body;
-        if (!userId ||
-            typeof coins !== "number" ||
-            typeof toDaysCoins !== "number" ||
-            !coinsTakingDate) {
-            return res.status(400).json({ message: "Invalid request data" });
-        }
-        // Find user and update coins and coinsTakingDate
-        const user = yield user_model_1.default.findByIdAndUpdate(userId, {
-            $inc: { coins }, // Increment coins
-            coinsTakingDate,
-            toDaysCoins,
-        }, { new: true } // Return the updated document
-        );
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({
-            message: "Coins added successfully",
-            coins: user.coins,
-            coinsTakingDate: user.coinsTakingDate,
-        });
-    }
-    catch (error) {
-        console.error("Error adding coins:", error);
-        res.status(500).json({ message: "Internal server error" });
-    }
-});
-exports.addCoins = addCoins;
 const getAuthenticatedUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const email = req.query.email;

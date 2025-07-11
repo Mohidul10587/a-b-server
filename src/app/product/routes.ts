@@ -26,7 +26,7 @@ import {
 
 const router = express.Router();
 
-router.post("/create", create);
+router.post("/create", verifyAdminToken, create);
 router.get("/singleForEditPage/:id", singleForEditPage);
 
 // // Route for getting all products
