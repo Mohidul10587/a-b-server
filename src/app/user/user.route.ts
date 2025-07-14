@@ -24,6 +24,7 @@ import {
   updatePassword,
   googleUpsertUser,
   logInByCredentials,
+  setRefreshToken,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 
@@ -39,6 +40,7 @@ const router = express.Router();
 router.post("/signUpByCredentials", signUpByCredentials);
 router.post("/logInByCredentials", logInByCredentials);
 router.post("/googleUpsertUser", googleUpsertUser);
+router.post("/setCookie", setRefreshToken);
 
 router.get("/getAuthenticatedUser", getAuthenticatedUser);
 router.post("/logout", logOut);

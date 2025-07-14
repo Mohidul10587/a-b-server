@@ -15,65 +15,87 @@ dotenv.config();
 // controllers/authController.ts
 
 export const signUpByCredentials = async (req: Request, res: Response) => {
-  const body = req.body;
-  if (!["email", "phone"].includes(body.authProvider)) {
+  const { authProvider, email, phone, slug, password, name } = req.body;
+
+  // 1️⃣ প্রাথমিক ভ্যালিডেশন – authProvider সঠিক কি না
+  if (!["email", "phone", "slug"].includes(authProvider)) {
     return res
       .status(400)
-      .json({ message: "Auth Provider must be 'email' or 'phone'" });
+      .json({ message: "Auth Provider must be 'email', 'phone' or 'slug'" });
   }
-  if (body.authProvider === "email") {
-    if (!body.email) {
-      return res
-        .status(400)
-        .json({ message: "Provide  email  for email signup" });
-    }
-  } else {
-    if (!body.phone) {
-      return res
-        .status(400)
-        .json({ message: "Provide  phone for phone signup" });
-    }
+
+  // 2️⃣ ফিল্ড চেক: যে প্রোভাইডার, সেই অনুযায়ী ইনপুট থাকা বাধ্যতামূলক
+  switch (authProvider) {
+    case "email":
+      if (!email)
+        return res
+          .status(400)
+          .json({ message: "Provide email for email signup" });
+      break;
+
+    case "phone":
+      if (!phone)
+        return res
+          .status(400)
+          .json({ message: "Provide phone for phone signup" });
+      break;
+
+    case "slug":
+      if (!slug)
+        return res
+          .status(400)
+          .json({ message: "Provide slug for slug signup" });
+      break;
   }
-  if (!body.password) {
+
+  // 3️⃣ পাসওয়ার্ড চেক
+  if (!password) {
     return res
       .status(400)
       .json({ message: "Password is required for credential signup" });
   }
 
-  const data = {
-    name: body.name,
-    slug: body.slug,
-    password: await bcrypt.hash(body.password, 10),
+  // 4️⃣ কমন ডেটা তৈরি
+  const hashedPwd = await bcrypt.hash(password, 10);
+  const baseData = {
+    name,
+    password: hashedPwd,
+    authProvider,
+    slug: slug || "slug",
   };
-  /* -------- 3. ডুপ্লিকেট চেক ---------- */
-  try {
-    if (body.authProvider === "email") {
-      if (await User.findOne({ email: body.email })) {
-        return res.status(409).json({ message: "Email already in use" });
-      }
 
-      const user = await User.create({
-        ...data,
-        email: body.email,
-      });
-      const refreshToken = setRefreshTokenCookie(res, user);
-      return res
-        .status(201)
-        .json({ user, refreshToken, message: "Created successfully" });
-    } else {
-      // phone
-      if (await User.findOne({ phone: body.phone })) {
-        return res.status(409).json({ message: "Phone already in use" });
-      }
-      const user = await User.create({
-        ...data,
-        phone: body.phone,
-      });
-      const refreshToken = setRefreshTokenCookie(res, user);
-      return res
-        .status(201)
-        .json({ user, refreshToken, message: "Created successfully" });
+  try {
+    let user;
+
+    switch (authProvider) {
+      case "email":
+        // ডুপ্লিকেট চেক
+        if (await User.findOne({ email }))
+          return res.status(409).json({ message: "Email already in use" });
+
+        user = await User.create({ ...baseData, email });
+        break;
+
+      case "phone":
+        if (await User.findOne({ phone }))
+          return res.status(409).json({ message: "Phone already in use" });
+
+        user = await User.create({ ...baseData, phone });
+        break;
+
+      case "slug":
+        if (await User.findOne({ slug }))
+          return res.status(409).json({ message: "Slug already in use" });
+
+        user = await User.create({ ...baseData, slug });
+        break;
     }
+
+    // 5️⃣ রিফ্রেশ‑টোকেন কুকি সেট এবং রেসপন্স
+    const refreshToken = setRefreshTokenCookie(res, user!);
+    return res
+      .status(201)
+      .json({ user, refreshToken, message: "Created successfully" });
   } catch (err) {
     console.error("Error creating user:", err);
     return res.status(500).json({ message: "Failed to create user" });
@@ -85,10 +107,10 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
 export const logInByCredentials = async (req: Request, res: Response) => {
   const { authProvider, identifier, password } = req.body;
   /* -------- 1. ভ্যালিডেশন ---------- */
-  if (!["email", "phone"].includes(authProvider)) {
+  if (!["email", "phone", "slug"].includes(authProvider)) {
     return res
       .status(400)
-      .json({ message: "Auth Provider must be 'email' or 'phone'" });
+      .json({ message: "Auth Provider must be 'email' or 'phone' or 'slug'" });
   }
 
   if (!identifier || !password) {
@@ -97,8 +119,10 @@ export const logInByCredentials = async (req: Request, res: Response) => {
       .json({ message: "Identifier & password are required" });
   }
 
-  const query =
-    authProvider === "email" ? { email: identifier } : { phone: identifier };
+  let query = {};
+  if (authProvider === "email") query = { email: identifier };
+  if (authProvider === "phone") query = { phone: identifier };
+  if (authProvider === "slug") query = { slug: identifier };
 
   try {
     /* -------- 2. ইউজার খুঁজে আনা ---------- */
@@ -134,7 +158,7 @@ export const logInByCredentials = async (req: Request, res: Response) => {
 // controllers/authController.ts
 
 export const googleUpsertUser = async (req: Request, res: Response) => {
-  const { name, email, image, slug, role = "user" } = req.body;
+  const { name, email, image, slug = "default-slug", role = "user" } = req.body;
 
   // 1. Check required fields
   if (!email || !name) {
@@ -142,26 +166,24 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
   }
 
   try {
-    // 2. Find by email & update OR insert new user
-    const user = await User.findOneAndUpdate(
-      { email },
-      {
-        $setOnInsert: {
-          slug: slug ?? "default-slug",
-          role,
-          authProvider: "google",
-        },
-        $set: {
-          name,
-          image,
-          lastLoginAt: new Date(),
-        },
-      },
-      {
-        new: true,
-        upsert: true,
-      }
-    );
+    // 2. Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (user) {
+      user.lastLoginAt = new Date();
+      await user.save();
+    } else {
+      // ==== CREATE NEW USER ====
+      user = await User.create({
+        name,
+        email,
+        image,
+        slug,
+        role,
+        authProvider: "google",
+        lastLoginAt: new Date(),
+      });
+    }
 
     // 3. Set Refresh Token Cookie
     const refreshToken = setRefreshTokenCookie(res, user);
@@ -173,6 +195,23 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
     console.error("Google upsert error:", err);
     return res.status(500).json({ message: "Failed to upsert user" });
   }
+};
+
+export const setRefreshToken = (req: Request, res: Response) => {
+  const { refreshToken } = req.body; // sent from the client
+  if (!refreshToken) {
+    return res.status(400).json({ message: "No token provided" });
+  }
+
+  //  ⚠️  Make sure your API is served from https://bikroy.96s.info
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none", // cross‑site cookie
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
+
+  return res.json({ message: "Cookie set" });
 };
 
 // Route to check user authentication
