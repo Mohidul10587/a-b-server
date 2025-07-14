@@ -198,7 +198,8 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
 };
 
 export const setRefreshToken = (req: Request, res: Response) => {
-  const { refreshToken } = req.body; // sent from the client
+  const { refreshToken } = req.body;
+  console.log("This is refresh token", refreshToken);
   if (!refreshToken) {
     return res.status(400).json({ message: "No token provided" });
   }

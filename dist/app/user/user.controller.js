@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -22,59 +22,73 @@ const order_model_1 = __importDefault(require("../order/order.model"));
 dotenv_1.default.config();
 // controllers/authController.ts
 const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const body = req.body;
-    if (!["email", "phone"].includes(body.authProvider)) {
+    const { authProvider, email, phone, slug, password, name } = req.body;
+    // 1️⃣ প্রাথমিক ভ্যালিডেশন – authProvider সঠিক কি না
+    if (!["email", "phone", "slug"].includes(authProvider)) {
         return res
             .status(400)
-            .json({ message: "Auth Provider must be 'email' or 'phone'" });
+            .json({ message: "Auth Provider must be 'email', 'phone' or 'slug'" });
     }
-    if (body.authProvider === "email") {
-        if (!body.email) {
-            return res
-                .status(400)
-                .json({ message: "Provide  email  for email signup" });
-        }
+    // 2️⃣ ফিল্ড চেক: যে প্রোভাইডার, সেই অনুযায়ী ইনপুট থাকা বাধ্যতামূলক
+    switch (authProvider) {
+        case "email":
+            if (!email)
+                return res
+                    .status(400)
+                    .json({ message: "Provide email for email signup" });
+            break;
+        case "phone":
+            if (!phone)
+                return res
+                    .status(400)
+                    .json({ message: "Provide phone for phone signup" });
+            break;
+        case "slug":
+            if (!slug)
+                return res
+                    .status(400)
+                    .json({ message: "Provide slug for slug signup" });
+            break;
     }
-    else {
-        if (!body.phone) {
-            return res
-                .status(400)
-                .json({ message: "Provide  phone for phone signup" });
-        }
-    }
-    if (!body.password) {
+    // 3️⃣ পাসওয়ার্ড চেক
+    if (!password) {
         return res
             .status(400)
             .json({ message: "Password is required for credential signup" });
     }
-    const data = {
-        name: body.name,
-        slug: body.slug,
-        password: yield bcryptjs_1.default.hash(body.password, 10),
+    // 4️⃣ কমন ডেটা তৈরি
+    const hashedPwd = yield bcryptjs_1.default.hash(password, 10);
+    const baseData = {
+        name,
+        password: hashedPwd,
+        authProvider,
+        slug: slug || "slug",
     };
-    /* -------- 3. ডুপ্লিকেট চেক ---------- */
     try {
-        if (body.authProvider === "email") {
-            if (yield user_model_1.default.findOne({ email: body.email })) {
-                return res.status(409).json({ message: "Email already in use" });
-            }
-            const user = yield user_model_1.default.create(Object.assign(Object.assign({}, data), { email: body.email }));
-            const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
-            return res
-                .status(201)
-                .json({ user, refreshToken, message: "Created successfully" });
+        let user;
+        switch (authProvider) {
+            case "email":
+                // ডুপ্লিকেট চেক
+                if (yield user_model_1.default.findOne({ email }))
+                    return res.status(409).json({ message: "Email already in use" });
+                user = yield user_model_1.default.create(Object.assign(Object.assign({}, baseData), { email }));
+                break;
+            case "phone":
+                if (yield user_model_1.default.findOne({ phone }))
+                    return res.status(409).json({ message: "Phone already in use" });
+                user = yield user_model_1.default.create(Object.assign(Object.assign({}, baseData), { phone }));
+                break;
+            case "slug":
+                if (yield user_model_1.default.findOne({ slug }))
+                    return res.status(409).json({ message: "Slug already in use" });
+                user = yield user_model_1.default.create(Object.assign(Object.assign({}, baseData), { slug }));
+                break;
         }
-        else {
-            // phone
-            if (yield user_model_1.default.findOne({ phone: body.phone })) {
-                return res.status(409).json({ message: "Phone already in use" });
-            }
-            const user = yield user_model_1.default.create(Object.assign(Object.assign({}, data), { phone: body.phone }));
-            const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
-            return res
-                .status(201)
-                .json({ user, refreshToken, message: "Created successfully" });
-        }
+        // 5️⃣ রিফ্রেশ‑টোকেন কুকি সেট এবং রেসপন্স
+        const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
+        return res
+            .status(201)
+            .json({ user, refreshToken, message: "Created successfully" });
     }
     catch (err) {
         console.error("Error creating user:", err);
@@ -86,17 +100,23 @@ exports.signUpByCredentials = signUpByCredentials;
 const logInByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { authProvider, identifier, password } = req.body;
     /* -------- 1. ভ্যালিডেশন ---------- */
-    if (!["email", "phone"].includes(authProvider)) {
+    if (!["email", "phone", "slug"].includes(authProvider)) {
         return res
             .status(400)
-            .json({ message: "Auth Provider must be 'email' or 'phone'" });
+            .json({ message: "Auth Provider must be 'email' or 'phone' or 'slug'" });
     }
     if (!identifier || !password) {
         return res
             .status(400)
             .json({ message: "Identifier & password are required" });
     }
-    const query = authProvider === "email" ? { email: identifier } : { phone: identifier };
+    let query = {};
+    if (authProvider === "email")
+        query = { email: identifier };
+    if (authProvider === "phone")
+        query = { phone: identifier };
+    if (authProvider === "slug")
+        query = { slug: identifier };
     try {
         /* -------- 2. ইউজার খুঁজে আনা ---------- */
         const user = yield user_model_1.default.findOne(query).select("+password");
@@ -127,28 +147,30 @@ const logInByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.logInByCredentials = logInByCredentials;
 // controllers/authController.ts
 const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { name, email, image, slug, role = "user" } = req.body;
+    const { name, email, image, slug = "default-slug", role = "user" } = req.body;
     // 1. Check required fields
     if (!email || !name) {
         return res.status(400).json({ message: "Name and email are required" });
     }
     try {
-        // 2. Find by email & update OR insert new user
-        const user = yield user_model_1.default.findOneAndUpdate({ email }, {
-            $setOnInsert: {
-                slug: slug !== null && slug !== void 0 ? slug : "default-slug",
+        // 2. Check if user already exists
+        let user = yield user_model_1.default.findOne({ email });
+        if (user) {
+            user.lastLoginAt = new Date();
+            yield user.save();
+        }
+        else {
+            // ==== CREATE NEW USER ====
+            user = yield user_model_1.default.create({
+                name,
+                email,
+                image,
+                slug,
                 role,
                 authProvider: "google",
-            },
-            $set: {
-                name,
-                image,
                 lastLoginAt: new Date(),
-            },
-        }, {
-            new: true,
-            upsert: true,
-        });
+            });
+        }
         // 3. Set Refresh Token Cookie
         const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
         return res
@@ -161,6 +183,21 @@ const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.googleUpsertUser = googleUpsertUser;
+const setRefreshToken = (req, res) => {
+    const { refreshToken } = req.body; // sent from the client
+    if (!refreshToken) {
+        return res.status(400).json({ message: "No token provided" });
+    }
+    //  ⚠️  Make sure your API is served from https://bikroy.96s.info
+    res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none", // cross‑site cookie
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+    return res.json({ message: "Cookie set" });
+};
+exports.setRefreshToken = setRefreshToken;
 // Route to check user authentication
 const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(200).json({

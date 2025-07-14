@@ -15,6 +15,7 @@ const router = express_1.default.Router();
 router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
 router.post("/logInByCredentials", user_controller_1.logInByCredentials);
 router.post("/googleUpsertUser", user_controller_1.googleUpsertUser);
+router.post("/setCookie", user_controller_1.setRefreshToken);
 router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/logout", user_controller_1.logOut);
 router.get("/singleUser/:userId", user_controller_1.getSingleUser);
