@@ -44,7 +44,7 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
       if (!slug)
         return res
           .status(400)
-          .json({ message: "Provide slug for slug signup" });
+          .json({ message: "Provide username for username signup" });
       break;
   }
 
@@ -85,7 +85,7 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
 
       case "slug":
         if (await User.findOne({ slug }))
-          return res.status(409).json({ message: "Slug already in use" });
+          return res.status(409).json({ message: "Usrname already in use" });
 
         user = await User.create({ ...baseData, slug });
         break;
