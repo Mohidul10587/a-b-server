@@ -12,13 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.getOrdersByUserId = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const setToken_1 = require("../shared/setToken");
 const order_model_1 = __importDefault(require("../order/order.model"));
+const model_1 = __importDefault(require("../product/model"));
 dotenv_1.default.config();
 // controllers/authController.ts
 const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -184,7 +185,8 @@ const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.googleUpsertUser = googleUpsertUser;
 const setRefreshToken = (req, res) => {
-    const { refreshToken } = req.body; // sent from the client
+    const { refreshToken } = req.body;
+    console.log("This is refresh token", refreshToken);
     if (!refreshToken) {
         return res.status(400).json({ message: "No token provided" });
     }
@@ -207,6 +209,14 @@ const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function
     });
 });
 exports.checkUser_Email = checkUser_Email;
+const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const users = yield user_model_1.default.find().sort({ createdAt: -1 });
+    return res.status(200).json({
+        users,
+        message: "Users fetched successfully",
+    });
+});
+exports.allUserForAdmin = allUserForAdmin;
 const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.params.userId;
@@ -712,3 +722,84 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.updatePassword = updatePassword;
+// Update the status of a PageElement by ID
+const updateSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params; // Make sure the ID is being passed correctly
+    const { role } = req.body;
+    try {
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { role }, // Ensure 'status' is the correct field
+        { new: true } // Return the updated document
+        );
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const updatedSellerId = updatedUser._id;
+        const status = updatedUser.isSeller;
+        try {
+            const result = yield model_1.default.updateMany({ seller: updatedSellerId }, // Filter: match seller ID
+            { $set: { display: status } } // Update: set updated timestamp
+            );
+        }
+        catch (error) {
+            console.error("Error updating products:", error);
+        }
+        res.status(200).json({
+            message: "User status updated successfully",
+            data: updatedUser,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error updating User status",
+            error: error.message,
+        });
+    }
+});
+exports.updateSellerStatus = updateSellerStatus;
+// Update the status of a PageElement by ID
+const updateUserStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params; // Make sure the ID is being passed correctly
+    const { isUser } = req.body;
+    try {
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { isUser }, // Ensure 'status' is the correct field
+        { new: true } // Return the updated document
+        );
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            message: "User status updated successfully",
+            data: updatedUser,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error updating User status",
+            error: error.message,
+        });
+    }
+});
+exports.updateUserStatus = updateUserStatus;
+// Update the status of a PageElement by ID
+const updateUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params; // Make sure the ID is being passed correctly
+    const { password } = req.body;
+    try {
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { password: hashedPassword }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            message: "User password updated successfully",
+            data: updatedUser,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error updating User password",
+            error: error.message,
+        });
+    }
+});
+exports.updateUserPassword = updateUserPassword;

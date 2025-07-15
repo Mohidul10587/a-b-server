@@ -17,7 +17,7 @@ declare module "express" {
 const verifyTokenByRoles = (allowedRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { refreshToken } = req.cookies;
-    console.log("This is request", req);
+
     if (!refreshToken) {
       return res
         .status(401)

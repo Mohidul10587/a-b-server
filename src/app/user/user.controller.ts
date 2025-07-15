@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { setRefreshTokenCookie } from "../shared/setToken";
 import Order from "../order/order.model";
+import Product from "../product/model";
 declare module "express" {
   interface Request {
     user?: IUser; // Adjust the type based on your User model
@@ -221,6 +222,14 @@ export const checkUser_Email = async (req: Request, res: Response) => {
     success: true,
     message: "User authenticated successfully",
     data: req.user, // User object retrieved from middleware
+  });
+};
+export const allUserForAdmin = async (req: Request, res: Response) => {
+  const users = await User.find().sort({ createdAt: -1 });
+
+  return res.status(200).json({
+    users,
+    message: "Users fetched successfully",
   });
 };
 
@@ -782,6 +791,100 @@ export const updatePassword = async (req: Request, res: Response) => {
     res.status(500).json({
       success: false,
       message: "Error updating User status",
+      error: error.message,
+    });
+  }
+};
+
+// Update the status of a PageElement by ID
+export const updateSellerStatus = async (req: Request, res: Response) => {
+  const { userId } = req.params; // Make sure the ID is being passed correctly
+  const { role } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role }, // Ensure 'status' is the correct field
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const updatedSellerId = updatedUser._id;
+    const status = updatedUser.isSeller;
+
+    try {
+      const result = await Product.updateMany(
+        { seller: updatedSellerId }, // Filter: match seller ID
+        { $set: { display: status } } // Update: set updated timestamp
+      );
+    } catch (error) {
+      console.error("Error updating products:", error);
+    }
+    res.status(200).json({
+      message: "User status updated successfully",
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error updating User status",
+      error: error.message,
+    });
+  }
+};
+
+// Update the status of a PageElement by ID
+export const updateUserStatus = async (req: Request, res: Response) => {
+  const { userId } = req.params; // Make sure the ID is being passed correctly
+  const { isUser } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { isUser }, // Ensure 'status' is the correct field
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User status updated successfully",
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error updating User status",
+      error: error.message,
+    });
+  }
+};
+// Update the status of a PageElement by ID
+export const updateUserPassword = async (req: Request, res: Response) => {
+  const { userId } = req.params; // Make sure the ID is being passed correctly
+  const { password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { password: hashedPassword },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User password updated successfully",
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error updating User password",
       error: error.message,
     });
   }
