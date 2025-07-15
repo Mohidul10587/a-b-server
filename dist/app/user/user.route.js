@@ -12,10 +12,6 @@ const user_model_1 = __importDefault(require("./user.model"));
 const middlewares_2 = require("./middlewares");
 const router = express_1.default.Router();
 //-----------------for user-----------------------------------
-router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
-router.post("/logInByCredentials", user_controller_1.logInByCredentials);
-router.post("/googleUpsertUser", user_controller_1.googleUpsertUser);
-router.post("/setCookie", user_controller_1.setRefreshToken);
 router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/logout", user_controller_1.logOut);
 router.get("/singleUser/:userId", user_controller_1.getSingleUser);
@@ -26,6 +22,10 @@ router.get("/singleForEditPage/:id", middlewares_1.verifyUserToken, user_control
 router.get("/getSummaryOfActivity", middlewares_1.verifyUserToken, user_controller_1.getSummaryOfActivity);
 router.put("/update/:id", middlewares_1.verifyUserToken, user_controller_1.update);
 //-----------------for Admin-----------------------------------
+router.get("/allUserForAdmin", user_controller_1.allUserForAdmin);
+router.patch("/updateSellerStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerStatus);
+router.patch("/updateUserStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserStatus);
+router.patch("/updateUserPassword/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserPassword);
 router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id", 
 // verifyAdminToken,
 user_controller_1.getDetailsOFSingleUserForAdminCustomerDetailsComponent);
@@ -46,4 +46,8 @@ router.delete("/delete/:id", middlewares_2.verifyAdminToken, (0, reusableControl
 //   verifyAdminToken,
 //   signUp
 // );
+router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
+router.post("/logInByCredentials", user_controller_1.logInByCredentials);
+router.post("/googleUpsertUser", user_controller_1.googleUpsertUser);
+router.post("/setCookie", user_controller_1.setRefreshToken);
 exports.default = router;

@@ -23,7 +23,6 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const verifyTokenByRoles = (allowedRoles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const { refreshToken } = req.cookies;
-        console.log("This is request", req);
         if (!refreshToken) {
             return res
                 .status(401)

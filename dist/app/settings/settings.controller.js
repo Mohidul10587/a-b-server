@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateDefaultSellerStatus = exports.updateSettings = exports.getPrivacyPoliciesOfSettings = exports.getSettings = void 0;
+exports.updateDefaultSellerStatus = exports.update = exports.getPrivacyPoliciesOfSettings = exports.getSettings = void 0;
 const cloudinary_config_1 = __importDefault(require("../shared/cloudinary.config"));
 const settings_model_1 = __importDefault(require("./settings.model"));
 const uploadToCloudinary = (file) => {
@@ -28,12 +28,12 @@ const uploadToCloudinary = (file) => {
 };
 const getSettings = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const settings = yield settings_model_1.default.findOne();
-        if (!settings) {
+        const item = yield settings_model_1.default.findOne();
+        if (!item) {
             res.status(404).json({ message: "Settings not found" });
             return;
         }
-        res.status(200).json({ respondedData: settings });
+        res.status(200).json({ message: "Settings not found", item });
     }
     catch (error) {
         res.status(500).json({ error: error.message });
@@ -54,95 +54,25 @@ const getPrivacyPoliciesOfSettings = (req, res) => __awaiter(void 0, void 0, voi
     }
 });
 exports.getPrivacyPoliciesOfSettings = getPrivacyPoliciesOfSettings;
-const updateSettings = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const files = req.files;
-        const logo = files.logo ? files.logo[0] : null;
-        const favicon = files.favicon ? files.favicon[0] : null;
-        const loto = files.loto ? files.loto[0] : null;
-        const fbImage = files.fbImage ? files.fbImage[0] : null;
-        let logoUrl = "";
-        let faviconUrl = "";
-        let lotoUrl = "";
-        let fbImageUrl = "";
-        if (logo) {
-            const result = yield uploadToCloudinary(logo);
-            logoUrl = result.secure_url;
-        }
-        if (favicon) {
-            const result = yield uploadToCloudinary(favicon);
-            faviconUrl = result.secure_url;
-        }
-        if (loto) {
-            const result = yield uploadToCloudinary(loto);
-            lotoUrl = result.secure_url;
-        }
-        if (fbImage) {
-            const result = yield uploadToCloudinary(fbImage);
-            fbImageUrl = result.secure_url;
-        }
-        // Find the first document in the collection
-        const settings = yield settings_model_1.default.findOne();
-        if (settings) {
-            settings.logo = logoUrl || settings.logo;
-            settings.favicon = faviconUrl || settings.favicon;
-            settings.loto = lotoUrl || settings.loto;
-            settings.fbImage = fbImageUrl || settings.fbImage;
-            settings.bgColor = req.body.bgColor || settings.bgColor;
-            settings.websiteTitle = req.body.websiteTitle || settings.websiteTitle;
-            settings.websiteBgColor =
-                req.body.websiteBgColor || settings.websiteBgColor;
-            settings.copyright = req.body.copyright || settings.copyright;
-            settings.country = req.body.country || settings.country;
-            settings.currencySymbol =
-                req.body.currencySymbol || settings.currencySymbol;
-            settings.priceZero = req.body.priceZero || settings.priceZero;
-            settings.highlights = req.body.highlights || settings.highlights;
-            settings.shippingInside =
-                req.body.shippingInside || settings.shippingInside;
-            settings.shippingOutside =
-                req.body.shippingOutside || settings.shippingOutside;
-            settings.deliveryMethod1 =
-                req.body.deliveryMethod1 || settings.deliveryMethod1;
-            settings.deliveryTime1 = req.body.deliveryTime1 || settings.deliveryTime1;
-            settings.deliveryMethod2 =
-                req.body.deliveryMethod2 || settings.deliveryMethod2;
-            settings.deliveryTime2 = req.body.deliveryTime2 || settings.deliveryTime2;
-            settings.payment = req.body.payment || settings.payment;
-            settings.paymentText1 = req.body.paymentText1 || settings.paymentText1;
-            settings.paymentText2 = req.body.paymentText2 || settings.paymentText2;
-            settings.officeAddress = req.body.officeAddress || settings.officeAddress;
-            settings.whatsapp = req.body.whatsapp;
-            settings.telegram = req.body.telegram;
-            settings.note = req.body.note || settings.note;
-            settings.order = req.body.order || settings.order;
-            settings.orderText = req.body.orderText || settings.orderText;
-            settings.metaDescription =
-                req.body.metaDescription || settings.metaDescription;
-            settings.description = req.body.description;
-            settings.privacyPolicies =
-                req.body.privacyPolicies || settings.privacyPolicies;
-            settings.termsAndConditions =
-                req.body.termsAndConditions || settings.termsAndConditions;
-            settings.otherPolicies = req.body.otherPolicies || settings.otherPolicies;
-            settings.sellerDefaultStatus =
-                req.body.sellerDefaultStatus || settings.sellerDefaultStatus;
-            settings.phone = req.body.phone || settings.phone;
-            settings.keywords =
-                req.body.keywords.split(",").map((tag) => tag.trim()) ||
-                    settings.keywords;
-            const result = yield settings.save();
-            res.status(200).json(settings);
-        }
-        else {
-            res.status(404).json({ message: "Settings not found" });
-        }
+        const { id } = req.params;
+        const item = yield settings_model_1.default.findByIdAndUpdate(id, req.body, {
+            new: true,
+            runValidators: true,
+        });
+        if (!item)
+            return res.status(404).json({ message: "Product not found." });
+        res.status(200).json({ message: "Product updated successfully!", item });
     }
     catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res
+            .status(500)
+            .json({ message: "Failed to update Product.", error: error.message });
     }
 });
-exports.updateSettings = updateSettings;
+exports.update = update;
 const updateDefaultSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params; // Extract the ID from request parameters
