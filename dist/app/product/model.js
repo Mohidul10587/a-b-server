@@ -70,11 +70,9 @@ const ProductSchema = new mongoose_1.Schema({
     orderType: { type: String },
     // P
     productType: { type: String },
-    publisher: {
+    seller: {
         type: mongoose_1.Schema.Types.ObjectId,
-        set: (value) => ((0, isObjectId_1.isObjectId)(value) ? value : null),
-        ref: "Publisher",
-        default: null,
+        ref: "User",
     },
     // R
     rating: { type: Number, default: 3.5 },

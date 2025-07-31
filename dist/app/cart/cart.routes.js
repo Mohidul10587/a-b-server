@@ -11,6 +11,7 @@ router.post("/create", cart_controller_1.createOrUpdate);
 router.post("/addSingleItemToCart", cart_controller_1.addSingleItemToCart);
 router.post("/updateProductQuantityInDataBase", middlewares_1.verifyUserToken, cart_controller_1.updateProductQuantityInDataBase);
 router.get("/getUserCart/:userId", cart_controller_1.getUserCart);
+router.get("/getUserCartQuantity/:userId", cart_controller_1.getUserCartQuantity);
 router.delete("/removeItemFromCart", middlewares_1.verifyUserToken, cart_controller_1.removeItemFromCart);
 router.patch("/update-isChecked", cart_controller_1.updateIsChecked);
 exports.default = router;

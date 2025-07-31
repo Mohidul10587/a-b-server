@@ -7,7 +7,7 @@ import {
   getSingleProduct,
   deleteProduct,
   update,
-  allForAdminIndexPage,
+  allForIndexPage,
   getAllProductsForOfferPage,
   getProductsByWriterSlug,
   getProductsByCategorySlug,
@@ -34,7 +34,7 @@ router.get("/singleForEditPage/:id", singleForEditPage);
 router.get("/all", getAllProducts);
 router.get("/getExistingQuantity", getExistingQuantity);
 // // Route for getting all products
-router.get("/allForAdminIndexPage", allForAdminIndexPage);
+router.get("/allForIndexPage", verifySellerAndAdminToken, allForIndexPage);
 
 router.get("/getAllProductsForOfferPage", getAllProductsForOfferPage);
 

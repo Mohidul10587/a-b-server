@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allForAdminIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
+exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const model_1 = __importDefault(require("./model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -43,7 +43,6 @@ exports.create = create;
 const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        console.log("This is id from update", req.params.id);
         const item = yield model_1.default.findByIdAndUpdate(id, req.body, {
             new: true, // Return the updated document
             runValidators: true, // Run validation on the updated data
@@ -346,29 +345,13 @@ const getProductsByPublishersSlug = (req, res) => __awaiter(void 0, void 0, void
 exports.getProductsByPublishersSlug = getProductsByPublishersSlug;
 const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { type, mainId, variantId } = req.query;
-        if (type == "main") {
-            const product = yield model_1.default.findOne({ _id: mainId });
-            res.status(200).json({
-                message: "Fetched successfully!",
-                respondedData: product === null || product === void 0 ? void 0 : product.existingQnt, // Optionally, include the created category in the response
-            });
-            return;
-        }
-        // if (type == "variant") {
-        //   const product = await Product.findOne(
-        //     {
-        //       _id: mainId,
-        //       "variantSectionInfo._id": variantId,
-        //     },
-        //     { "variantSectionInfo.$": 1 } // Returns only the matching variant section
-        //   );
-        //   res.status(200).json({
-        //     message: "Fetched successfully!",
-        //     respondedData: product?.variantSectionInfo[0].variantExistingQnt, // Optionally, include the created category in the response
-        //   });
-        //   return;
-        // }
+        const { mainId } = req.query;
+        const product = yield model_1.default.findOne({ _id: mainId });
+        res.status(200).json({
+            message: "Fetched successfully!",
+            respondedData: product === null || product === void 0 ? void 0 : product.existingQnt, // Optionally, include the created category in the response
+        });
+        return;
     }
     catch (error) {
         res.status(500).json({
@@ -404,7 +387,7 @@ const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.updateStatus = updateStatus;
 // Get all data with pagination and filtering
-const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
         const page = parseInt(req.query.page) || 1;
@@ -413,9 +396,11 @@ const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, fun
         const displayFilter = req.query.display; // e.g., 'true' or 'false'
         const skip = (page - 1) * limit;
         let query = {};
+        let displayTrueQuery = { display: true };
+        let displayFalseQuery = { display: false };
         if (searchText) {
             query.$or = [
-                { titleEnglish: { $regex: searchText, $options: "i" } },
+                { titleEn: { $regex: searchText, $options: "i" } },
                 { SKU: { $regex: searchText, $options: "i" } },
             ];
         }
@@ -427,16 +412,18 @@ const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, fun
         }
         if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === "seller") {
             query.seller = req.user._id;
+            displayTrueQuery.seller = req.user._id;
+            displayFalseQuery.seller = req.user._id;
         }
         const [items, totalCount, totalActiveCount, totalInactiveCount] = yield Promise.all([
             model_1.default.find(query)
-                .select("titleEnglish SKU sellingPrice img slug  display display_2   seller ")
+                .select("titleEn SKU sellingPrice img slug  display display_2   seller ")
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit),
             model_1.default.countDocuments(query),
-            model_1.default.countDocuments({ display: true }),
-            model_1.default.countDocuments({ display: false }),
+            model_1.default.countDocuments(displayTrueQuery),
+            model_1.default.countDocuments(displayFalseQuery),
         ]);
         res.status(200).json({
             message: "Fetched successfully!",
@@ -455,4 +442,4 @@ const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, fun
         });
     }
 });
-exports.allForAdminIndexPage = allForAdminIndexPage;
+exports.allForIndexPage = allForIndexPage;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateIsChecked = exports.removeItemFromCart = exports.getUserCart = exports.updateProductQuantityInDataBase = exports.addSingleItemToCart = exports.createOrUpdate = void 0;
+exports.updateIsChecked = exports.removeItemFromCart = exports.getUserCart = exports.getUserCartQuantity = exports.updateProductQuantityInDataBase = exports.addSingleItemToCart = exports.createOrUpdate = void 0;
 const cart_model_1 = __importDefault(require("./cart.model"));
 const createOrUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -29,7 +29,7 @@ const createOrUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function*
         else {
             // Loop through the new cart items
             cartItems.forEach((newItem) => {
-                const existingItemIndex = cart.cartItems.findIndex((item) => item.variantId === newItem.variantId);
+                const existingItemIndex = cart.cartItems.findIndex((item) => item._id === newItem._id);
                 if (existingItemIndex !== -1) {
                     // Update quantity if item already exists
                     cart.cartItems[existingItemIndex].quantity += newItem.quantity;
@@ -40,7 +40,7 @@ const createOrUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function*
                 }
             });
             // Ensure cartItems don't have duplicates
-            cart.cartItems = Array.from(new Map(cart.cartItems.map((item) => [item.variantId, item])).values());
+            cart.cartItems = Array.from(new Map(cart.cartItems.map((item) => [item._id, item])).values());
         }
         // Save the cart after updates
         yield cart.save();
@@ -64,7 +64,7 @@ const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, func
             cart = new cart_model_1.default({ userId, cartItems: [cartItem] });
         }
         else {
-            const existingItemIndex = cart.cartItems.findIndex((item) => item.variantId === cartItem.variantId);
+            const existingItemIndex = cart.cartItems.findIndex((item) => item._id === cartItem._id);
             if (existingItemIndex !== -1) {
                 // Increase quantity if item exists
                 cart.cartItems[existingItemIndex].quantity += cartItem.quantity;
@@ -86,8 +86,8 @@ const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, func
 exports.addSingleItemToCart = addSingleItemToCart;
 const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, productId, variantId, operationType } = req.body;
-        if (!userId || !productId || !variantId || !operationType) {
+        const { userId, productId, operationType } = req.body;
+        if (!userId || !productId || !operationType) {
             return res.status(400).json({ message: "Invalid request data" });
         }
         // Find the user's cart
@@ -96,7 +96,7 @@ const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, 
             return res.status(404).json({ message: "Cart not found" });
         }
         // Find the item in the cart
-        const itemIndex = cart.cartItems.findIndex((item) => item._id.toString() === productId && item.variantId === variantId);
+        const itemIndex = cart.cartItems.findIndex((item) => item._id.toString() === productId);
         if (itemIndex === -1) {
             return res.status(404).json({ message: "Item not found in cart" });
         }
@@ -118,9 +118,11 @@ const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, 
         }
         // Save the updated cart
         yield cart.save();
-        res
-            .status(200)
-            .json({ message: "Item quantity updated successfully", cart });
+        const totalQuantityInTheCart = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
+        res.status(200).json({
+            message: "Item quantity updated successfully",
+            totalQuantityInTheCart,
+        });
     }
     catch (error) {
         console.error(error);
@@ -128,9 +130,33 @@ const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, 
     }
 });
 exports.updateProductQuantityInDataBase = updateProductQuantityInDataBase;
+const getUserCartQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userId } = req.params; // Get userId from the query
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+        // Find the cart for the given userId
+        const cart = yield cart_model_1.default.findOne({ userId });
+        if (!cart) {
+            return res
+                .status(400)
+                .json({ message: "Product in the cart not found required" });
+        }
+        const totalQuantityInTheCart = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
+        // Return the user's cart data
+        res.status(200).json({
+            totalQuantityInTheCart: totalQuantityInTheCart || 0,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Error fetching cart", error });
+    }
+});
+exports.getUserCartQuantity = getUserCartQuantity;
 const getUserCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId } = req.params; // Get userId from the query parameter
+        const { userId } = req.params; // Get userId from the query
         if (!userId) {
             return res.status(400).json({ message: "User ID is required" });
         }
@@ -138,7 +164,6 @@ const getUserCart = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         const cart = yield cart_model_1.default.findOne({ userId });
         // Return the user's cart data
         res.status(200).json({
-            message: "Cart fetched successfully",
             respondedData: (cart === null || cart === void 0 ? void 0 : cart.cartItems) || [],
         });
     }
@@ -149,8 +174,8 @@ const getUserCart = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 exports.getUserCart = getUserCart;
 const removeItemFromCart = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, productId, variantId } = req.body;
-        if (!userId || !productId || !variantId) {
+        const { userId, productId } = req.query;
+        if (!userId || !productId) {
             return res.status(400).json({ message: "Invalid request data" });
         }
         // Find the user's carts
@@ -159,11 +184,14 @@ const removeItemFromCart = (req, res) => __awaiter(void 0, void 0, void 0, funct
             return res.status(404).json({ message: "Cart not found" });
         }
         // Filter out the item to be removed
-        const updatedCartItems = cart.cartItems.filter((item) => !(item._id.toString() === productId && item.variantId === variantId));
+        const updatedCartItems = cart.cartItems.filter((item) => !(item._id.toString() === productId));
         // Update cart items
         cart.cartItems = updatedCartItems;
         yield cart.save();
-        res.status(200).json({ message: "Item removed successfully", cart });
+        const totalQuantityInTheCart = cart.cartItems.reduce((total, item) => total + item.quantity, 0);
+        res
+            .status(200)
+            .json({ message: "Item removed successfully", totalQuantityInTheCart });
     }
     catch (error) {
         console.error(error);

@@ -200,7 +200,6 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
 
 export const setRefreshToken = (req: Request, res: Response) => {
   const { refreshToken } = req.body;
-  console.log("This is refresh token", refreshToken);
   if (!refreshToken) {
     return res.status(400).json({ message: "No token provided" });
   }
@@ -695,10 +694,9 @@ export const getSummaryOfActivity = async (req: Request, res: Response) => {
 export const update = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
     const updatedItem = await User.findByIdAndUpdate(id, req.body, {
-      new: true, // Return the updated document
-      runValidators: true, // Run validation on the updated data
+      new: true,
+      runValidators: true,
     });
 
     if (!updatedItem) {

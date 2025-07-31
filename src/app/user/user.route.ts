@@ -53,6 +53,7 @@ router.get("/getSummaryOfActivity", verifyUserToken, getSummaryOfActivity);
 router.put("/update/:id", verifyUserToken, update);
 
 //-----------------for Admin-----------------------------------
+
 router.get("/allUserForAdmin", allUserForAdmin);
 router.get(
   "/singleForEditForSellerSettings/:id",

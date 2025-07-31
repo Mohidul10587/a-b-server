@@ -20,14 +20,15 @@ export interface IProduct extends Document {
   numberOfPage: number;
   orderType: string;
   productType: string;
-  publisher: Schema.Types.ObjectId;
   rating: number;
   regularPrice: number;
+  seller: Schema.Types.ObjectId;
   sellingPrice: number;
   shippingInside: number;
   shippingOutside: number;
   shortDescription: string;
   slug: string;
+
   stockStatus: string;
   subcategory: Schema.Types.ObjectId;
   subTitle: string;
@@ -88,11 +89,9 @@ const ProductSchema = new Schema<IProduct>(
 
     // P
     productType: { type: String },
-    publisher: {
+    seller: {
       type: Schema.Types.ObjectId,
-      set: (value: string | null) => (isObjectId(value) ? value : null),
-      ref: "Publisher",
-      default: null,
+      ref: "User",
     },
 
     // R

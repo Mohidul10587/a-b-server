@@ -19,7 +19,6 @@ const category_model_1 = __importDefault(require("../category/category.model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const model_1 = __importDefault(require("../product/model"));
 const order_model_1 = __importDefault(require("../order/order.model"));
-const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
 const user_model_1 = __importDefault(require("../user/user.model"));
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -31,6 +30,7 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: user not found" });
         }
+        console.log(orderInfo);
         // 1. Create the new order
         const newOrder = yield order_model_1.default.create([orderInfo], { session });
         // 2. Clear the user's cart
@@ -70,12 +70,12 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             firstProduct: order.cart[0],
             status: order.status,
         }));
-        const [categoriesCount, writersCount, ordersCount, productsCount, publishersCount, usersCount,] = yield Promise.all([
+        const [categoriesCount, writersCount, ordersCount, productsCount, sellersCount, usersCount,] = yield Promise.all([
             category_model_1.default.countDocuments(),
             writer_model_1.default.countDocuments(),
             order_model_1.default.countDocuments(),
             model_1.default.countDocuments(),
-            publishers_model_1.default.countDocuments(),
+            user_model_1.default.countDocuments({ role: "seller" }),
             user_model_1.default.countDocuments(),
         ]);
         res.status(200).json({
@@ -85,7 +85,7 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 writersCount,
                 ordersCount,
                 productsCount,
-                publishersCount,
+                sellersCount,
                 usersCount,
             },
         });

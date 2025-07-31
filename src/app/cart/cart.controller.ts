@@ -19,7 +19,7 @@ export const createOrUpdate = async (req: Request, res: Response) => {
       // Loop through the new cart items
       cartItems.forEach((newItem) => {
         const existingItemIndex = cart!.cartItems.findIndex(
-          (item) => item.variantId === newItem.variantId
+          (item) => item._id === newItem._id
         );
 
         if (existingItemIndex !== -1) {
@@ -33,7 +33,7 @@ export const createOrUpdate = async (req: Request, res: Response) => {
 
       // Ensure cartItems don't have duplicates
       cart!.cartItems = Array.from(
-        new Map(cart!.cartItems.map((item) => [item.variantId, item])).values()
+        new Map(cart!.cartItems.map((item) => [item._id, item])).values()
       );
     }
 
@@ -50,7 +50,7 @@ export const createOrUpdate = async (req: Request, res: Response) => {
 export const addSingleItemToCart = async (req: Request, res: Response) => {
   try {
     const { userId, cartItem } = req.body;
-    
+
     if (!userId || !cartItem || typeof cartItem !== "object") {
       return res.status(400).json({ message: "Invalid request data" });
     }
@@ -62,7 +62,7 @@ export const addSingleItemToCart = async (req: Request, res: Response) => {
       cart = new Cart({ userId, cartItems: [cartItem] });
     } else {
       const existingItemIndex = cart.cartItems.findIndex(
-        (item) => item.variantId === cartItem.variantId
+        (item) => item._id === cartItem._id
       );
 
       if (existingItemIndex !== -1) {
@@ -89,9 +89,9 @@ export const updateProductQuantityInDataBase = async (
   res: Response
 ) => {
   try {
-    const { userId, productId, variantId, operationType } = req.body;
+    const { userId, productId, operationType } = req.body;
 
-    if (!userId || !productId || !variantId || !operationType) {
+    if (!userId || !productId || !operationType) {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
@@ -104,8 +104,7 @@ export const updateProductQuantityInDataBase = async (
 
     // Find the item in the cart
     const itemIndex = cart.cartItems.findIndex(
-      (item) =>
-        item._id.toString() === productId && item.variantId === variantId
+      (item) => item._id.toString() === productId
     );
 
     if (itemIndex === -1) {
@@ -128,20 +127,50 @@ export const updateProductQuantityInDataBase = async (
 
     // Save the updated cart
     await cart.save();
-
-    res
-      .status(200)
-      .json({ message: "Item quantity updated successfully", cart });
+    const totalQuantityInTheCart = cart.cartItems.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+    res.status(200).json({
+      message: "Item quantity updated successfully",
+      totalQuantityInTheCart,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating item quantity", error });
   }
 };
+export const getUserCartQuantity = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params; // Get userId from the query
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
+    // Find the cart for the given userId
+    const cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      return res
+        .status(400)
+        .json({ message: "Product in the cart not found required" });
+    }
+
+    const totalQuantityInTheCart = cart.cartItems.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
+    // Return the user's cart data
+    res.status(200).json({
+      totalQuantityInTheCart: totalQuantityInTheCart || 0,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching cart", error });
+  }
+};
 export const getUserCart = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.params; // Get userId from the query parameter
-
+    const { userId } = req.params; // Get userId from the query
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
     }
@@ -151,7 +180,6 @@ export const getUserCart = async (req: Request, res: Response) => {
 
     // Return the user's cart data
     res.status(200).json({
-      message: "Cart fetched successfully",
       respondedData: cart?.cartItems || [],
     });
   } catch (error) {
@@ -161,9 +189,9 @@ export const getUserCart = async (req: Request, res: Response) => {
 
 export const removeItemFromCart = async (req: Request, res: Response) => {
   try {
-    const { userId, productId, variantId } = req.body;
+    const { userId, productId } = req.query;
 
-    if (!userId || !productId || !variantId) {
+    if (!userId || !productId) {
       return res.status(400).json({ message: "Invalid request data" });
     }
 
@@ -176,15 +204,20 @@ export const removeItemFromCart = async (req: Request, res: Response) => {
 
     // Filter out the item to be removed
     const updatedCartItems = cart.cartItems.filter(
-      (item) =>
-        !(item._id.toString() === productId && item.variantId === variantId)
+      (item) => !(item._id.toString() === productId)
     );
 
     // Update cart items
     cart.cartItems = updatedCartItems;
     await cart.save();
+    const totalQuantityInTheCart = cart.cartItems.reduce(
+      (total, item) => total + item.quantity,
+      0
+    );
 
-    res.status(200).json({ message: "Item removed successfully", cart });
+    res
+      .status(200)
+      .json({ message: "Item removed successfully", totalQuantityInTheCart });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error removing item from cart", error });

@@ -32,7 +32,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log("This is id from update", req.params.id);
     const item = await Product.findByIdAndUpdate(id, req.body, {
       new: true, // Return the updated document
       runValidators: true, // Run validation on the updated data
@@ -393,32 +392,15 @@ export const getProductsByPublishersSlug = async (
 
 export const getExistingQuantity = async (req: Request, res: Response) => {
   try {
-    const { type, mainId, variantId } = req.query;
+    const { mainId } = req.query;
 
-    if (type == "main") {
-      const product = await Product.findOne({ _id: mainId });
+    const product = await Product.findOne({ _id: mainId });
 
-      res.status(200).json({
-        message: "Fetched successfully!",
-        respondedData: product?.existingQnt, // Optionally, include the created category in the response
-      });
-      return;
-    }
-    // if (type == "variant") {
-    //   const product = await Product.findOne(
-    //     {
-    //       _id: mainId,
-    //       "variantSectionInfo._id": variantId,
-    //     },
-    //     { "variantSectionInfo.$": 1 } // Returns only the matching variant section
-    //   );
-
-    //   res.status(200).json({
-    //     message: "Fetched successfully!",
-    //     respondedData: product?.variantSectionInfo[0].variantExistingQnt, // Optionally, include the created category in the response
-    //   });
-    //   return;
-    // }
+    res.status(200).json({
+      message: "Fetched successfully!",
+      respondedData: product?.existingQnt, // Optionally, include the created category in the response
+    });
+    return;
   } catch (error: any) {
     res.status(500).json({
       message: "Failed to Fetch.",
@@ -455,7 +437,7 @@ export const updateStatus = async (req: Request, res: Response) => {
   }
 };
 // Get all data with pagination and filtering
-export const allForAdminIndexPage = async (
+export const allForIndexPage = async (
   req: Request,
   res: Response
 ): Promise<void> => {
@@ -468,10 +450,12 @@ export const allForAdminIndexPage = async (
     const skip = (page - 1) * limit;
 
     let query: any = {};
+    let displayTrueQuery: any = { display: true };
+    let displayFalseQuery: any = { display: false };
 
     if (searchText) {
       query.$or = [
-        { titleEnglish: { $regex: searchText, $options: "i" } },
+        { titleEn: { $regex: searchText, $options: "i" } },
         { SKU: { $regex: searchText, $options: "i" } },
       ];
     }
@@ -484,21 +468,23 @@ export const allForAdminIndexPage = async (
 
     if (req.user?.role === "seller") {
       query.seller = req.user._id;
+      displayTrueQuery.seller = req.user._id;
+      displayFalseQuery.seller = req.user._id;
     }
 
     const [items, totalCount, totalActiveCount, totalInactiveCount] =
       await Promise.all([
         Product.find(query)
           .select(
-            "titleEnglish SKU sellingPrice img slug  display display_2   seller "
+            "titleEn SKU sellingPrice img slug  display display_2   seller "
           )
 
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit),
         Product.countDocuments(query),
-        Product.countDocuments({ display: true }),
-        Product.countDocuments({ display: false }),
+        Product.countDocuments(displayTrueQuery),
+        Product.countDocuments(displayFalseQuery),
       ]);
 
     res.status(200).json({

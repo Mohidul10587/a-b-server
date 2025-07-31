@@ -186,7 +186,6 @@ const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
 exports.googleUpsertUser = googleUpsertUser;
 const setRefreshToken = (req, res) => {
     const { refreshToken } = req.body;
-    console.log("This is refresh token", refreshToken);
     if (!refreshToken) {
         return res.status(400).json({ message: "No token provided" });
     }
@@ -630,8 +629,8 @@ const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         const updatedItem = yield user_model_1.default.findByIdAndUpdate(id, req.body, {
-            new: true, // Return the updated document
-            runValidators: true, // Run validation on the updated data
+            new: true,
+            runValidators: true,
         });
         if (!updatedItem) {
             return res.status(404).json({

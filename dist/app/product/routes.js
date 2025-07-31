@@ -15,7 +15,7 @@ router.get("/singleForEditPage/:id", controller_1.singleForEditPage);
 router.get("/all", controller_1.getAllProducts);
 router.get("/getExistingQuantity", controller_1.getExistingQuantity);
 // // Route for getting all products
-router.get("/allForAdminIndexPage", controller_1.allForAdminIndexPage);
+router.get("/allForIndexPage", middlewares_1.verifySellerAndAdminToken, controller_1.allForIndexPage);
 router.get("/getAllProductsForOfferPage", controller_1.getAllProductsForOfferPage);
 router.get("/products_by_category_slug/:slug", controller_1.getProductsByCategorySlug);
 router.get("/products_by_punishers_slug/:slug", controller_1.getProductsByPublishersSlug);

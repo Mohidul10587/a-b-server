@@ -7,8 +7,6 @@ import Category from "../category/category.model";
 import Writer from "../writer/writer.model";
 import Product from "../product/model";
 import Order from "../order/order.model";
-import Publisher from "../publishers/publishers.model";
-import { count } from "console";
 import User from "../user/user.model";
 export const create = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
@@ -21,7 +19,7 @@ export const create = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
     }
-
+    console.log(orderInfo);
     // 1. Create the new order
     const newOrder = await Order.create([orderInfo], { session });
 
@@ -76,14 +74,14 @@ export const allForAdmin = async (req: Request, res: Response) => {
       writersCount,
       ordersCount,
       productsCount,
-      publishersCount,
+      sellersCount,
       usersCount,
     ] = await Promise.all([
       Category.countDocuments(),
       Writer.countDocuments(),
       Order.countDocuments(),
       Product.countDocuments(),
-      Publisher.countDocuments(),
+      User.countDocuments({ role: "seller" }),
       User.countDocuments(),
     ]);
 
@@ -94,7 +92,7 @@ export const allForAdmin = async (req: Request, res: Response) => {
         writersCount,
         ordersCount,
         productsCount,
-        publishersCount,
+        sellersCount,
         usersCount,
       },
     });
