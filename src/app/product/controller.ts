@@ -8,6 +8,7 @@ import { generateSlug } from "../shared/generateSLug";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = req.body;
+    console.log("THis is data xxx", data);
     const item = await Product.create({
       ...data,
       slug: generateSlug(data.titleEn),
@@ -179,22 +180,6 @@ export const getSingleProduct = async (
   }
 };
 
-export const allForAdminIndexPage = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  try {
-    const result = await Product.find()
-      .select("_id img titleEn sellingPrice slug")
-      .populate("writer", "title");
-
-    const products = result.reverse();
-
-    res.status(200).json(products);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
-  }
-};
 // Get all data with optional filtering
 export const getAllForSeriesAddPage = async (
   req: Request,
@@ -441,4 +426,94 @@ export const getExistingQuantity = async (req: Request, res: Response) => {
     });
   }
 };
-//new
+// Update the status  by ID
+export const updateStatus = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log("This is id", id);
+  const { display } = req.body;
+
+  try {
+    const updateProduct = await Product.findByIdAndUpdate(
+      id,
+      { display }, // Ensure 'status' is the correct field
+      { new: true } // Return the updated document
+    );
+
+    if (!updateProduct) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "User status updated successfully",
+      data: updateProduct,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error updating User status",
+      error: error.message,
+    });
+  }
+};
+// Get all data with pagination and filtering
+export const allForAdminIndexPage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const searchText = req.query.search as string;
+    const displayFilter = req.query.display as string; // e.g., 'true' or 'false'
+
+    const skip = (page - 1) * limit;
+
+    let query: any = {};
+
+    if (searchText) {
+      query.$or = [
+        { titleEnglish: { $regex: searchText, $options: "i" } },
+        { SKU: { $regex: searchText, $options: "i" } },
+      ];
+    }
+
+    if (displayFilter === "true") {
+      query.display = true;
+    } else if (displayFilter === "false") {
+      query.display = false;
+    }
+
+    if (req.user?.role === "seller") {
+      query.seller = req.user._id;
+    }
+
+    const [items, totalCount, totalActiveCount, totalInactiveCount] =
+      await Promise.all([
+        Product.find(query)
+          .select(
+            "titleEnglish SKU sellingPrice img slug  display display_2   seller "
+          )
+
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+        Product.countDocuments(query),
+        Product.countDocuments({ display: true }),
+        Product.countDocuments({ display: false }),
+      ]);
+
+    res.status(200).json({
+      message: "Fetched successfully!",
+      resData: items,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+      totalItems: totalCount,
+      totalActiveCount,
+      totalInactiveCount,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};

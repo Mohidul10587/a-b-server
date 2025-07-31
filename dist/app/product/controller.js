@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.allForAdminIndexPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
+exports.allForAdminIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const model_1 = __importDefault(require("./model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -21,6 +21,7 @@ const generateSLug_1 = require("../shared/generateSLug");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
+        console.log("THis is data xxx", data);
         const item = yield model_1.default.create(Object.assign(Object.assign({}, data), { slug: (0, generateSLug_1.generateSlug)(data.titleEn) }));
         // Send success message along with the created product data
         res.status(201).json({
@@ -177,19 +178,6 @@ const getSingleProduct = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getSingleProduct = getSingleProduct;
-const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield model_1.default.find()
-            .select("_id img titleEn sellingPrice slug")
-            .populate("writer", "title");
-        const products = result.reverse();
-        res.status(200).json(products);
-    }
-    catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-exports.allForAdminIndexPage = allForAdminIndexPage;
 // Get all data with optional filtering
 const getAllForSeriesAddPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -390,4 +378,81 @@ const getExistingQuantity = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getExistingQuantity = getExistingQuantity;
-//new
+// Update the status  by ID
+const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    console.log("This is id", id);
+    const { display } = req.body;
+    try {
+        const updateProduct = yield model_1.default.findByIdAndUpdate(id, { display }, // Ensure 'status' is the correct field
+        { new: true } // Return the updated document
+        );
+        if (!updateProduct) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            message: "User status updated successfully",
+            data: updateProduct,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error updating User status",
+            error: error.message,
+        });
+    }
+});
+exports.updateStatus = updateStatus;
+// Get all data with pagination and filtering
+const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const searchText = req.query.search;
+        const displayFilter = req.query.display; // e.g., 'true' or 'false'
+        const skip = (page - 1) * limit;
+        let query = {};
+        if (searchText) {
+            query.$or = [
+                { titleEnglish: { $regex: searchText, $options: "i" } },
+                { SKU: { $regex: searchText, $options: "i" } },
+            ];
+        }
+        if (displayFilter === "true") {
+            query.display = true;
+        }
+        else if (displayFilter === "false") {
+            query.display = false;
+        }
+        if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === "seller") {
+            query.seller = req.user._id;
+        }
+        const [items, totalCount, totalActiveCount, totalInactiveCount] = yield Promise.all([
+            model_1.default.find(query)
+                .select("titleEnglish SKU sellingPrice img slug  display display_2   seller ")
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            model_1.default.countDocuments(query),
+            model_1.default.countDocuments({ display: true }),
+            model_1.default.countDocuments({ display: false }),
+        ]);
+        res.status(200).json({
+            message: "Fetched successfully!",
+            resData: items,
+            currentPage: page,
+            totalPages: Math.ceil(totalCount / limit),
+            totalItems: totalCount,
+            totalActiveCount,
+            totalInactiveCount,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.allForAdminIndexPage = allForAdminIndexPage;

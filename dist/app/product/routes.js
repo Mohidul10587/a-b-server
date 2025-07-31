@@ -9,7 +9,7 @@ const model_1 = __importDefault(require("./model"));
 const reusableControllers_1 = require("../shared/reusableControllers");
 const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
-router.post("/create", middlewares_1.verifyAdminToken, controller_1.create);
+router.post("/create", middlewares_1.verifySellerAndAdminToken, controller_1.create);
 router.get("/singleForEditPage/:id", controller_1.singleForEditPage);
 // // Route for getting all products
 router.get("/all", controller_1.getAllProducts);
@@ -28,5 +28,6 @@ router.get("/:productId", controller_1.getSingleProduct);
 router.delete("/:productId", middlewares_1.verifyAdminToken, controller_1.deleteProduct);
 // // Route for updating a product by ID
 router.put("/update/:id", middlewares_1.verifyAdminToken, controller_1.update);
+router.patch("/updateStatus/:id", middlewares_1.verifySellerAndAdminToken, controller_1.updateStatus);
 router.get("/getAllSlugsForSitemap", (0, reusableControllers_1.getAllSlugsForSitemap)(model_1.default));
 exports.default = router;

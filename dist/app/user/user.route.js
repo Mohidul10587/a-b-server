@@ -31,7 +31,7 @@ router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id",
 user_controller_1.getDetailsOFSingleUserForAdminCustomerDetailsComponent);
 router.get("/check-user-email", middlewares_1.verifyUserToken, user_controller_1.checkUser_Email);
 router.get("/checkStuff", middlewares_2.verifyStuffToken, user_controller_1.checkUser_Email);
-router.get("/allOrdersOfUser", middlewares_1.verifyUserToken, user_controller_1.getOrdersByUserId);
+router.get("/allOrdersOfUser", middlewares_1.verifyUserToken, user_controller_1.allOrdersOfUser);
 router.get("/getSingleOrder/:id", middlewares_1.verifyUserToken, user_controller_1.getSingleOrder);
 router.get("/allForAdminIndexPage", middlewares_2.verifyAdminToken, user_controller_1.allForAdminIndexPage);
 router.get("/allStuffForAdminIndexPage", middlewares_2.verifyAdminToken, user_controller_1.allStuffForAdminIndexPage);

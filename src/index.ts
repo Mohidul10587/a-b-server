@@ -18,7 +18,11 @@ import paymentRoutes from "./app/payment/payment.routes";
 import publishersRoutes from "./app/publishers/publishers.routes";
 import galleryRoutes from "./app/gallery/gallery.route";
 import cartRoutes from "./app/cart/cart.routes";
+import wishlistRoutes from "./app/wishlist/wishlist.routes";
+import transactionRoutes from "./app/transaction/transaction.route";
+import withdrawRoutes from "./app/withdraw/withdraw.route";
 
+import adminTransactionRoutes from "./app/adminTransaction/adminTransaction.route";
 import {
   createDefaultSettings,
   registerAdmin,
@@ -55,7 +59,11 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://book7.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://book7.vercel.app",
+    ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
@@ -81,6 +89,9 @@ app.use("/publishers", publishersRoutes);
 app.use("/gallery", galleryRoutes);
 app.use("/user", userRoutes);
 app.use("/cart", cartRoutes);
+app.use("/wishlist", wishlistRoutes);
+app.use("/transaction", transactionRoutes);
+app.use("/withdraw", withdrawRoutes);
 app.listen(port, () => {
   console.log(port);
 });

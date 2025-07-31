@@ -5,7 +5,7 @@ import {
   getSingleUser,
   updateUser,
   logOut,
-  getOrdersByUserId,
+  allOrdersOfUser,
   getSingleUserBySlug,
   getContactInfoOfSingleUserBySlug,
   getStatus,
@@ -77,7 +77,7 @@ router.get(
 
 router.get("/check-user-email", verifyUserToken, checkUser_Email);
 router.get("/checkStuff", verifyStuffToken, checkUser_Email);
-router.get("/allOrdersOfUser", verifyUserToken, getOrdersByUserId);
+router.get("/allOrdersOfUser", verifyUserToken, allOrdersOfUser);
 router.get("/getSingleOrder/:id", verifyUserToken, getSingleOrder);
 router.get("/allForAdminIndexPage", verifyAdminToken, allForAdminIndexPage);
 router.get(

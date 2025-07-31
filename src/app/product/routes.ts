@@ -15,6 +15,7 @@ import {
   getExistingQuantity,
   singleForEditPage,
   getAllForSeriesAddPage,
+  updateStatus,
 } from "./controller";
 
 import Product from "./model";
@@ -26,7 +27,7 @@ import {
 
 const router = express.Router();
 
-router.post("/create", verifyAdminToken, create);
+router.post("/create", verifySellerAndAdminToken, create);
 router.get("/singleForEditPage/:id", singleForEditPage);
 
 // // Route for getting all products
@@ -58,6 +59,6 @@ router.delete("/:productId", verifyAdminToken, deleteProduct);
 
 // // Route for updating a product by ID
 router.put("/update/:id", verifyAdminToken, update);
-
+router.patch("/updateStatus/:id", verifySellerAndAdminToken, updateStatus);
 router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
 export default router;

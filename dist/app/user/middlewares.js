@@ -30,18 +30,14 @@ const verifyTokenByRoles = (allowedRoles) => {
         }
         jsonwebtoken_1.default.verify(refreshToken, JWT_SECRET, (err, decoded) => __awaiter(void 0, void 0, void 0, function* () {
             if (err || !(decoded === null || decoded === void 0 ? void 0 : decoded.userId)) {
-                return res
-                    .status(401)
-                    .json({ success: false, message: "Invalid or expired token" });
+                return res.status(401).json({ message: "Invalid or expired token" });
             }
             try {
                 const user = yield user_model_1.default.findById(decoded.userId);
                 if (!user ||
                     user.isUser === false ||
                     !allowedRoles.includes(user.role)) {
-                    return res
-                        .status(403)
-                        .json({ success: false, message: "Access denied" });
+                    return res.status(403).json({ message: "Access denied" });
                 }
                 req.user = user;
                 next();

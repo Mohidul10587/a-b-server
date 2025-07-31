@@ -26,22 +26,17 @@ const verifyTokenByRoles = (allowedRoles: string[]) => {
 
     jwt.verify(refreshToken, JWT_SECRET, async (err: any, decoded: any) => {
       if (err || !decoded?.userId) {
-        return res
-          .status(401)
-          .json({ success: false, message: "Invalid or expired token" });
+        return res.status(401).json({ message: "Invalid or expired token" });
       }
 
       try {
         const user = await User.findById(decoded.userId);
-
         if (
           !user ||
           user.isUser === false ||
           !allowedRoles.includes(user.role)
         ) {
-          return res
-            .status(403)
-            .json({ success: false, message: "Access denied" });
+          return res.status(403).json({ message: "Access denied" });
         }
 
         req.user = user;

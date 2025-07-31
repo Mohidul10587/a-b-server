@@ -569,7 +569,7 @@ export const logOut = (req: Request, res: Response) => {
 };
 
 // Get a single order by ID
-export const getOrdersByUserId = async (
+export const allOrdersOfUser = async (
   req: Request,
   res: Response
 ): Promise<void> => {
