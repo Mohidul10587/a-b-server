@@ -29,6 +29,7 @@ import {
   updateSellerStatus,
   updateUserStatus,
   updateUserPassword,
+  singleForEditForSellerSettings,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 
@@ -53,6 +54,11 @@ router.put("/update/:id", verifyUserToken, update);
 
 //-----------------for Admin-----------------------------------
 router.get("/allUserForAdmin", allUserForAdmin);
+router.get(
+  "/singleForEditForSellerSettings/:id",
+  singleForEditForSellerSettings
+);
+
 router.patch(
   "/updateSellerStatusOfUser/:userId",
   verifyAdminToken,

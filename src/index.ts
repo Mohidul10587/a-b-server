@@ -21,7 +21,7 @@ import cartRoutes from "./app/cart/cart.routes";
 import wishlistRoutes from "./app/wishlist/wishlist.routes";
 import transactionRoutes from "./app/transaction/transaction.route";
 import withdrawRoutes from "./app/withdraw/withdraw.route";
-
+import sellerOrderRoutes from "./app/ordersOFSeller/sellerOrder.route";
 import adminTransactionRoutes from "./app/adminTransaction/adminTransaction.route";
 import {
   createDefaultSettings,
@@ -75,6 +75,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Routes
+app.use("/sellerOrder", sellerOrderRoutes);
 app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);
 app.use("/category", categoryRoutes);
@@ -92,6 +93,7 @@ app.use("/cart", cartRoutes);
 app.use("/wishlist", wishlistRoutes);
 app.use("/transaction", transactionRoutes);
 app.use("/withdraw", withdrawRoutes);
+app.use("/adminTransaction", adminTransactionRoutes);
 app.listen(port, () => {
   console.log(port);
 });

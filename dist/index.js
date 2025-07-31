@@ -26,6 +26,8 @@ const cart_routes_1 = __importDefault(require("./app/cart/cart.routes"));
 const wishlist_routes_1 = __importDefault(require("./app/wishlist/wishlist.routes"));
 const transaction_route_1 = __importDefault(require("./app/transaction/transaction.route"));
 const withdraw_route_1 = __importDefault(require("./app/withdraw/withdraw.route"));
+const sellerOrder_route_1 = __importDefault(require("./app/ordersOFSeller/sellerOrder.route"));
+const adminTransaction_route_1 = __importDefault(require("./app/adminTransaction/adminTransaction.route"));
 const defaultInsertion_1 = require("./app/shared/defaultInsertion");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -57,6 +59,7 @@ app.get("/", (req, res) => {
     res.send("Welcome to the Price in Kenya Sever!"); // Send a welcome message
 });
 // Routes
+app.use("/sellerOrder", sellerOrder_route_1.default);
 app.use("/writer", writer_routes_1.default);
 app.use("/product", routes_1.default);
 app.use("/category", category_routes_1.default);
@@ -74,6 +77,7 @@ app.use("/cart", cart_routes_1.default);
 app.use("/wishlist", wishlist_routes_1.default);
 app.use("/transaction", transaction_route_1.default);
 app.use("/withdraw", withdraw_route_1.default);
+app.use("/adminTransaction", adminTransaction_route_1.default);
 app.listen(port, () => {
     console.log(port);
 });

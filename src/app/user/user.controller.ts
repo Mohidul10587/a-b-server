@@ -318,6 +318,19 @@ export const getSingleUserById = async (req: Request, res: Response) => {
 };
 
 // Get all orders
+export const singleForEditForSellerSettings = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching orders", error });
+  }
+};
+
+// Get all orders
 export const getDetailsOFSingleUserForAdminCustomerDetailsComponent = async (
   req: Request,
   res: Response

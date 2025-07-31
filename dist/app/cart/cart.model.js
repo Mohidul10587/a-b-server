@@ -27,7 +27,6 @@ exports.CartItemSchema = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
 exports.CartItemSchema = new mongoose_1.Schema({
     _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product" },
-    type: { type: String, required: true },
     img: { type: String, required: true },
     variantId: { type: String, required: true },
     sellingPrice: { type: Number, required: true },
