@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCatsWritersPublishersForNavbar = exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
+exports.getAllCategoryForFilterPage = exports.getCatsWritersPublishersForNavbar = exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
@@ -221,3 +221,15 @@ const getCatsWritersPublishersForNavbar = (req, res) => __awaiter(void 0, void 0
     }
 });
 exports.getCatsWritersPublishersForNavbar = getCatsWritersPublishersForNavbar;
+// ✅ GET all categories for filter page
+const getAllCategoryForFilterPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const categories = yield category_model_1.default.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({ position: 1 }); // sort by position field
+        res.status(200).json({ categories });
+    }
+    catch (error) {
+        console.error("Error fetching categories:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+exports.getAllCategoryForFilterPage = getAllCategoryForFilterPage;

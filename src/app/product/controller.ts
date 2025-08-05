@@ -4,6 +4,7 @@ import Writer from "../writer/writer.model";
 import Category from "../category/category.model";
 import Publisher from "../publishers/publishers.model";
 import { generateSlug } from "../shared/generateSLug";
+import User from "../user/user.model";
 
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -501,5 +502,110 @@ export const allForIndexPage = async (
       message: "Failed to fetch.",
       error: error.message,
     });
+  }
+};
+
+export const getFilteredProducts = async (req: Request, res: Response) => {
+  try {
+    const {
+      page = "1",
+      limit = "10",
+      search = "",
+      sellers = "",
+      categories = "",
+      minPrice,
+      maxPrice,
+      minRating,
+      lang = "all",
+    } = req.query;
+
+    const pageNum = parseInt(page as string, 10);
+    const limitNum = parseInt(limit as string, 10);
+    const sellerSlugs = (sellers as string)?.split("--").filter(Boolean) || [];
+    const categorySlugs =
+      (categories as string)?.split("--").filter(Boolean) || [];
+
+    const minPriceNum = minPrice ? parseFloat(minPrice as string) : undefined;
+    const maxPriceNum = maxPrice ? parseFloat(maxPrice as string) : undefined;
+    const minRatingNum = minRating
+      ? parseFloat(minRating as string)
+      : undefined;
+    const language = lang as string;
+
+    const filter: any = {};
+
+    // Search by product title
+    if (search) {
+      const regex = new RegExp(search as string, "i");
+      filter.$or = [{ titleEn: regex }, { titleBn: regex }];
+    }
+
+    // Filter by seller slugs
+    if (sellerSlugs.length > 0) {
+      const matchingSellers = await User.find(
+        { slug: { $in: sellerSlugs }, role: "seller" },
+        "_id"
+      );
+      const sellerIds = matchingSellers.map((s) => s._id);
+      filter.seller = { $in: sellerIds };
+    }
+
+    // ✅ Correct: Filter by category slugs
+    if (categorySlugs.length > 0) {
+      const matchingCategories = await Category.find(
+        { slug: { $in: categorySlugs } },
+        "_id"
+      );
+      const categoryIds = matchingCategories.map((cat) => cat._id);
+      filter.category = { $in: categoryIds };
+    }
+
+    // Filter by price range
+    if (minPriceNum !== undefined) {
+      filter.sellingPrice = { ...filter.sellingPrice, $gte: minPriceNum };
+    }
+    if (maxPriceNum !== undefined) {
+      filter.sellingPrice = { ...filter.sellingPrice, $lte: maxPriceNum };
+    }
+
+    // Filter by rating
+    if (minRatingNum !== undefined) {
+      filter.rating = { $gte: minRatingNum };
+    }
+
+    // Filter by language
+    if (language && language !== "all") {
+      filter.language = language;
+    }
+
+    // Count total matching products
+    const totalProducts = await Product.countDocuments(filter);
+    const totalPages = Math.ceil(totalProducts / limitNum);
+
+    // Fetch paginated products
+    const products = await Product.find(filter)
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .populate({
+        path: "seller",
+        match: { role: "seller" },
+        select: "slug companyName",
+      })
+      .populate({
+        path: "category",
+        select: "slug title",
+      })
+      .lean();
+
+    res.status(200).json({
+      products,
+      totalProducts,
+      totalPages,
+      currentPage: pageNum,
+      limit: limitNum,
+    });
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };

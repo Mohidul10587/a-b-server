@@ -22,6 +22,7 @@ router.get("/singleForEditPage/:id", middlewares_1.verifyUserToken, user_control
 router.get("/getSummaryOfActivity", middlewares_1.verifyUserToken, user_controller_1.getSummaryOfActivity);
 router.put("/update/:id", middlewares_1.verifyUserToken, user_controller_1.update);
 //-----------------for Admin-----------------------------------
+router.get("/getAllSellerForFilterPage", user_controller_1.getAllSellerForFilterPage);
 router.get("/allUserForAdmin", user_controller_1.allUserForAdmin);
 router.get("/singleForEditForSellerSettings/:id", user_controller_1.singleForEditForSellerSettings);
 router.patch("/updateSellerStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerStatus);

@@ -232,3 +232,20 @@ export const getCatsWritersPublishersForNavbar = async (
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+// ✅ GET all categories for filter page
+export const getAllCategoryForFilterPage = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const categories = await Category.find(
+      {},
+      { _id: 1, slug: 1, title: 1, img: 1 }
+    ).sort({ position: 1 }); // sort by position field
+
+    res.status(200).json({ categories });
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

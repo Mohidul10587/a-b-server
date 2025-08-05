@@ -30,6 +30,7 @@ import {
   updateUserStatus,
   updateUserPassword,
   singleForEditForSellerSettings,
+  getAllSellerForFilterPage,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 
@@ -53,7 +54,7 @@ router.get("/getSummaryOfActivity", verifyUserToken, getSummaryOfActivity);
 router.put("/update/:id", verifyUserToken, update);
 
 //-----------------for Admin-----------------------------------
-
+router.get("/getAllSellerForFilterPage", getAllSellerForFilterPage);
 router.get("/allUserForAdmin", allUserForAdmin);
 router.get(
   "/singleForEditForSellerSettings/:id",

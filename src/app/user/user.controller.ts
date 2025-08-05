@@ -900,3 +900,20 @@ export const updateUserPassword = async (req: Request, res: Response) => {
     });
   }
 };
+// ✅ GET all sellers for filter page
+export const getAllSellerForFilterPage = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const sellers = await User.find(
+      { role: "seller", display: true },
+      { _id: 1, slug: 1, companyName: 1, image: 1 }
+    ).sort({ companyName: 1 }); // sort alphabetically
+
+    res.status(200).json({ sellers });
+  } catch (error) {
+    console.error("Error fetching sellers:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};

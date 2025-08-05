@@ -11,6 +11,7 @@ import {
   singleForEditPage,
   getAllCatWithSubCat,
   getCatsWritersPublishersForNavbar,
+  getAllCategoryForFilterPage,
 } from "./category.controller";
 import { verifyAdminToken } from "../user/middlewares";
 
@@ -47,4 +48,6 @@ router.put("/update/:id", verifyAdminToken, update);
 router.get("/allCategoryForFiltering", allCategoryForFiltering);
 
 router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
+
+router.get("/getAllCategoryForFilterPage", getAllCategoryForFilterPage);
 export default router;

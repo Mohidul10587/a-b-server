@@ -16,6 +16,7 @@ import {
   singleForEditPage,
   getAllForSeriesAddPage,
   updateStatus,
+  getFilteredProducts,
 } from "./controller";
 
 import Product from "./model";
@@ -29,7 +30,7 @@ const router = express.Router();
 
 router.post("/create", verifySellerAndAdminToken, create);
 router.get("/singleForEditPage/:id", singleForEditPage);
-
+router.get("/getFilteredProducts", getFilteredProducts);
 // // Route for getting all products
 router.get("/all", getAllProducts);
 router.get("/getExistingQuantity", getExistingQuantity);

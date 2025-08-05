@@ -11,6 +11,7 @@ const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
 router.post("/create", middlewares_1.verifySellerAndAdminToken, controller_1.create);
 router.get("/singleForEditPage/:id", controller_1.singleForEditPage);
+router.get("/getFilteredProducts", controller_1.getFilteredProducts);
 // // Route for getting all products
 router.get("/all", controller_1.getAllProducts);
 router.get("/getExistingQuantity", controller_1.getExistingQuantity);

@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
+exports.getFilteredProducts = exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const model_1 = __importDefault(require("./model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
 const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
 const generateSLug_1 = require("../shared/generateSLug");
+const user_model_1 = __importDefault(require("../user/user.model"));
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
@@ -443,3 +444,80 @@ const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.allForIndexPage = allForIndexPage;
+const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { page = "1", limit = "10", search = "", sellers = "", categories = "", minPrice, maxPrice, minRating, lang = "all", } = req.query;
+        const pageNum = parseInt(page, 10);
+        const limitNum = parseInt(limit, 10);
+        const sellerSlugs = (sellers === null || sellers === void 0 ? void 0 : sellers.split("--").filter(Boolean)) || [];
+        const categorySlugs = (categories === null || categories === void 0 ? void 0 : categories.split("--").filter(Boolean)) || [];
+        const minPriceNum = minPrice ? parseFloat(minPrice) : undefined;
+        const maxPriceNum = maxPrice ? parseFloat(maxPrice) : undefined;
+        const minRatingNum = minRating
+            ? parseFloat(minRating)
+            : undefined;
+        const language = lang;
+        const filter = {};
+        // Search by product title
+        if (search) {
+            const regex = new RegExp(search, "i");
+            filter.$or = [{ titleEn: regex }, { titleBn: regex }];
+        }
+        // Filter by seller slugs
+        if (sellerSlugs.length > 0) {
+            const matchingSellers = yield user_model_1.default.find({ slug: { $in: sellerSlugs }, role: "seller" }, "_id");
+            const sellerIds = matchingSellers.map((s) => s._id);
+            filter.seller = { $in: sellerIds };
+        }
+        // ✅ Correct: Filter by category slugs
+        if (categorySlugs.length > 0) {
+            const matchingCategories = yield category_model_1.default.find({ slug: { $in: categorySlugs } }, "_id");
+            const categoryIds = matchingCategories.map((cat) => cat._id);
+            filter.category = { $in: categoryIds };
+        }
+        // Filter by price range
+        if (minPriceNum !== undefined) {
+            filter.sellingPrice = Object.assign(Object.assign({}, filter.sellingPrice), { $gte: minPriceNum });
+        }
+        if (maxPriceNum !== undefined) {
+            filter.sellingPrice = Object.assign(Object.assign({}, filter.sellingPrice), { $lte: maxPriceNum });
+        }
+        // Filter by rating
+        if (minRatingNum !== undefined) {
+            filter.rating = { $gte: minRatingNum };
+        }
+        // Filter by language
+        if (language && language !== "all") {
+            filter.language = language;
+        }
+        // Count total matching products
+        const totalProducts = yield model_1.default.countDocuments(filter);
+        const totalPages = Math.ceil(totalProducts / limitNum);
+        // Fetch paginated products
+        const products = yield model_1.default.find(filter)
+            .skip((pageNum - 1) * limitNum)
+            .limit(limitNum)
+            .populate({
+            path: "seller",
+            match: { role: "seller" },
+            select: "slug companyName",
+        })
+            .populate({
+            path: "category",
+            select: "slug title",
+        })
+            .lean();
+        res.status(200).json({
+            products,
+            totalProducts,
+            totalPages,
+            currentPage: pageNum,
+            limit: limitNum,
+        });
+    }
+    catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
+exports.getFilteredProducts = getFilteredProducts;

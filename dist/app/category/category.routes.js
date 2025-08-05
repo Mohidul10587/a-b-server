@@ -17,4 +17,5 @@ router.put("/update/:id", middlewares_1.verifyAdminToken, category_controller_1.
 // common routes
 router.get("/allCategoryForFiltering", category_controller_1.allCategoryForFiltering);
 router.get("/getAllCategoriesForCatMainPage", category_controller_1.getAllCategoriesForCatMainPage);
+router.get("/getAllCategoryForFilterPage", category_controller_1.getAllCategoryForFilterPage);
 exports.default = router;
