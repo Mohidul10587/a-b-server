@@ -33,11 +33,6 @@ export const getWithdrawRequestsForAdmin = async (
     const withdrawRequests = await WithdrawRequest.find().populate({
       path: "sellerId", // Populate sellerId field in WithdrawRequest
       model: "User", // From the User model
-      populate: {
-        path: "sellerId", // Populate sellerId field in the populated User
-        model: "Seller", // From the Seller model
-        select: "companyName email photo",
-      },
     });
 
     res.status(200).json({

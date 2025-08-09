@@ -8,6 +8,7 @@ import Writer from "../writer/writer.model";
 import Product from "../product/model";
 import Order from "../order/order.model";
 import User from "../user/user.model";
+import { SellerOrderModel } from "../ordersOFSeller/sellerOrder.model";
 export const create = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
 
@@ -19,11 +20,46 @@ export const create = async (req: Request, res: Response) => {
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
     }
-    console.log(orderInfo);
+
     // 1. Create the new order
     const newOrder = await Order.create([orderInfo], { session });
+    const sellerOrdersMap = new Map();
 
-    // 2. Clear the user's cart
+    orderInfo.cart.forEach((product: any) => {
+      const sellerId = product.seller.toString();
+      if (!sellerOrdersMap.has(sellerId)) {
+        sellerOrdersMap.set(sellerId, {
+          sellerId: sellerId,
+          products: [],
+          name: orderInfo.deliveryInfo.name,
+          address: orderInfo.deliveryInfo.address,
+          location: orderInfo.deliveryInfo.address,
+          phone: orderInfo.deliveryInfo.phone,
+          status: orderInfo.paymentStatus,
+          userId: orderInfo.user,
+          paymentMethod: orderInfo.paymentMethod,
+          shippingMethod: orderInfo.shippingMethod || "Cache on delivery",
+          transactionId: orderInfo.paymentTnxId || "Cache on delivery",
+          totalAmount: 0,
+        });
+      }
+
+      // Add product to the respective seller order
+      const sellerOrder = sellerOrdersMap.get(sellerId);
+      sellerOrder.products.push({
+        ...product,
+        commissionForSeller: 90,
+        transactionId: orderInfo.paymentTnxId,
+        userId: orderInfo.userId,
+      });
+      sellerOrder.totalAmount += product.sellingPrice * product.quantity;
+    });
+
+    // Convert map values to array
+    const sellerOrders = Array.from(sellerOrdersMap.values());
+
+    await SellerOrderModel.insertMany(sellerOrders, { session });
+    // 3. Clear the user's cart
     await Cart.findOneAndUpdate(
       { userId },
       { $set: { cartItems: [] } },
@@ -50,7 +86,6 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
-// Get all orders
 export const allForAdmin = async (req: Request, res: Response) => {
   try {
     const orders = await Order.find()
@@ -97,7 +132,6 @@ export const allForAdmin = async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Failed to fetch orders.", error });
   }
 };
@@ -131,7 +165,6 @@ export const getSingleOrders = async (req: Request, res: Response) => {
 
     res.status(200).json(order);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Failed to fetch order.", error });
   }
 };

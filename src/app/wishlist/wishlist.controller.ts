@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 export const addToWishlist = async (req: Request, res: Response) => {
   const { productId } = req.body;
   const userId = req?.user?._id as string;
-  console.log(productId, userId);
+
   if (
     !mongoose.Types.ObjectId.isValid(userId) ||
     !mongoose.Types.ObjectId.isValid(productId)

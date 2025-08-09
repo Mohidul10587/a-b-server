@@ -22,8 +22,7 @@ const user_model_1 = __importDefault(require("../user/user.model"));
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const data = req.body;
-        console.log("THis is data xxx", data);
-        const item = yield model_1.default.create(Object.assign(Object.assign({}, data), { slug: (0, generateSLug_1.generateSlug)(data.titleEn) }));
+        const item = yield model_1.default.create(Object.assign(Object.assign({}, data), { slug: (0, generateSLug_1.generateSlug)(data.title) }));
         // Send success message along with the created product data
         res.status(201).json({
             message: "Created successfully!",
@@ -31,7 +30,6 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         // Send error message if there was an issue
         res.status(500).json({
             message: "Failed to create.",
@@ -59,7 +57,6 @@ const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({
             message: "Failed to update.",
             error: error,
@@ -194,7 +191,7 @@ const getAllForSeriesAddPage = (req, res) => __awaiter(void 0, void 0, void 0, f
         if (((_a = req.user) === null || _a === void 0 ? void 0 : _a.role) === "seller") {
             filter.seller = req.user._id;
         }
-        const items = yield model_1.default.find(filter).select("titleEn sellingPrice img slug display seller");
+        const items = yield model_1.default.find(filter).select("title sellingPrice img slug display seller");
         res.status(200).json({
             message: "Fetched successfully!",
             resData: items.reverse(),
@@ -297,7 +294,7 @@ const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0
     const slug = req.params.slug;
     try {
         const category = yield category_model_1.default.findOne({ slug: slug })
-            .select("_id title slug img metaTitle metaDescription description shortDescription keywords")
+            .select("_id title slug img metaTitle metaDescription description shortDescription keywords ")
             .populate({
             path: "subcategories",
             select: "title",
@@ -306,7 +303,7 @@ const getProductsByCategorySlug = (req, res) => __awaiter(void 0, void 0, void 0
         const categoryId = category === null || category === void 0 ? void 0 : category._id;
         const products = yield model_1.default.find({
             category: categoryId,
-        }).select("_id img title featured sele sellingPrice slug stockStatus writer publisher  subcategory language");
+        }).select("_id img title featured sele sellingPrice slug stockStatus writer publisher seller subcategory language");
         const writers = yield writer_model_1.default.find().select("_id title slug img").lean();
         const reverseProducts = products.reverse();
         res.status(200).json({ products: reverseProducts, writers, category });
@@ -365,7 +362,6 @@ exports.getExistingQuantity = getExistingQuantity;
 // Update the status  by ID
 const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    console.log("This is id", id);
     const { display } = req.body;
     try {
         const updateProduct = yield model_1.default.findByIdAndUpdate(id, { display }, // Ensure 'status' is the correct field
@@ -401,7 +397,7 @@ const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function
         let displayFalseQuery = { display: false };
         if (searchText) {
             query.$or = [
-                { titleEn: { $regex: searchText, $options: "i" } },
+                { title: { $regex: searchText, $options: "i" } },
                 { SKU: { $regex: searchText, $options: "i" } },
             ];
         }
@@ -418,7 +414,7 @@ const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function
         }
         const [items, totalCount, totalActiveCount, totalInactiveCount] = yield Promise.all([
             model_1.default.find(query)
-                .select("titleEn SKU sellingPrice img slug  display display_2   seller ")
+                .select("title SKU sellingPrice img slug  display display_2   seller ")
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(limit),
@@ -461,7 +457,7 @@ const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, func
         // Search by product title
         if (search) {
             const regex = new RegExp(search, "i");
-            filter.$or = [{ titleEn: regex }, { titleBn: regex }];
+            filter.$or = [{ title: regex }, { titleBn: regex }];
         }
         // Filter by seller slugs
         if (sellerSlugs.length > 0) {

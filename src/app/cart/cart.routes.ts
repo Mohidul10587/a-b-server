@@ -3,7 +3,7 @@ import express from "express";
 import {
   createOrUpdate,
   addSingleItemToCart,
-  updateProductQuantityInDataBase,
+  updateProductQntInDb,
   getUserCart,
   removeItemFromCart,
   updateIsChecked,
@@ -15,11 +15,7 @@ const router = express.Router();
 
 router.post("/create", createOrUpdate);
 router.post("/addSingleItemToCart", addSingleItemToCart);
-router.post(
-  "/updateProductQuantityInDataBase",
-  verifyUserToken,
-  updateProductQuantityInDataBase
-);
+router.post("/updateProductQntInDb", verifyUserToken, updateProductQntInDb);
 
 router.get("/getUserCart/:userId", getUserCart);
 router.get("/getUserCartQuantity/:userId", getUserCartQuantity);

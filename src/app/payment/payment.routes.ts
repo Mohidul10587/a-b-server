@@ -36,7 +36,6 @@ router.post(
     try {
       session.startTransaction();
 
-      console.log(orderInfoForStore);
       // 1. Create order in DB
       await Order.create([orderInfoForStore], { session });
 
@@ -81,7 +80,6 @@ router.post(
       // 6. Respond with payment URL
       res.json({ paymentUrl: response.data.payment_url });
     } catch (error) {
-      console.log(error);
       await session.abortTransaction();
       res.status(500).json({
         message: "Payment initialization failed",

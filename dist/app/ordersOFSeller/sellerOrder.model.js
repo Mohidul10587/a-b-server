@@ -29,8 +29,8 @@ const mongoose_1 = __importStar(require("mongoose"));
 const ProductSchema = new mongoose_1.Schema({
     _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product", required: true },
     title: { type: String, required: true },
-    price: { type: Number, required: true },
-    photo: { type: String, required: true },
+    sellingPrice: { type: Number, required: true },
+    img: { type: String, required: true },
     seller: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     commissionForSeller: { type: Number, required: true },
     quantity: { type: Number, required: true },

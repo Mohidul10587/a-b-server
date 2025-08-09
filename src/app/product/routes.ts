@@ -39,7 +39,7 @@ router.get("/allForIndexPage", verifySellerAndAdminToken, allForIndexPage);
 
 router.get("/getAllProductsForOfferPage", getAllProductsForOfferPage);
 
-router.get("/products_by_category_slug/:slug", getProductsByCategorySlug);
+router.get("/getProductsByCategorySlug/:slug", getProductsByCategorySlug);
 router.get("/products_by_punishers_slug/:slug", getProductsByPublishersSlug);
 router.get(
   "/getAllForSeriesAddPage",
@@ -59,7 +59,7 @@ router.get("/:productId", getSingleProduct);
 router.delete("/:productId", verifyAdminToken, deleteProduct);
 
 // // Route for updating a product by ID
-router.put("/update/:id", verifyAdminToken, update);
+router.put("/update/:id", verifySellerAndAdminToken, update);
 router.patch("/updateStatus/:id", verifySellerAndAdminToken, updateStatus);
 router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
 export default router;

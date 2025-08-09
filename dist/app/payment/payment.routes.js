@@ -38,7 +38,6 @@ router.post("/initialize-payment", middlewares_1.verifyUserToken, (req, res) => 
     const session = yield mongoose_1.default.startSession();
     try {
         session.startTransaction();
-        console.log(orderInfoForStore);
         // 1. Create order in DB
         yield order_model_1.default.create([orderInfoForStore], { session });
         // 2. Prepare payment data
@@ -71,7 +70,6 @@ router.post("/initialize-payment", middlewares_1.verifyUserToken, (req, res) => 
         res.json({ paymentUrl: response.data.payment_url });
     }
     catch (error) {
-        console.log(error);
         yield session.abortTransaction();
         res.status(500).json({
             message: "Payment initialization failed",

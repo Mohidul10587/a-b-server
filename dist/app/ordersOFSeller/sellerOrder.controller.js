@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateOrderStatusByAdmin = exports.updateOrderStatusBySeller = exports.getOrderById = exports.getAllOrdersForAdmin = exports.getAllOrders = void 0;
+exports.updateOrderStatusByAdmin = exports.updateStatusBySeller = exports.getOrderById = exports.getAllOrdersForAdmin = exports.getAllOrders = void 0;
 const sellerOrder_model_1 = require("./sellerOrder.model"); // Adjust path if needed
 const transaction_model_1 = __importDefault(require("../transaction/transaction.model"));
 const adminTransaction_model_1 = __importDefault(require("../adminTransaction/adminTransaction.model"));
@@ -131,10 +131,6 @@ const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         const order = yield sellerOrder_model_1.SellerOrderModel.findById({ _id: id }).populate({
             path: "sellerId",
             select: "name image email",
-            populate: {
-                path: "sellerId",
-                select: "companyName photo email",
-            },
         });
         if (!order) {
             return res.status(404).json({ message: "Order not found" });
@@ -146,37 +142,44 @@ const getOrderById = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getOrderById = getOrderById;
-const updateOrderStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h;
     const session = yield mongoose_1.default.startSession();
-    session.startTransaction(); // Start transaction
+    session.startTransaction();
     try {
         const { id } = req.params;
         const { status } = req.body;
         if (!status) {
             throw new Error("Status is required");
         }
+        // 1️⃣ Find previous order
         const previousOrder = yield sellerOrder_model_1.SellerOrderModel.findOne({ _id: id }).session(session);
         if (!previousOrder) {
             throw new Error("Order not found");
         }
+        const previousStatus = previousOrder.status;
+        // 2️⃣ Update product quantities if needed
         for (const product of previousOrder.products) {
             const existingProduct = yield model_1.default.findById(product._id).session(session);
             if (existingProduct) {
                 const newQuantity = Math.max(0, existingProduct.existingQnt - product.quantity);
-                yield model_1.default.findOneAndUpdate({ _id: product._id }, { $set: { existingQnt: newQuantity } }, { new: true, session });
+                yield model_1.default.findOneAndUpdate({ _id: product._id }, { $set: { existingQnt: newQuantity } }, { session });
             }
         }
-        // ✅ Update order status
-        const updatedOrder = yield sellerOrder_model_1.SellerOrderModel.findOneAndUpdate({ _id: id }, { status: status }, { new: true, session });
+        // 3️⃣ Update order status
+        const updatedOrder = yield sellerOrder_model_1.SellerOrderModel.findOneAndUpdate({ _id: id }, { status }, { new: true, session });
         if (!updatedOrder) {
             throw new Error("Order not found after update");
         }
+        // 4️⃣ Calculate commissions
         const totalCommission = updatedOrder.products.reduce((total, product) => total +
-            (product.price * product.commissionForSeller * product.quantity) / 100, 0);
+            (product.sellingPrice *
+                product.commissionForSeller *
+                product.quantity) /
+                100, 0);
         const remainedCommission = updatedOrder.products.reduce((total, product) => total +
             ((100 - product.commissionForSeller) / 100) *
-                product.price *
+                product.sellingPrice *
                 product.quantity, 0);
         const lastTnxOfAdmin = yield adminTransaction_model_1.default.findOne()
             .sort({ _id: -1 })
@@ -186,8 +189,9 @@ const updateOrderStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0
         })
             .sort({ _id: -1 })
             .session(session);
-        if (previousOrder.status === "Delivered" &&
-            updatedOrder.status === "Cancelled") {
+        // 5️⃣ Handle status transitions
+        // Delivered ➡ Cancelled (Refund commissions)
+        if (previousStatus === "Delivered" && status === "Cancelled") {
             yield transaction_model_1.default.create([
                 {
                     sellerId: updatedOrder.sellerId,
@@ -211,7 +215,9 @@ const updateOrderStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0
                 },
             ], { session });
         }
-        if (updatedOrder.status === "Delivered") {
+        console.log(status, previousStatus);
+        // Any status ➡ Delivered (Give commissions)
+        if (status === "Delivered" && previousStatus !== "Delivered") {
             yield transaction_model_1.default.create([
                 {
                     sellerId: updatedOrder.sellerId,
@@ -235,21 +241,22 @@ const updateOrderStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0
                 },
             ], { session });
         }
-        yield session.commitTransaction(); // ✅ Commit transaction
+        // 6️⃣ Commit transaction
+        yield session.commitTransaction();
         res.status(200).json(updatedOrder);
     }
     catch (error) {
-        yield session.abortTransaction(); // ✅ Ensure transaction rollback
+        yield session.abortTransaction();
         console.error("Error updating order status:", error);
         res
             .status(500)
             .json({ message: error.message || "Error updating order status" });
     }
     finally {
-        session.endSession(); // ✅ Always end session
+        session.endSession();
     }
 });
-exports.updateOrderStatusBySeller = updateOrderStatusBySeller;
+exports.updateStatusBySeller = updateStatusBySeller;
 // // 'Update status by admin'
 const updateOrderStatusByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h;
@@ -284,11 +291,11 @@ const updateOrderStatusByAdmin = (req, res) => __awaiter(void 0, void 0, void 0,
         }
         // Calculate commission values
         const totalCommission = updatedOrder.products.reduce((total, product) => {
-            const commission = (product.price * product.commissionForSeller) / 100;
+            const commission = (product.sellingPrice * product.commissionForSeller) / 100;
             return total + commission;
         }, 0);
         const remainedCommission = updatedOrder.products.reduce((total, product) => {
-            const commission = ((100 - product.commissionForSeller) / 100) * product.price;
+            const commission = ((100 - product.commissionForSeller) / 100) * product.sellingPrice;
             return total + commission;
         }, 0);
         // Get last transactions

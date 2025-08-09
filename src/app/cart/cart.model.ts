@@ -4,7 +4,7 @@ interface ICartItem {
   _id: ObjectId;
   img: string;
   sellingPrice: number;
-  // seller: ObjectId;
+  seller: ObjectId;
   title: string;
   shippingInside?: number;
   shippingOutside?: number;
@@ -21,7 +21,7 @@ export interface ICart extends Document {
 export const CartItemSchema = new Schema<ICartItem>({
   _id: { type: Schema.Types.ObjectId, ref: "Product" },
   img: { type: String, required: true },
-  // seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
   sellingPrice: { type: Number, required: true },
   title: { type: String },
   shippingInside: { type: Number },

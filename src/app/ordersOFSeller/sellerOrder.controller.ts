@@ -10,6 +10,7 @@ export const getAllOrders = async (req: Request, res: Response) => {
   try {
     const sellerId = req.user?._id;
     const orders = await SellerOrderModel.find({ sellerId });
+
     const totalProductsNumber = await Product.find({
       seller: sellerId,
     }).countDocuments();
@@ -68,6 +69,7 @@ export const getAllOrdersForAdmin = async (req: Request, res: Response) => {
         select: "companyName photo email",
       },
     });
+
     const totalProductsNumber = await Product.find().countDocuments();
     // Use aggregation to calculate counts in one query
     const results = await SellerOrderModel.aggregate([
@@ -119,10 +121,6 @@ export const getOrderById = async (req: Request, res: Response) => {
     const order = await SellerOrderModel.findById({ _id: id }).populate({
       path: "sellerId",
       select: "name image email",
-      populate: {
-        path: "sellerId",
-        select: "companyName photo email",
-      },
     });
 
     if (!order) {
@@ -134,12 +132,9 @@ export const getOrderById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateOrderStatusBySeller = async (
-  req: Request,
-  res: Response
-) => {
+export const updateStatusBySeller = async (req: Request, res: Response) => {
   const session = await mongoose.startSession();
-  session.startTransaction(); // Start transaction
+  session.startTransaction();
 
   try {
     const { id } = req.params;
@@ -149,14 +144,17 @@ export const updateOrderStatusBySeller = async (
       throw new Error("Status is required");
     }
 
+    // 1️⃣ Find previous order
     const previousOrder = await SellerOrderModel.findOne({ _id: id }).session(
       session
     );
-
     if (!previousOrder) {
       throw new Error("Order not found");
     }
 
+    const previousStatus = previousOrder.status;
+
+    // 2️⃣ Update product quantities if needed
     for (const product of previousOrder.products) {
       const existingProduct = await Product.findById(product._id).session(
         session
@@ -169,26 +167,29 @@ export const updateOrderStatusBySeller = async (
         await Product.findOneAndUpdate(
           { _id: product._id },
           { $set: { existingQnt: newQuantity } },
-          { new: true, session }
+          { session }
         );
       }
     }
 
-    // ✅ Update order status
+    // 3️⃣ Update order status
     const updatedOrder = await SellerOrderModel.findOneAndUpdate(
       { _id: id },
-      { status: status },
+      { status },
       { new: true, session }
     );
-
     if (!updatedOrder) {
       throw new Error("Order not found after update");
     }
 
+    // 4️⃣ Calculate commissions
     const totalCommission = updatedOrder.products.reduce(
       (total, product) =>
         total +
-        (product.price * product.commissionForSeller * product.quantity) / 100,
+        (product.sellingPrice *
+          product.commissionForSeller *
+          product.quantity) /
+          100,
       0
     );
 
@@ -196,7 +197,7 @@ export const updateOrderStatusBySeller = async (
       (total, product) =>
         total +
         ((100 - product.commissionForSeller) / 100) *
-          product.price *
+          product.sellingPrice *
           product.quantity,
       0
     );
@@ -204,16 +205,17 @@ export const updateOrderStatusBySeller = async (
     const lastTnxOfAdmin = await AdminTransaction.findOne()
       .sort({ _id: -1 })
       .session(session);
+
     const lastTnxOfSeller = await Transaction.findOne({
       sellerId: updatedOrder.sellerId,
     })
       .sort({ _id: -1 })
       .session(session);
 
-    if (
-      previousOrder.status === "Delivered" &&
-      updatedOrder.status === "Cancelled"
-    ) {
+    // 5️⃣ Handle status transitions
+
+    // Delivered ➡ Cancelled (Refund commissions)
+    if (previousStatus === "Delivered" && status === "Cancelled") {
       await Transaction.create(
         [
           {
@@ -246,8 +248,9 @@ export const updateOrderStatusBySeller = async (
         { session }
       );
     }
-
-    if (updatedOrder.status === "Delivered") {
+    console.log(status, previousStatus);
+    // Any status ➡ Delivered (Give commissions)
+    if (status === "Delivered" && previousStatus !== "Delivered") {
       await Transaction.create(
         [
           {
@@ -281,16 +284,17 @@ export const updateOrderStatusBySeller = async (
       );
     }
 
-    await session.commitTransaction(); // ✅ Commit transaction
+    // 6️⃣ Commit transaction
+    await session.commitTransaction();
     res.status(200).json(updatedOrder);
   } catch (error: any) {
-    await session.abortTransaction(); // ✅ Ensure transaction rollback
+    await session.abortTransaction();
     console.error("Error updating order status:", error);
     res
       .status(500)
       .json({ message: error.message || "Error updating order status" });
   } finally {
-    session.endSession(); // ✅ Always end session
+    session.endSession();
   }
 };
 
@@ -350,14 +354,15 @@ export const updateOrderStatusByAdmin = async (req: Request, res: Response) => {
 
     // Calculate commission values
     const totalCommission = updatedOrder.products.reduce((total, product) => {
-      const commission = (product.price * product.commissionForSeller) / 100;
+      const commission =
+        (product.sellingPrice * product.commissionForSeller) / 100;
       return total + commission;
     }, 0);
 
     const remainedCommission = updatedOrder.products.reduce(
       (total, product) => {
         const commission =
-          ((100 - product.commissionForSeller) / 100) * product.price;
+          ((100 - product.commissionForSeller) / 100) * product.sellingPrice;
         return total + commission;
       },
       0

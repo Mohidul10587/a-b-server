@@ -19,7 +19,6 @@ const addToWishlist = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     var _a;
     const { productId } = req.body;
     const userId = (_a = req === null || req === void 0 ? void 0 : req.user) === null || _a === void 0 ? void 0 : _a._id;
-    console.log(productId, userId);
     if (!mongoose_1.default.Types.ObjectId.isValid(userId) ||
         !mongoose_1.default.Types.ObjectId.isValid(productId)) {
         return res

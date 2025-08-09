@@ -20,6 +20,7 @@ const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const model_1 = __importDefault(require("../product/model"));
 const order_model_1 = __importDefault(require("../order/order.model"));
 const user_model_1 = __importDefault(require("../user/user.model"));
+const sellerOrder_model_1 = require("../ordersOFSeller/sellerOrder.model");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const session = yield mongoose_1.default.startSession();
@@ -30,10 +31,36 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized: user not found" });
         }
-        console.log(orderInfo);
         // 1. Create the new order
         const newOrder = yield order_model_1.default.create([orderInfo], { session });
-        // 2. Clear the user's cart
+        const sellerOrdersMap = new Map();
+        orderInfo.cart.forEach((product) => {
+            const sellerId = product.seller.toString();
+            if (!sellerOrdersMap.has(sellerId)) {
+                sellerOrdersMap.set(sellerId, {
+                    sellerId: sellerId,
+                    products: [],
+                    name: orderInfo.deliveryInfo.name,
+                    address: orderInfo.deliveryInfo.address,
+                    location: orderInfo.deliveryInfo.address,
+                    phone: orderInfo.deliveryInfo.phone,
+                    status: orderInfo.paymentStatus,
+                    userId: orderInfo.user,
+                    paymentMethod: orderInfo.paymentMethod,
+                    shippingMethod: orderInfo.shippingMethod || "Cache on delivery",
+                    transactionId: orderInfo.paymentTnxId || "Cache on delivery",
+                    totalAmount: 0,
+                });
+            }
+            // Add product to the respective seller order
+            const sellerOrder = sellerOrdersMap.get(sellerId);
+            sellerOrder.products.push(Object.assign(Object.assign({}, product), { commissionForSeller: 90, transactionId: orderInfo.paymentTnxId, userId: orderInfo.userId }));
+            sellerOrder.totalAmount += product.sellingPrice * product.quantity;
+        });
+        // Convert map values to array
+        const sellerOrders = Array.from(sellerOrdersMap.values());
+        yield sellerOrder_model_1.SellerOrderModel.insertMany(sellerOrders, { session });
+        // 3. Clear the user's cart
         yield cart_model_1.default.findOneAndUpdate({ userId }, { $set: { cartItems: [] } }, { session });
         // 3. Commit the transaction
         yield session.commitTransaction();
@@ -54,7 +81,6 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.create = create;
-// Get all orders
 const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const orders = yield order_model_1.default.find()
@@ -91,7 +117,6 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         });
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ message: "Failed to fetch orders.", error });
     }
 });
@@ -123,7 +148,6 @@ const getSingleOrders = (req, res) => __awaiter(void 0, void 0, void 0, function
         res.status(200).json(order);
     }
     catch (error) {
-        console.log(error);
         res.status(500).json({ message: "Failed to fetch order.", error });
     }
 });

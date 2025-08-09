@@ -183,7 +183,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
         populate: {
           path: "products",
           select:
-            "_id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside",
+            "_id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller",
         },
       });
 
@@ -202,7 +202,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
       const categoryProducts = await Product.find({
         category: element.productSectionId,
       }).select(
-        "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside"
+        "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
       );
       if (categoryProducts.length > 0) {
         products = categoryProducts;
@@ -211,7 +211,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
         const subCategoryProducts = await Product.find({
           subcategory: element.productSectionId,
         }).select(
-          "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside"
+          "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
         );
         if (subCategoryProducts.length > 0) {
           products = subCategoryProducts;
@@ -220,7 +220,7 @@ export const getElementsByIdAndPage = async (req: Request, res: Response) => {
           const writerProducts = await Product.find({
             writer: element.productSectionId,
           }).select(
-            "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside"
+            "__id title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
           );
           products = writerProducts;
         }

@@ -16,7 +16,7 @@ const AdminTransactionSchema = new mongoose_1.Schema({
             "Cancel after delivered",
             "Cancel by admin after delivered",
             "Order delivered by admin",
-            "Withdraw",
+            "Pay to seller",
         ],
         required: true,
     },

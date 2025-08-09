@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateIsChecked = exports.removeItemFromCart = exports.getUserCart = exports.getUserCartQuantity = exports.updateProductQuantityInDataBase = exports.addSingleItemToCart = exports.createOrUpdate = void 0;
+exports.updateIsChecked = exports.removeItemFromCart = exports.getUserCart = exports.getUserCartQuantity = exports.updateProductQntInDb = exports.addSingleItemToCart = exports.createOrUpdate = void 0;
 const cart_model_1 = __importDefault(require("./cart.model"));
 const createOrUpdate = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -84,7 +84,7 @@ const addSingleItemToCart = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.addSingleItemToCart = addSingleItemToCart;
-const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateProductQntInDb = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId, productId, operationType } = req.body;
         if (!userId || !productId || !operationType) {
@@ -129,7 +129,7 @@ const updateProductQuantityInDataBase = (req, res) => __awaiter(void 0, void 0, 
         res.status(500).json({ message: "Error updating item quantity", error });
     }
 });
-exports.updateProductQuantityInDataBase = updateProductQuantityInDataBase;
+exports.updateProductQntInDb = updateProductQntInDb;
 const getUserCartQuantity = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { userId } = req.params; // Get userId from the query

@@ -13,7 +13,7 @@ export interface IAdminTransaction extends Document {
     | "Cancel after delivered"
     | "Cancel by admin after delivered"
     | "Order delivered by admin"
-    | "Withdraw";
+    | "Pay to seller";
 }
 
 // Schema definition
@@ -32,7 +32,7 @@ const AdminTransactionSchema: Schema = new Schema(
         "Cancel after delivered",
         "Cancel by admin after delivered",
         "Order delivered by admin",
-        "Withdraw",
+        "Pay to seller",
       ],
       required: true,
     },

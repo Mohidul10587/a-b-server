@@ -24,7 +24,6 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        console.log(error);
         // Send error message if there was an issue
         res.status(500).json({
             message: "Failed to create.",
@@ -37,7 +36,6 @@ exports.create = create;
 const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
-        console.log("THis is id");
         const item = yield banner_model_1.default.findByIdAndUpdate(id, req.body, {
             new: true,
             runValidators: true,

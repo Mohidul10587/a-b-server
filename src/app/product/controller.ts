@@ -9,10 +9,10 @@ import User from "../user/user.model";
 export const create = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = req.body;
-    console.log("THis is data xxx", data);
+
     const item = await Product.create({
       ...data,
-      slug: generateSlug(data.titleEn),
+      slug: generateSlug(data.title),
     });
 
     // Send success message along with the created product data
@@ -21,7 +21,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       item, // Optionally, include the created product in the response
     });
   } catch (error: any) {
-    console.log(error);
     // Send error message if there was an issue
     res.status(500).json({
       message: "Failed to create.",
@@ -49,7 +48,6 @@ export const update = async (req: Request, res: Response) => {
       item,
     });
   } catch (error: any) {
-    console.log(error);
     res.status(500).json({
       message: "Failed to update.",
       error: error,
@@ -201,7 +199,7 @@ export const getAllForSeriesAddPage = async (
     }
 
     const items = await Product.find(filter).select(
-      "titleEn sellingPrice img slug display seller"
+      "title sellingPrice img slug display seller"
     );
 
     res.status(200).json({
@@ -328,7 +326,7 @@ export const getProductsByCategorySlug = async (
   try {
     const category = await Category.findOne({ slug: slug })
       .select(
-        "_id title slug img metaTitle metaDescription description shortDescription keywords"
+        "_id title slug img metaTitle metaDescription description shortDescription keywords "
       )
       .populate({
         path: "subcategories",
@@ -340,7 +338,7 @@ export const getProductsByCategorySlug = async (
     const products = await Product.find({
       category: categoryId,
     }).select(
-      "_id img title featured sele sellingPrice slug stockStatus writer publisher  subcategory language"
+      "_id img title featured sele sellingPrice slug stockStatus writer publisher seller subcategory language"
     );
 
     const writers = await Writer.find().select("_id title slug img").lean();
@@ -412,7 +410,7 @@ export const getExistingQuantity = async (req: Request, res: Response) => {
 // Update the status  by ID
 export const updateStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log("This is id", id);
+
   const { display } = req.body;
 
   try {
@@ -456,7 +454,7 @@ export const allForIndexPage = async (
 
     if (searchText) {
       query.$or = [
-        { titleEn: { $regex: searchText, $options: "i" } },
+        { title: { $regex: searchText, $options: "i" } },
         { SKU: { $regex: searchText, $options: "i" } },
       ];
     }
@@ -477,7 +475,7 @@ export const allForIndexPage = async (
       await Promise.all([
         Product.find(query)
           .select(
-            "titleEn SKU sellingPrice img slug  display display_2   seller "
+            "title SKU sellingPrice img slug  display display_2   seller "
           )
 
           .sort({ createdAt: -1 })
@@ -537,7 +535,7 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
     // Search by product title
     if (search) {
       const regex = new RegExp(search as string, "i");
-      filter.$or = [{ titleEn: regex }, { titleBn: regex }];
+      filter.$or = [{ title: regex }, { titleBn: regex }];
     }
 
     // Filter by seller slugs

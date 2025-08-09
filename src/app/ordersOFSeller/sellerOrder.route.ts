@@ -2,7 +2,7 @@ import express from "express";
 
 import {
   getAllOrders,
-  updateOrderStatusBySeller,
+  updateStatusBySeller,
   getAllOrdersForAdmin,
   getOrderById,
   //   updateOrderStatus,
@@ -12,11 +12,11 @@ import { verifyAdminToken, verifySellerToken } from "../user/middlewares";
 
 const router = express.Router();
 
-router.get("/", verifySellerToken, getAllOrders);
+router.get("/getAllOrders", verifySellerToken, getAllOrders);
 router.get("/allOrdersForAdmin", verifyAdminToken, getAllOrdersForAdmin);
 
 router.post("/updateStatusByAdmin/:id", updateOrderStatusByAdmin);
-router.post("/updateStatusBySeller/:id", updateOrderStatusBySeller);
+router.post("/updateStatusBySeller/:id", updateStatusBySeller);
 
 router.get("/getSingleOrder/:id", getOrderById);
 

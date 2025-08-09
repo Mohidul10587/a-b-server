@@ -84,10 +84,7 @@ export const addSingleItemToCart = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProductQuantityInDataBase = async (
-  req: Request,
-  res: Response
-) => {
+export const updateProductQntInDb = async (req: Request, res: Response) => {
   try {
     const { userId, productId, operationType } = req.body;
 
@@ -140,6 +137,7 @@ export const updateProductQuantityInDataBase = async (
     res.status(500).json({ message: "Error updating item quantity", error });
   }
 };
+
 export const getUserCartQuantity = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params; // Get userId from the query

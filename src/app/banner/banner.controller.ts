@@ -12,7 +12,6 @@ export const create = async (req: Request, res: Response): Promise<void> => {
       item, // Optionally, include the created product in the response
     });
   } catch (error: any) {
-    console.log(error);
     // Send error message if there was an issue
     res.status(500).json({
       message: "Failed to create.",
@@ -26,7 +25,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
 export const update = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log("THis is id");
+
     const item = await Banner.findByIdAndUpdate(id, req.body, {
       new: true,
       runValidators: true,

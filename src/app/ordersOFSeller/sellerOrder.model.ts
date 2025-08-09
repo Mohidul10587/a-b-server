@@ -4,8 +4,8 @@ import mongoose, { Schema, Document, Types } from "mongoose";
 interface Product {
   _id: Types.ObjectId;
   title: string;
-  price: number;
-  photo: string;
+  sellingPrice: number;
+  img: string;
   seller: Types.ObjectId;
   commissionForSeller: number;
   quantity: number;
@@ -36,8 +36,8 @@ const ProductSchema = new Schema<Product>(
   {
     _id: { type: Schema.Types.ObjectId, ref: "Product", required: true },
     title: { type: String, required: true },
-    price: { type: Number, required: true },
-    photo: { type: String, required: true },
+    sellingPrice: { type: Number, required: true },
+    img: { type: String, required: true },
     seller: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     commissionForSeller: { type: Number, required: true },
     quantity: { type: Number, required: true },

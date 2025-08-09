@@ -35,7 +35,7 @@ export interface IProduct extends Document {
   suggestion: Schema.Types.ObjectId | null;
   summary: string;
   titleBn: string;
-  titleEn: string;
+  title: string;
   translator: string;
   writer: Schema.Types.ObjectId;
   youtubeVideo: string[];
@@ -122,7 +122,7 @@ const ProductSchema = new Schema<IProduct>(
 
     // T
     titleBn: { type: String, default: "" },
-    titleEn: { type: String, required: true },
+    title: { type: String, required: true },
     translator: { type: String, default: "" },
 
     // W

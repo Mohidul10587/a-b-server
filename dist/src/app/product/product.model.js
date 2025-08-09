@@ -122,7 +122,7 @@ const ProductSchema = new mongoose_1.Schema(
     binding: { type: String },
     language: { type: String },
     orderType: { type: String },
-    titleEn: { type: String, default: "" },
+    title: { type: String, default: "" },
     subTitle: { type: String, default: "" },
     keywords: { type: [String], default: [] },
     img: { type: String },

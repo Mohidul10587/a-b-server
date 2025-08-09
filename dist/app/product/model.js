@@ -100,7 +100,7 @@ const ProductSchema = new mongoose_1.Schema({
     summary: { type: String, default: "" },
     // T
     titleBn: { type: String, default: "" },
-    titleEn: { type: String, required: true },
+    title: { type: String, required: true },
     translator: { type: String, default: "" },
     // W
     writer: {
