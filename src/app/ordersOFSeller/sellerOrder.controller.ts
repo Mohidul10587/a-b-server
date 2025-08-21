@@ -5,6 +5,7 @@ import AdminTransaction from "../adminTransaction/adminTransaction.model";
 
 import mongoose from "mongoose";
 import Product from "../product/model";
+import User from "../user/user.model";
 // Get all orders
 export const getAllOrders = async (req: Request, res: Response) => {
   try {
@@ -137,7 +138,7 @@ export const updateStatusBySeller = async (req: Request, res: Response) => {
   session.startTransaction();
 
   try {
-    const { id } = req.params;
+    const sellerOrderId = req.params.id;
     const { status } = req.body;
 
     if (!status) {
@@ -145,36 +146,56 @@ export const updateStatusBySeller = async (req: Request, res: Response) => {
     }
 
     // 1️⃣ Find previous order
-    const previousOrder = await SellerOrderModel.findOne({ _id: id }).session(
-      session
-    );
+    const previousOrder = await SellerOrderModel.findOne({
+      _id: sellerOrderId,
+    }).session(session);
     if (!previousOrder) {
       throw new Error("Order not found");
     }
 
     const previousStatus = previousOrder.status;
 
-    // 2️⃣ Update product quantities if needed
-    for (const product of previousOrder.products) {
-      const existingProduct = await Product.findById(product._id).session(
-        session
-      );
-      if (existingProduct) {
-        const newQuantity = Math.max(
-          0,
-          existingProduct.existingQnt - product.quantity
+    // 2️⃣ Update product quantities conditionally
+    if (status === "Delivered" && previousStatus !== "Delivered") {
+      // Delivered হলে stock কমাও
+      for (const product of previousOrder.products) {
+        const existingProduct = await Product.findById(product._id).session(
+          session
         );
-        await Product.findOneAndUpdate(
-          { _id: product._id },
-          { $set: { existingQnt: newQuantity } },
-          { session }
+        if (existingProduct) {
+          const newQuantity = Math.max(
+            0,
+            existingProduct.existingQnt - product.quantity
+          );
+          await Product.findOneAndUpdate(
+            { _id: product._id },
+            { $set: { existingQnt: newQuantity } },
+            { session }
+          );
+        }
+      }
+    }
+
+    if (previousStatus === "Delivered" && status === "Cancelled") {
+      // Cancelled হলে stock ফেরত দাও
+      for (const product of previousOrder.products) {
+        const existingProduct = await Product.findById(product._id).session(
+          session
         );
+        if (existingProduct) {
+          const newQuantity = existingProduct.existingQnt + product.quantity;
+          await Product.findOneAndUpdate(
+            { _id: product._id },
+            { $set: { existingQnt: newQuantity } },
+            { session }
+          );
+        }
       }
     }
 
     // 3️⃣ Update order status
     const updatedOrder = await SellerOrderModel.findOneAndUpdate(
-      { _id: id },
+      { _id: sellerOrderId },
       { status },
       { new: true, session }
     );
@@ -182,21 +203,23 @@ export const updateStatusBySeller = async (req: Request, res: Response) => {
       throw new Error("Order not found after update");
     }
 
+    const seller = await User.findById(updatedOrder.sellerId).session(session);
+    if (!seller) {
+      throw new Error("Seller not found");
+    }
+
     // 4️⃣ Calculate commissions
     const totalCommission = updatedOrder.products.reduce(
       (total, product) =>
         total +
-        (product.sellingPrice *
-          product.commissionForSeller *
-          product.quantity) /
-          100,
+        (product.sellingPrice * seller.commission * product.quantity) / 100,
       0
     );
 
     const remainedCommission = updatedOrder.products.reduce(
       (total, product) =>
         total +
-        ((100 - product.commissionForSeller) / 100) *
+        ((100 - seller.commission) / 100) *
           product.sellingPrice *
           product.quantity,
       0
@@ -248,7 +271,7 @@ export const updateStatusBySeller = async (req: Request, res: Response) => {
         { session }
       );
     }
-    console.log(status, previousStatus);
+
     // Any status ➡ Delivered (Give commissions)
     if (status === "Delivered" && previousStatus !== "Delivered") {
       await Transaction.create(

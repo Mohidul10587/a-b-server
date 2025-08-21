@@ -31,20 +31,17 @@ import {
   updateUserPassword,
   singleForEditForSellerSettings,
   getAllSellerForFilterPage,
+  updateSellerCommission,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
-
 import { deleteById } from "../shared/reusableControllers";
 import User from "./user.model";
-
 import { verifyAdminToken, verifyStuffToken } from "./middlewares";
 
 const router = express.Router();
 
-//-----------------for user-----------------------------------
+//=================== For user ===================
 
-router.get("/getAuthenticatedUser", getAuthenticatedUser);
-router.post("/logout", logOut);
 router.get("/singleUser/:userId", getSingleUser);
 router.get("/getSingleUserBySlug/:userSlug", getSingleUserBySlug);
 router.get("/getSingleUserById/:id", getSingleUserById);
@@ -53,7 +50,15 @@ router.get("/singleForEditPage/:id", verifyUserToken, singleForEditPage);
 router.get("/getSummaryOfActivity", verifyUserToken, getSummaryOfActivity);
 router.put("/update/:id", verifyUserToken, update);
 
-//-----------------for Admin-----------------------------------
+//=================== For user authentication ===================
+router.get("/getAuthenticatedUser", getAuthenticatedUser);
+router.post("/signUpByCredentials", signUpByCredentials);
+router.post("/logInByCredentials", logInByCredentials);
+router.post("/googleUpsertUser", googleUpsertUser);
+router.post("/setCookie", setRefreshToken);
+router.post("/logout", logOut);
+
+//===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", getAllSellerForFilterPage);
 router.get("/allUserForAdmin", allUserForAdmin);
 router.get(
@@ -76,6 +81,11 @@ router.patch(
   "/updateUserPassword/:userId",
   verifyAdminToken,
   updateUserPassword
+);
+router.patch(
+  "/updateSellerCommission/:userId",
+  verifyAdminToken,
+  updateSellerCommission
 );
 router.get(
   "/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id",
@@ -105,16 +115,6 @@ router.get(
 router.post("/updateUserInfo/:userId", verifyUserToken, updateUser);
 router.patch("/updateStatus/:id", verifyAdminToken, updateStatus);
 router.patch("/updatePassword/:id", verifyAdminToken, updatePassword);
-
 router.delete("/delete/:id", verifyAdminToken, deleteById(User));
-// router.post(
-//   "/createUserAsStuffByEmailAndPasswordByAdmin",
-//   verifyAdminToken,
-//   signUp
-// );
-router.post("/signUpByCredentials", signUpByCredentials);
-router.post("/logInByCredentials", logInByCredentials);
-router.post("/googleUpsertUser", googleUpsertUser);
-router.post("/setCookie", setRefreshToken);
 
 export default router;

@@ -18,6 +18,7 @@ const transaction_model_1 = __importDefault(require("../transaction/transaction.
 const adminTransaction_model_1 = __importDefault(require("../adminTransaction/adminTransaction.model"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const model_1 = __importDefault(require("../product/model"));
+const user_model_1 = __importDefault(require("../user/user.model"));
 // Get all orders
 const getAllOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
@@ -147,38 +148,54 @@ const updateStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0, fun
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        const { id } = req.params;
+        const sellerOrderId = req.params.id;
         const { status } = req.body;
         if (!status) {
             throw new Error("Status is required");
         }
         // 1️⃣ Find previous order
-        const previousOrder = yield sellerOrder_model_1.SellerOrderModel.findOne({ _id: id }).session(session);
+        const previousOrder = yield sellerOrder_model_1.SellerOrderModel.findOne({
+            _id: sellerOrderId,
+        }).session(session);
         if (!previousOrder) {
             throw new Error("Order not found");
         }
         const previousStatus = previousOrder.status;
-        // 2️⃣ Update product quantities if needed
-        for (const product of previousOrder.products) {
-            const existingProduct = yield model_1.default.findById(product._id).session(session);
-            if (existingProduct) {
-                const newQuantity = Math.max(0, existingProduct.existingQnt - product.quantity);
-                yield model_1.default.findOneAndUpdate({ _id: product._id }, { $set: { existingQnt: newQuantity } }, { session });
+        // 2️⃣ Update product quantities conditionally
+        if (status === "Delivered" && previousStatus !== "Delivered") {
+            // Delivered হলে stock কমাও
+            for (const product of previousOrder.products) {
+                const existingProduct = yield model_1.default.findById(product._id).session(session);
+                if (existingProduct) {
+                    const newQuantity = Math.max(0, existingProduct.existingQnt - product.quantity);
+                    yield model_1.default.findOneAndUpdate({ _id: product._id }, { $set: { existingQnt: newQuantity } }, { session });
+                }
+            }
+        }
+        if (previousStatus === "Delivered" && status === "Cancelled") {
+            // Cancelled হলে stock ফেরত দাও
+            for (const product of previousOrder.products) {
+                const existingProduct = yield model_1.default.findById(product._id).session(session);
+                if (existingProduct) {
+                    const newQuantity = existingProduct.existingQnt + product.quantity;
+                    yield model_1.default.findOneAndUpdate({ _id: product._id }, { $set: { existingQnt: newQuantity } }, { session });
+                }
             }
         }
         // 3️⃣ Update order status
-        const updatedOrder = yield sellerOrder_model_1.SellerOrderModel.findOneAndUpdate({ _id: id }, { status }, { new: true, session });
+        const updatedOrder = yield sellerOrder_model_1.SellerOrderModel.findOneAndUpdate({ _id: sellerOrderId }, { status }, { new: true, session });
         if (!updatedOrder) {
             throw new Error("Order not found after update");
         }
+        const seller = yield user_model_1.default.findById(updatedOrder.sellerId).session(session);
+        if (!seller) {
+            throw new Error("Seller not found");
+        }
         // 4️⃣ Calculate commissions
         const totalCommission = updatedOrder.products.reduce((total, product) => total +
-            (product.sellingPrice *
-                product.commissionForSeller *
-                product.quantity) /
-                100, 0);
+            (product.sellingPrice * seller.commission * product.quantity) / 100, 0);
         const remainedCommission = updatedOrder.products.reduce((total, product) => total +
-            ((100 - product.commissionForSeller) / 100) *
+            ((100 - seller.commission) / 100) *
                 product.sellingPrice *
                 product.quantity, 0);
         const lastTnxOfAdmin = yield adminTransaction_model_1.default.findOne()
@@ -215,7 +232,6 @@ const updateStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 },
             ], { session });
         }
-        console.log(status, previousStatus);
         // Any status ➡ Delivered (Give commissions)
         if (status === "Delivered" && previousStatus !== "Delivered") {
             yield transaction_model_1.default.create([

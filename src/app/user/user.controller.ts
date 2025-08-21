@@ -224,7 +224,11 @@ export const checkUser_Email = async (req: Request, res: Response) => {
   });
 };
 export const allUserForAdmin = async (req: Request, res: Response) => {
-  const users = await User.find().sort({ createdAt: -1 });
+  const users = await User.find()
+    .sort({ createdAt: -1 })
+    .select(
+      "name slug img image email phone  companyName isSeller isUser commission role createdAt"
+    );
 
   return res.status(200).json({
     users,
@@ -896,6 +900,33 @@ export const updateUserPassword = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({
       message: "Error updating User password",
+      error: error.message,
+    });
+  }
+};
+
+export const updateSellerCommission = async (req: Request, res: Response) => {
+  const { userId } = req.params; // Make sure the ID is being passed correctly
+  const { commission } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { commission },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({
+      message: "Seller commission updated successfully",
+      data: updatedUser,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Error updating Seller commission",
       error: error.message,
     });
   }

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSellerForFilterPage = exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -209,7 +209,9 @@ const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 exports.checkUser_Email = checkUser_Email;
 const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_model_1.default.find().sort({ createdAt: -1 });
+    const users = yield user_model_1.default.find()
+        .sort({ createdAt: -1 })
+        .select("name slug img image email phone  companyName isSeller isUser commission role createdAt");
     return res.status(200).json({
         users,
         message: "Users fetched successfully",
@@ -813,6 +815,27 @@ const updateUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.updateUserPassword = updateUserPassword;
+const updateSellerCommission = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params; // Make sure the ID is being passed correctly
+    const { commission } = req.body;
+    try {
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { commission }, { new: true });
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            message: "Seller commission updated successfully",
+            data: updatedUser,
+        });
+    }
+    catch (error) {
+        res.status(500).json({
+            message: "Error updating Seller commission",
+            error: error.message,
+        });
+    }
+});
+exports.updateSellerCommission = updateSellerCommission;
 // ✅ GET all sellers for filter page
 const getAllSellerForFilterPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

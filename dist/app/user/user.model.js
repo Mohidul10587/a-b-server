@@ -66,6 +66,7 @@ const UserSchema = new mongoose_1.Schema({
     img: { type: String, default: "" },
     display: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
+    commission: { type: Number, default: 0 },
 }, { timestamps: true });
 UserSchema.index({ email: 1 });
 UserSchema.index({ phone: 1 });

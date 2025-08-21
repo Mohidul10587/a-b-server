@@ -26,6 +26,7 @@ export interface IUser extends Document {
   display?: boolean;
   comparePassword?: (inputPassword: string) => Promise<boolean>;
   lastLoginAt: Date;
+  commission: number;
 }
 
 // === Mongoose Schema ===
@@ -61,6 +62,7 @@ const UserSchema = new Schema<IUser>(
     img: { type: String, default: "" },
     display: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
+    commission: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
