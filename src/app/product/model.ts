@@ -20,12 +20,11 @@ export interface IProduct extends Document {
   numberOfPage: number;
   orderType: string;
   productType: string;
+
   rating: number;
   regularPrice: number;
   seller: Schema.Types.ObjectId;
   sellingPrice: number;
-  shippingInside: number;
-  shippingOutside: number;
   shortDescription: string;
   slug: string;
 
@@ -100,8 +99,7 @@ const ProductSchema = new Schema<IProduct>(
 
     // S
     sellingPrice: { type: Number },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
+
     shortDescription: { type: String },
     slug: { type: String, required: true, unique: true },
     stockStatus: { type: String },
@@ -118,7 +116,6 @@ const ProductSchema = new Schema<IProduct>(
       ref: "Suggestion",
       default: null,
     },
-    summary: { type: String, default: "" },
 
     // T
     titleBn: { type: String, default: "" },

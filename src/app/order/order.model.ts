@@ -8,9 +8,17 @@ interface IOrder extends Document {
   deliveryInfo: {
     name: string;
     email: string;
-    address: string;
-    city: string;
     phone: string;
+    address: string;
+    receiverName: string;
+    receiverPhone: string;
+    deliveryType: "Post Office" | "Courier";
+    district?: string;
+    thana?: string;
+    village?: string;
+    postOffice?: string;
+    postalCode?: string;
+    courierAddress?: string;
   };
   paidAmount: number;
   paymentMethod: string;
@@ -22,13 +30,21 @@ interface IOrder extends Document {
 const OrderSchema = new Schema<IOrder>(
   {
     cart: [CartItemSchema],
-    user: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+    user: { type: mongoose.Types.ObjectId, ref: "User", default: null },
     deliveryInfo: {
       name: { type: String, required: true },
-      email: { type: String, required: true },
-      address: { type: String, required: true },
-      city: { type: String, required: true },
+      email: { type: String },
+      address: { type: String },
       phone: { type: String, required: true },
+      receiverName: { type: String },
+      receiverPhone: { type: String },
+      deliveryType: { type: String },
+      district: { type: String },
+      thana: { type: String },
+      village: { type: String },
+      postOffice: { type: String },
+      postalCode: { type: String },
+      courierAddress: { type: String },
     },
     paidAmount: { type: Number, required: true },
     paymentMethod: { type: String, required: true },

@@ -224,9 +224,9 @@ export const removeItemFromCart = async (req: Request, res: Response) => {
 
 export const updateIsChecked = async (req: Request, res: Response) => {
   try {
-    const { userId, variantId, isChecked } = req.body;
+    const { userId, itemId, isChecked } = req.body;
 
-    if (!userId || !variantId) {
+    if (!userId) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -237,7 +237,7 @@ export const updateIsChecked = async (req: Request, res: Response) => {
     }
 
     const updatedCart = await Cart.findOneAndUpdate(
-      { userId, "cartItems.variantId": variantId },
+      { userId, "cartItems._id": itemId },
       { $set: { "cartItems.$.isChecked": isChecked } },
       { new: true }
     );

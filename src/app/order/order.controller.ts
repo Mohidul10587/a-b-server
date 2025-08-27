@@ -16,10 +16,8 @@ export const create = async (req: Request, res: Response) => {
     session.startTransaction();
 
     const orderInfo = req.body;
-    const userId = req.user?._id;
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized: user not found" });
-    }
+    console.log("This is order info", orderInfo);
+    const userId = orderInfo.user;
 
     // 1. Create the new order
     const newOrder = await Order.create([orderInfo], { session });
@@ -35,8 +33,17 @@ export const create = async (req: Request, res: Response) => {
           address: orderInfo.deliveryInfo.address,
           location: orderInfo.deliveryInfo.address,
           phone: orderInfo.deliveryInfo.phone,
-          status: orderInfo.paymentStatus,
-          userId: orderInfo.user,
+          receiverName: orderInfo.deliveryInfo.receiverName,
+          receiverPhone: orderInfo.deliveryInfo.receiverPhone,
+          deliveryType: orderInfo.deliveryInfo.deliveryType,
+          district: orderInfo.deliveryInfo.district,
+          thana: orderInfo.deliveryInfo.thana,
+          village: orderInfo.deliveryInfo.village,
+          postOffice: orderInfo.deliveryInfo.postOffice,
+          postalCode: orderInfo.deliveryInfo.postalCode,
+          courierAddress: orderInfo.deliveryInfo.courierAddress,
+          status: orderInfo.status,
+          userId: orderInfo.user || null,
           paymentMethod: orderInfo.paymentMethod,
           shippingMethod: orderInfo.shippingMethod || "Cache on delivery",
           transactionId: orderInfo.paymentTnxId || "Cache on delivery",
@@ -50,7 +57,7 @@ export const create = async (req: Request, res: Response) => {
         ...product,
         commissionForSeller: 90,
         transactionId: orderInfo.paymentTnxId,
-        userId: orderInfo.userId,
+        userId: orderInfo.userId || null,
       });
       sellerOrder.totalAmount += product.sellingPrice * product.quantity;
     });
@@ -60,11 +67,13 @@ export const create = async (req: Request, res: Response) => {
 
     await SellerOrderModel.insertMany(sellerOrders, { session });
     // 3. Clear the user's cart
-    await Cart.findOneAndUpdate(
-      { userId },
-      { $set: { cartItems: [] } },
-      { session }
-    );
+    if (userId) {
+      await Cart.findOneAndUpdate(
+        { userId },
+        { $set: { cartItems: [] } },
+        { session }
+      );
+    }
 
     // 3. Commit the transaction
     await session.commitTransaction();
