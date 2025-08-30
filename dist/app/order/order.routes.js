@@ -6,12 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // routes/orderRoutes.ts
 const express_1 = __importDefault(require("express"));
 const order_controller_1 = require("./order.controller");
-const middlewares_1 = require("../user/middlewares");
 const reusableControllers_1 = require("../shared/reusableControllers");
 const order_model_1 = __importDefault(require("./order.model"));
 const router = express_1.default.Router();
 // Create a new order
-router.post("/create", middlewares_1.verifyUserToken, order_controller_1.create);
+router.post("/create", order_controller_1.create);
 // Get all orders
 router.get("/allForAdmin", order_controller_1.allForAdmin);
 router.get("/getSingleOrder/:id", order_controller_1.getSingleOrders);

@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SellerOrderModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
+const isObjectId_1 = require("../shared/isObjectId");
 // Product Schema
 const ProductSchema = new mongoose_1.Schema({
     _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "Product", required: true },
@@ -42,16 +43,28 @@ const SellerOrderSchema = new mongoose_1.Schema({
     sellerId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     products: { type: [ProductSchema], required: true },
     name: { type: String, required: true },
-    address: { type: String, required: true },
+    address: { type: String },
     phone: { type: String, required: true },
     shippingMethod: { type: String, required: true },
     status: { type: String, required: true },
-    userId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
+    userId: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        set: (value) => ((0, isObjectId_1.isObjectId)(value) ? value : null),
+        default: null,
+        ref: "User",
+    },
+    receiverName: { type: String },
+    receiverPhone: { type: String },
+    deliveryType: { type: String },
+    district: { type: String },
+    thana: { type: String },
+    village: { type: String },
+    postOffice: { type: String },
+    postalCode: { type: String },
+    courierAddress: { type: String },
     paymentMethod: { type: String, required: true },
     transactionId: { type: String, required: true },
     totalAmount: { type: Number, required: true },
-    offerDeadLine: { type: String },
-    oneClickPayOrder: { type: Boolean },
 }, { timestamps: true });
 // Export Model
 exports.SellerOrderModel = mongoose_1.default.model("SellerOrder", SellerOrderSchema);
