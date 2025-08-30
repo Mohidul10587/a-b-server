@@ -13,7 +13,7 @@ import Order from "./order.model";
 const router = express.Router();
 
 // Create a new order
-router.post("/create", verifyUserToken, create);
+router.post("/create", create);
 
 // Get all orders
 router.get("/allForAdmin", allForAdmin);
