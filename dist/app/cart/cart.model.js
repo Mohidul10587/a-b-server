@@ -31,8 +31,6 @@ exports.CartItemSchema = new mongoose_1.Schema({
     seller: { type: mongoose_1.Schema.Types.ObjectId, ref: "User", required: true },
     sellingPrice: { type: Number, required: true },
     title: { type: String },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
     quantity: { type: Number, required: true },
     existingQnt: { type: Number, required: true },
     isChecked: { type: Boolean, default: true },

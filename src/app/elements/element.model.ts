@@ -1,42 +1,48 @@
 import { Schema, model, Types, Document } from "mongoose";
+import { isObjectId } from "../shared/isObjectId";
 
 export interface IPageElements extends Document {
-  targetedPageId: string; // New field added
-  sectionTitle: string;
-  link: string;
-  status: boolean;
-  titleLink: string;
-  titleAlignment: "left" | "center" | "right";
-  isTitle: boolean;
-  desktopGrid: number;
-  mobileGrid: number;
-  margin: number;
-  padding: number;
-  titleBackgroundColor: string;
-  boxText: string;
-  sectionBackgroundColor: string;
-  boxBg: string;
-  gridStyle: string;
-  productStyle: string;
-  postLimit: number;
-  display: "both" | "desktop" | "mobile";
-  imagePosition: "left" | "right" | "center";
-  page: string;
-  position: number;
-  selectionType: string;
-  bannerId: Types.ObjectId | null; // Reference to the banner ID
-  productSectionId: string; // Reference to product section ID
-  images: string[]; // Array of image URLs
-  width: number;
-  height: number;
-  suggestion: Types.ObjectId | null;
+  title: string;
+  sections: {
+    sectionTitle: string;
+    link: string;
+    status: boolean;
+    titleLink: string;
+    titleAlignment: "left" | "center" | "right";
+    isTitle: string;
+    desktopGrid: number;
+    mobileGrid: number;
+    margin: number;
+    padding: number;
+    titleTextColor: string;
+    boxText: string;
+    titleBgColor: string;
+    boxBg: string;
+    gridStyle: string;
+    productStyle: string;
+    postLimit: number;
+    display: "both" | "desktop" | "mobile";
+    imagePosition: "left" | "right" | "center";
+
+    position: number;
+    selectionType: string;
+    banner: Types.ObjectId | null;
+    category: Types.ObjectId | null;
+    subcategory: Types.ObjectId | null;
+    writer: Types.ObjectId | null;
+    latest: any[];
+    preOrder: any[];
+    images: string[];
+    width: number;
+    height: number;
+    suggestion: Types.ObjectId | null;
+  }[];
 }
 
-const pageElementsSchema = new Schema<IPageElements>(
+const sectionSchema = new Schema(
   {
-    targetedPageId: { type: String, required: true },
     sectionTitle: { type: String, required: true },
-    link: { type: String },
+    link: { type: String, default: "" },
     status: { type: Boolean, required: true },
     titleLink: { type: String, default: "" },
     titleAlignment: {
@@ -44,15 +50,15 @@ const pageElementsSchema = new Schema<IPageElements>(
       enum: ["left", "center", "right"],
       default: "left",
     },
-    isTitle: { type: Boolean, default: true },
+    isTitle: { type: String, default: "true" },
     desktopGrid: { type: Number, default: 4 },
     mobileGrid: { type: Number, default: 1 },
     margin: { type: Number, default: 0 },
     padding: { type: Number, default: 0 },
     boxText: { type: String, default: "#ffffff" },
-    titleBackgroundColor: { type: String, default: "#ffffff" },
+    titleTextColor: { type: String, default: "#ffffff" },
     boxBg: { type: String, default: "#ffffff" },
-    sectionBackgroundColor: { type: String, default: "#ffffff" },
+    titleBgColor: { type: String, default: "#ffffff" },
     gridStyle: { type: String, default: "1" },
     productStyle: { type: String, default: "1" },
     postLimit: { type: Number, default: 10 },
@@ -66,23 +72,51 @@ const pageElementsSchema = new Schema<IPageElements>(
       enum: ["left", "right", "center"],
       default: "left",
     },
-    page: { type: String, required: true },
     position: { type: Number, required: true },
     selectionType: { type: String, required: true },
-    bannerId: { type: Schema.Types.ObjectId, ref: "Banner", default: null }, // Reference to banner
+    banner: {
+      type: Schema.Types.ObjectId,
+      ref: "Banner",
+      set: (v: string | null) => (isObjectId(v) ? v : null),
+      default: null,
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+      set: (v: string | null) => (isObjectId(v) ? v : null),
+      default: null,
+    },
+    subcategory: {
+      type: Schema.Types.ObjectId,
+      ref: "Subcategory",
+      set: (v: string | null) => (isObjectId(v) ? v : null),
+      default: null,
+    },
     suggestion: {
       type: Schema.Types.ObjectId,
       ref: "Suggestion",
+      set: (v: string | null) => (isObjectId(v) ? v : null),
       default: null,
-    }, // Reference to banner
-
-    productSectionId: {
-      type: String,
-      required: false,
     },
-    images: { type: [String], default: [] }, // Array of image URLs
+    writer: {
+      type: Schema.Types.ObjectId,
+      ref: "Writer",
+      set: (v: string | null) => (isObjectId(v) ? v : null),
+      default: null,
+    },
+    latest: { type: [], default: [] },
+    preOrder: { type: [], default: [] },
+    images: { type: [String], default: [] },
     width: { type: Number, required: true },
     height: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
+const pageElementsSchema = new Schema<IPageElements>(
+  {
+    title: { type: String, required: true },
+    sections: { type: [sectionSchema], default: [] },
   },
   { timestamps: true }
 );

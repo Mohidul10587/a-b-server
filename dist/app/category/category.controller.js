@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllCategoryForFilterPage = exports.getCatsWritersPublishersForNavbar = exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
+exports.getAllForPageBuilder = exports.getAllCategoryForFilterPage = exports.getCatsWritersPublishersForNavbar = exports.getAllCatWithSubCat = exports.singleCategoryForCategoryEditPage = exports.getAllCategoriesForCatMainPage = exports.allCategoryForFiltering = exports.allCategoriesForAdminCatIndexPage = exports.allCategoryForProductAddPage = exports.allCategoriesForSubCatAddPage = exports.update = exports.singleForEditPage = exports.create = void 0;
 const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
@@ -233,3 +233,23 @@ const getAllCategoryForFilterPage = (req, res) => __awaiter(void 0, void 0, void
     }
 });
 exports.getAllCategoryForFilterPage = getAllCategoryForFilterPage;
+const getAllForPageBuilder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield category_model_1.default.find()
+            .select("title")
+            .populate({
+            path: "subcategories",
+            select: "title",
+        })
+            .sort({ position: 1 });
+        res.status(200).json(items);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.getAllForPageBuilder = getAllForPageBuilder;

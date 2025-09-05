@@ -7,6 +7,7 @@ import {
   getWriteById,
   singleWriterForWriterEditPage,
   update,
+  getAllForPageBuilder,
 
   // getAllBrandIds,
 } from "./writer.controller";
@@ -30,5 +31,6 @@ router.get("/all", getAllBrands);
 router.get("/singleWriterBySlug/:slug", getWriterBySlug);
 
 router.get("/singleWriter/:id", getWriteById);
+router.get("/getAllForPageBuilder", getAllForPageBuilder);
 
 export default router;

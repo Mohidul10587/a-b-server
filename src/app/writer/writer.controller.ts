@@ -124,3 +124,15 @@ export const update = async (req: Request, res: Response) => {
     });
   }
 };
+export const getAllForPageBuilder = async (req: Request, res: Response) => {
+  try {
+    const items = await Writer.find().select("title").sort({ createdAt: -1 });
+    res.status(200).json(items);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Failed to fetch.",
+      error: error.message,
+    });
+  }
+};

@@ -607,3 +607,41 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+// 1️⃣ Get last posted products (sorted by createdAt descending)
+export const getLastPostedProducts = async (req: Request, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 20; // Optional: limit number of products
+    const products = await Product.find({ display: true })
+      .select(
+        " title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
+      )
+      .sort({ createdAt: -1 }) // latest first
+      .limit(limit);
+
+    res.status(200).json({ success: true, data: products });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+// 2️⃣ Get pre-order products
+export const getPreOrderProducts = async (req: Request, res: Response) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 20;
+    const products = await Product.find({
+      orderType: "Pre Order",
+      display: true,
+    })
+      .select(
+        " title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
+      )
+      .sort({ createdAt: -1 }) // optional: latest pre-orders first
+      .limit(limit);
+
+    res.status(200).json({ success: true, data: products });
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};

@@ -88,9 +88,9 @@ const createPageElement = (req, res) =>
       mobileGrid,
       margin,
       padding,
-      titleBackgroundColor,
+      titleTextColor,
       boxText,
-      sectionBackgroundColor,
+      titleBgColor,
       boxBg,
       gridStyle,
       productStyle,
@@ -133,8 +133,8 @@ const createPageElement = (req, res) =>
         mobileGrid: parseInt(mobileGrid), // Convert string back to number
         margin: parseInt(margin), // Convert string back to number
         padding: parseInt(padding), // Convert string back to number
-        titleBackgroundColor,
-        sectionBackgroundColor,
+        titleTextColor,
+        titleBgColor,
         boxText,
         boxBg,
         gridStyle,
@@ -370,8 +370,8 @@ const updatePageElement = (req, res) =>
       mobileGrid,
       margin,
       padding,
-      titleBackgroundColor,
-      sectionBackgroundColor,
+      titleTextColor,
+      titleBgColor,
       boxText,
       boxBg,
       gridStyle,
@@ -451,10 +451,8 @@ const updatePageElement = (req, res) =>
         : pageElement.mobileGrid;
       pageElement.margin = margin ? parseInt(margin) : pageElement.margin;
       pageElement.padding = padding ? parseInt(padding) : pageElement.padding;
-      pageElement.titleBackgroundColor =
-        titleBackgroundColor || pageElement.titleBackgroundColor;
-      pageElement.sectionBackgroundColor =
-        sectionBackgroundColor || pageElement.sectionBackgroundColor;
+      pageElement.titleTextColor = titleTextColor || pageElement.titleTextColor;
+      pageElement.titleBgColor = titleBgColor || pageElement.titleBgColor;
       pageElement.boxText = boxText || pageElement.boxText;
       pageElement.boxBg = boxBg || pageElement.boxBg;
       pageElement.gridStyle = gridStyle || pageElement.gridStyle;

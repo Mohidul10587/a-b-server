@@ -12,6 +12,7 @@ import {
   getAllCatWithSubCat,
   getCatsWritersPublishersForNavbar,
   getAllCategoryForFilterPage,
+  getAllForPageBuilder,
 } from "./category.controller";
 import { verifyAdminToken } from "../user/middlewares";
 
@@ -50,4 +51,5 @@ router.get("/allCategoryForFiltering", allCategoryForFiltering);
 router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
 
 router.get("/getAllCategoryForFilterPage", getAllCategoryForFilterPage);
+router.get("/getAllForPageBuilder", getAllForPageBuilder);
 export default router;

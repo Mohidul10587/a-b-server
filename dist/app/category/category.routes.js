@@ -18,4 +18,5 @@ router.put("/update/:id", middlewares_1.verifyAdminToken, category_controller_1.
 router.get("/allCategoryForFiltering", category_controller_1.allCategoryForFiltering);
 router.get("/getAllCategoriesForCatMainPage", category_controller_1.getAllCategoriesForCatMainPage);
 router.get("/getAllCategoryForFilterPage", category_controller_1.getAllCategoryForFilterPage);
+router.get("/getAllForPageBuilder", category_controller_1.getAllForPageBuilder);
 exports.default = router;

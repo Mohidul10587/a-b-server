@@ -17,6 +17,8 @@ import {
   getAllForSeriesAddPage,
   updateStatus,
   getFilteredProducts,
+  getLastPostedProducts,
+  getPreOrderProducts,
 } from "./controller";
 
 import Product from "./model";
@@ -47,7 +49,11 @@ router.get(
   getAllForSeriesAddPage
 );
 router.get("/writer_products_by_slug/:slug", getProductsByWriterSlug);
+// Route to get last posted products
+router.get("/getLastPostedProducts", getLastPostedProducts);
 
+// Route to get pre-order products
+router.get("/getPreOrderProducts", getPreOrderProducts);
 router.get(
   "/singleForUserFoDetailsPageBySlug/:slug",
   singleForUserFoDetailsPageBySlug

@@ -18,7 +18,7 @@ export interface IProduct extends Document {
   metaImg: string;
   metaTitle: string;
   numberOfPage: number;
-  orderType: string;
+  orderType: "Buy Now" | "Pre Order";
   productType: string;
 
   rating: number;
@@ -84,7 +84,11 @@ const ProductSchema = new Schema<IProduct>(
     numberOfPage: { type: Number },
 
     // O
-    orderType: { type: String },
+    orderType: {
+      type: String,
+      enum: ["Buy Now", "Pre Order"],
+      default: "Buy Now",
+    },
 
     // P
     productType: { type: String },
