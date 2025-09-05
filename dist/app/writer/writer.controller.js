@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.update = exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.singleWriterForWriterEditPage = exports.create = void 0;
+exports.getAllForPageBuilder = exports.update = exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.singleWriterForWriterEditPage = exports.create = void 0;
 const writer_model_1 = __importDefault(require("./writer.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -117,3 +117,17 @@ const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.update = update;
+const getAllForPageBuilder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const items = yield writer_model_1.default.find().select("title").sort({ createdAt: -1 });
+        res.status(200).json(items);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Failed to fetch.",
+            error: error.message,
+        });
+    }
+});
+exports.getAllForPageBuilder = getAllForPageBuilder;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFilteredProducts = exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
+exports.getPreOrderProducts = exports.getLastPostedProducts = exports.getFilteredProducts = exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const model_1 = __importDefault(require("./model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -517,3 +517,38 @@ const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getFilteredProducts = getFilteredProducts;
+// 1️⃣ Get last posted products (sorted by createdAt descending)
+const getLastPostedProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const limit = parseInt(req.query.limit) || 20; // Optional: limit number of products
+        const products = yield model_1.default.find({ display: true })
+            .select(" title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller")
+            .sort({ createdAt: -1 }) // latest first
+            .limit(limit);
+        res.status(200).json({ success: true, data: products });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+});
+exports.getLastPostedProducts = getLastPostedProducts;
+// 2️⃣ Get pre-order products
+const getPreOrderProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const limit = parseInt(req.query.limit) || 20;
+        const products = yield model_1.default.find({
+            orderType: "Pre Order",
+            display: true,
+        })
+            .select(" title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller")
+            .sort({ createdAt: -1 }) // optional: latest pre-orders first
+            .limit(limit);
+        res.status(200).json({ success: true, data: products });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+});
+exports.getPreOrderProducts = getPreOrderProducts;

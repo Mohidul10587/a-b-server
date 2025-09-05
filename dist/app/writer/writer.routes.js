@@ -11,4 +11,5 @@ router.put("/update/:id", middlewares_1.verifyAdminToken, writer_controller_1.up
 router.get("/all", writer_controller_1.getAllBrands);
 router.get("/singleWriterBySlug/:slug", writer_controller_1.getWriterBySlug);
 router.get("/singleWriter/:id", writer_controller_1.getWriteById);
+router.get("/getAllForPageBuilder", writer_controller_1.getAllForPageBuilder);
 exports.default = router;

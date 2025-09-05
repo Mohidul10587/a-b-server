@@ -201,15 +201,15 @@ const removeItemFromCart = (req, res) => __awaiter(void 0, void 0, void 0, funct
 exports.removeItemFromCart = removeItemFromCart;
 const updateIsChecked = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { userId, variantId, isChecked } = req.body;
-        if (!userId || !variantId) {
+        const { userId, itemId, isChecked } = req.body;
+        if (!userId) {
             return res.status(400).json({ message: "Missing required fields." });
         }
         const cart = yield cart_model_1.default.findOne({ userId });
         if (!cart) {
             return res.status(404).json({ message: "Cart not found." });
         }
-        const updatedCart = yield cart_model_1.default.findOneAndUpdate({ userId, "cartItems.variantId": variantId }, { $set: { "cartItems.$.isChecked": isChecked } }, { new: true });
+        const updatedCart = yield cart_model_1.default.findOneAndUpdate({ userId, "cartItems._id": itemId }, { $set: { "cartItems.$.isChecked": isChecked } }, { new: true });
         if (!updatedCart) {
             return res.status(404).json({ message: "Product not found in cart." });
         }

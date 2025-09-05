@@ -6,8 +6,6 @@ interface ICartItem {
   sellingPrice: number;
   seller: ObjectId;
   title: string;
-  shippingInside?: number;
-  shippingOutside?: number;
   quantity: number;
   isChecked: boolean;
   existingQnt: number;
@@ -24,8 +22,6 @@ export const CartItemSchema = new Schema<ICartItem>({
   seller: { type: Schema.Types.ObjectId, ref: "User", required: true },
   sellingPrice: { type: Number, required: true },
   title: { type: String },
-  shippingInside: { type: Number },
-  shippingOutside: { type: Number },
   quantity: { type: Number, required: true },
   existingQnt: { type: Number, required: true },
   isChecked: { type: Boolean, default: true },

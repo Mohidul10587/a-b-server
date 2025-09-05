@@ -67,7 +67,11 @@ const ProductSchema = new mongoose_1.Schema({
     // N
     numberOfPage: { type: Number },
     // O
-    orderType: { type: String },
+    orderType: {
+        type: String,
+        enum: ["Buy Now", "Pre Order"],
+        default: "Buy Now",
+    },
     // P
     productType: { type: String },
     seller: {
@@ -79,8 +83,6 @@ const ProductSchema = new mongoose_1.Schema({
     regularPrice: { type: Number },
     // S
     sellingPrice: { type: Number },
-    shippingInside: { type: Number },
-    shippingOutside: { type: Number },
     shortDescription: { type: String },
     slug: { type: String, required: true, unique: true },
     stockStatus: { type: String },
@@ -97,7 +99,6 @@ const ProductSchema = new mongoose_1.Schema({
         ref: "Suggestion",
         default: null,
     },
-    summary: { type: String, default: "" },
     // T
     titleBn: { type: String, default: "" },
     title: { type: String, required: true },
