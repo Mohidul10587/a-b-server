@@ -22,11 +22,15 @@ export interface IUser extends Document {
   whatsapp: string;
   coverImg: string;
   image?: string;
-  img?: string;
   display?: boolean;
   comparePassword?: (inputPassword: string) => Promise<boolean>;
   lastLoginAt: Date;
   commission: number;
+  // ✅ New fields
+  firstContactPersonName: string;
+  firstContactPersonPhone: string;
+  secondContactPersonName: string;
+  secondContactPersonPhone: string;
 }
 
 // === Mongoose Schema ===
@@ -59,10 +63,15 @@ const UserSchema = new Schema<IUser>(
     whatsapp: { type: String, default: "" },
     coverImg: { type: String, default: "" },
     image: { type: String, default: "" },
-    img: { type: String, default: "" },
+
     display: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     commission: { type: Number, default: 0 },
+    // ✅ New fields in schema
+    firstContactPersonName: { type: String, default: "" },
+    firstContactPersonPhone: { type: String, default: "" },
+    secondContactPersonName: { type: String, default: "" },
+    secondContactPersonPhone: { type: String, default: "" },
   },
   { timestamps: true }
 );

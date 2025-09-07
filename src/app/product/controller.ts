@@ -511,20 +511,16 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
       search = "",
       sellers = "",
       categories = "",
-      minPrice,
-      maxPrice,
       minRating,
       lang = "all",
+      orderType = "all",
     } = req.query;
-
+    console.log("THis is order type", orderType);
     const pageNum = parseInt(page as string, 10);
     const limitNum = parseInt(limit as string, 10);
     const sellerSlugs = (sellers as string)?.split("--").filter(Boolean) || [];
     const categorySlugs =
       (categories as string)?.split("--").filter(Boolean) || [];
-
-    const minPriceNum = minPrice ? parseFloat(minPrice as string) : undefined;
-    const maxPriceNum = maxPrice ? parseFloat(maxPrice as string) : undefined;
     const minRatingNum = minRating
       ? parseFloat(minRating as string)
       : undefined;
@@ -558,14 +554,6 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
       filter.category = { $in: categoryIds };
     }
 
-    // Filter by price range
-    if (minPriceNum !== undefined) {
-      filter.sellingPrice = { ...filter.sellingPrice, $gte: minPriceNum };
-    }
-    if (maxPriceNum !== undefined) {
-      filter.sellingPrice = { ...filter.sellingPrice, $lte: maxPriceNum };
-    }
-
     // Filter by rating
     if (minRatingNum !== undefined) {
       filter.rating = { $gte: minRatingNum };
@@ -575,7 +563,10 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
     if (language && language !== "all") {
       filter.language = language;
     }
-
+    // Filter by language
+    if (orderType && orderType !== "all") {
+      filter.orderType = orderType;
+    }
     // Count total matching products
     const totalProducts = await Product.countDocuments(filter);
     const totalPages = Math.ceil(totalProducts / limitNum);
@@ -605,43 +596,5 @@ export const getFilteredProducts = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error fetching products:", error);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-// 1️⃣ Get last posted products (sorted by createdAt descending)
-export const getLastPostedProducts = async (req: Request, res: Response) => {
-  try {
-    const limit = parseInt(req.query.limit as string) || 20; // Optional: limit number of products
-    const products = await Product.find({ display: true })
-      .select(
-        " title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
-      )
-      .sort({ createdAt: -1 }) // latest first
-      .limit(limit);
-
-    res.status(200).json({ success: true, data: products });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server Error" });
-  }
-};
-
-// 2️⃣ Get pre-order products
-export const getPreOrderProducts = async (req: Request, res: Response) => {
-  try {
-    const limit = parseInt(req.query.limit as string) || 20;
-    const products = await Product.find({
-      orderType: "Pre Order",
-      display: true,
-    })
-      .select(
-        " title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller"
-      )
-      .sort({ createdAt: -1 }) // optional: latest pre-orders first
-      .limit(limit);
-
-    res.status(200).json({ success: true, data: products });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ success: false, message: "Server Error" });
   }
 };

@@ -9,8 +9,10 @@ const mongoose_1 = __importDefault(require("mongoose")); // Import Mongoose
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser")); // Import body-parser
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+// ImportRoutes
+const routes_1 = __importDefault(require("./app/sellerApplication/routes"));
 const writer_routes_1 = __importDefault(require("./app/writer/writer.routes"));
-const routes_1 = __importDefault(require("./app/product/routes"));
+const routes_2 = __importDefault(require("./app/product/routes"));
 const category_routes_1 = __importDefault(require("./app/category/category.routes"));
 const subcategory_routes_1 = __importDefault(require("./app/subcategory/subcategory.routes"));
 const user_route_1 = __importDefault(require("./app/user/user.route"));
@@ -58,10 +60,11 @@ app.use((0, cors_1.default)({
 app.get("/", (req, res) => {
     res.send("Welcome to the Price in Kenya Sever!"); // Send a welcome message
 });
-// Routes
+// UseRoutes
+app.use("/sellerApplication", routes_1.default);
 app.use("/sellerOrder", sellerOrder_route_1.default);
 app.use("/writer", writer_routes_1.default);
-app.use("/product", routes_1.default);
+app.use("/product", routes_2.default);
 app.use("/category", category_routes_1.default);
 app.use("/subcategory", subcategory_routes_1.default);
 app.use("/settings", settings_routes_1.default);

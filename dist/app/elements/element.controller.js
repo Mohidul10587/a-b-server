@@ -116,7 +116,7 @@ const elementById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             }
             if (sec.selectionType === "preOrder") {
                 const products = yield model_1.default.find({
-                    orderType: "Pre Order",
+                    orderType: "Pre_Order",
                 }).limit(sec.postLimit || 10);
                 sectionCopy.preOrder = products;
             }
