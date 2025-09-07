@@ -22,10 +22,6 @@ router.get("/getProductsByCategorySlug/:slug", controller_1.getProductsByCategor
 router.get("/products_by_punishers_slug/:slug", controller_1.getProductsByPublishersSlug);
 router.get("/getAllForSeriesAddPage", middlewares_1.verifySellerAndAdminToken, controller_1.getAllForSeriesAddPage);
 router.get("/writer_products_by_slug/:slug", controller_1.getProductsByWriterSlug);
-// Route to get last posted products
-router.get("/getLastPostedProducts", controller_1.getLastPostedProducts);
-// Route to get pre-order products
-router.get("/getPreOrderProducts", controller_1.getPreOrderProducts);
 router.get("/singleForUserFoDetailsPageBySlug/:slug", controller_1.singleForUserFoDetailsPageBySlug);
 // // Route for getting a single product by ID
 router.get("/:productId", controller_1.getSingleProduct);

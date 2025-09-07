@@ -63,10 +63,14 @@ const UserSchema = new mongoose_1.Schema({
     whatsapp: { type: String, default: "" },
     coverImg: { type: String, default: "" },
     image: { type: String, default: "" },
-    img: { type: String, default: "" },
     display: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     commission: { type: Number, default: 0 },
+    // ✅ New fields in schema
+    firstContactPersonName: { type: String, default: "" },
+    firstContactPersonPhone: { type: String, default: "" },
+    secondContactPersonName: { type: String, default: "" },
+    secondContactPersonPhone: { type: String, default: "" },
 }, { timestamps: true });
 UserSchema.index({ email: 1 });
 UserSchema.index({ phone: 1 });

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -130,9 +130,9 @@ const logInByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, funct
             return res.status(401).json({ message: "Invalid credentials" });
         }
         /* -------- 4. এক্সেস কন্ট্রোল (ঐচ্ছিক) ---------- */
-        if (user.isUser === false) {
-            return res.status(403).json({ message: "User is blocked" });
-        }
+        // if (user.isUser === false) {
+        //   return res.status(403).json({ message: "User is blocked" });
+        // }
         /* -------- 5. রিফ্রেশ‑টোকেন কুকি সেট ---------- */
         const refreshToken = (0, setToken_1.setRefreshTokenCookie)(res, user);
         /* -------- 6. সফল রেসপন্স ---------- */
@@ -209,13 +209,37 @@ const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 exports.checkUser_Email = checkUser_Email;
 const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_model_1.default.find()
-        .sort({ createdAt: -1 })
-        .select("name slug img image email phone  companyName isSeller isUser commission role createdAt");
-    return res.status(200).json({
-        users,
-        message: "Users fetched successfully",
-    });
+    try {
+        const { role, search = "", page = 1, limit = 10 } = req.query;
+        // Build the query object
+        const query = {};
+        if (role && role !== "all") {
+            query.role = role;
+        }
+        if (search) {
+            query.name = { $regex: search, $options: "i" }; // case-insensitive search
+        }
+        const pageNumber = Number(page) || 1;
+        const itemsPerPage = Number(limit) || 10;
+        const skip = (pageNumber - 1) * itemsPerPage;
+        // Fetch users with pagination & filters
+        const users = yield user_model_1.default.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(itemsPerPage)
+            .select("name slug img image email phone companyName isSeller isUser commission role createdAt");
+        // Get total count for pagination
+        const total = yield user_model_1.default.countDocuments(query);
+        return res.status(200).json({
+            users,
+            total,
+            message: "Users fetched successfully",
+        });
+    }
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Failed to fetch users" });
+    }
 });
 exports.allUserForAdmin = allUserForAdmin;
 const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -249,6 +273,31 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.getSingleUser = getSingleUser;
+const getUserByIdForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(400).json({
+                message: "User ID is required",
+            });
+        }
+        const item = yield user_model_1.default.findById(userId);
+        console.log(item);
+        if (!item) {
+            return res.status(404).json({
+                message: "User not found",
+            });
+        }
+        return res.status(200).json(item);
+    }
+    catch (error) {
+        return res.status(500).json({
+            message: "An error occurred while fetching the user",
+            error: error.message,
+        });
+    }
+});
+exports.getUserByIdForAdmin = getUserByIdForAdmin;
 const getSingleUserBySlug = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userSlug = req.params.userSlug;

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPreOrderProducts = exports.getLastPostedProducts = exports.getFilteredProducts = exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
+exports.getFilteredProducts = exports.allForIndexPage = exports.updateStatus = exports.getExistingQuantity = exports.getProductsByPublishersSlug = exports.getProductsByCategorySlug = exports.getProductsByCategory2 = exports.getProductsByCategory = exports.getProductsByWriter = exports.getProductsByWriterSlug = exports.deleteProduct = exports.getAllProductsForOfferPage = exports.getAllForSeriesAddPage = exports.getSingleProduct = exports.getAllProducts = exports.singleForEditPage = exports.singleForUserFoDetailsPageBySlug = exports.update = exports.create = void 0;
 const model_1 = __importDefault(require("./model"));
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -442,13 +442,12 @@ const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function
 exports.allForIndexPage = allForIndexPage;
 const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { page = "1", limit = "10", search = "", sellers = "", categories = "", minPrice, maxPrice, minRating, lang = "all", } = req.query;
+        const { page = "1", limit = "10", search = "", sellers = "", categories = "", minRating, lang = "all", orderType = "all", } = req.query;
+        console.log("THis is order type", orderType);
         const pageNum = parseInt(page, 10);
         const limitNum = parseInt(limit, 10);
         const sellerSlugs = (sellers === null || sellers === void 0 ? void 0 : sellers.split("--").filter(Boolean)) || [];
         const categorySlugs = (categories === null || categories === void 0 ? void 0 : categories.split("--").filter(Boolean)) || [];
-        const minPriceNum = minPrice ? parseFloat(minPrice) : undefined;
-        const maxPriceNum = maxPrice ? parseFloat(maxPrice) : undefined;
         const minRatingNum = minRating
             ? parseFloat(minRating)
             : undefined;
@@ -471,13 +470,6 @@ const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, func
             const categoryIds = matchingCategories.map((cat) => cat._id);
             filter.category = { $in: categoryIds };
         }
-        // Filter by price range
-        if (minPriceNum !== undefined) {
-            filter.sellingPrice = Object.assign(Object.assign({}, filter.sellingPrice), { $gte: minPriceNum });
-        }
-        if (maxPriceNum !== undefined) {
-            filter.sellingPrice = Object.assign(Object.assign({}, filter.sellingPrice), { $lte: maxPriceNum });
-        }
         // Filter by rating
         if (minRatingNum !== undefined) {
             filter.rating = { $gte: minRatingNum };
@@ -485,6 +477,10 @@ const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, func
         // Filter by language
         if (language && language !== "all") {
             filter.language = language;
+        }
+        // Filter by language
+        if (orderType && orderType !== "all") {
+            filter.orderType = orderType;
         }
         // Count total matching products
         const totalProducts = yield model_1.default.countDocuments(filter);
@@ -517,38 +513,3 @@ const getFilteredProducts = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.getFilteredProducts = getFilteredProducts;
-// 1️⃣ Get last posted products (sorted by createdAt descending)
-const getLastPostedProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const limit = parseInt(req.query.limit) || 20; // Optional: limit number of products
-        const products = yield model_1.default.find({ display: true })
-            .select(" title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller")
-            .sort({ createdAt: -1 }) // latest first
-            .limit(limit);
-        res.status(200).json({ success: true, data: products });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Server Error" });
-    }
-});
-exports.getLastPostedProducts = getLastPostedProducts;
-// 2️⃣ Get pre-order products
-const getPreOrderProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const limit = parseInt(req.query.limit) || 20;
-        const products = yield model_1.default.find({
-            orderType: "Pre Order",
-            display: true,
-        })
-            .select(" title slug img sellingPrice regularPrice stockStatus existingQnt shippingInside shippingOutside seller")
-            .sort({ createdAt: -1 }) // optional: latest pre-orders first
-            .limit(limit);
-        res.status(200).json({ success: true, data: products });
-    }
-    catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: "Server Error" });
-    }
-});
-exports.getPreOrderProducts = getPreOrderProducts;

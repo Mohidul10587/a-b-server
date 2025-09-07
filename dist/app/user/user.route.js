@@ -13,13 +13,14 @@ const middlewares_2 = require("./middlewares");
 const router = express_1.default.Router();
 //=================== For user ===================
 router.get("/singleUser/:userId", user_controller_1.getSingleUser);
+router.get("/getUserByIdForAdmin/:userId", user_controller_1.getUserByIdForAdmin);
 router.get("/getSingleUserBySlug/:userSlug", user_controller_1.getSingleUserBySlug);
 router.get("/getSingleUserById/:id", user_controller_1.getSingleUserById);
 router.get("/sellerStatus/:userSlug", user_controller_1.getStatus);
 router.get("/singleForEditPage/:id", middlewares_1.verifyUserToken, user_controller_1.singleForEditPage);
 router.get("/getSummaryOfActivity", middlewares_1.verifyUserToken, user_controller_1.getSummaryOfActivity);
 router.put("/update/:id", middlewares_1.verifyUserToken, user_controller_1.update);
-//=================== For user authentication ===================
+//================For user authentication ===================
 router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
 router.post("/logInByCredentials", user_controller_1.logInByCredentials);

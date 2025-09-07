@@ -4,6 +4,8 @@ import mongoose from "mongoose"; // Import Mongoose
 import cors from "cors";
 import bodyParser from "body-parser"; // Import body-parser
 import cookieParser from "cookie-parser";
+// ImportRoutes
+import sellerApplicationRoutes from "./app/sellerApplication/routes";
 import writerRoutes from "./app/writer/writer.routes";
 import productRoutes from "./app/product/routes";
 import categoryRoutes from "./app/category/category.routes";
@@ -27,19 +29,13 @@ import {
   createDefaultSettings,
   registerAdmin,
 } from "./app/shared/defaultInsertion";
-
 dotenv.config();
-
 const app: Express = express();
 const port = process.env.PORT || 5000;
-
 // Connect to MongoDB
-
 const mongoUri = process.env.MONGODB_URI as string;
 mongoose.connect(mongoUri);
-
 const db = mongoose.connection;
-
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => {
   console.log("Connected to MongoDB");
@@ -52,11 +48,9 @@ db.once("open", () => {
   );
   createDefaultSettings();
 });
-
 // Middleware
 app.use(bodyParser.json()); // Parse JSON bodies
 app.use(cookieParser());
-
 app.use(
   cors({
     origin: [
@@ -68,13 +62,12 @@ app.use(
     credentials: true,
   })
 );
-
 // Main Route
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to the Price in Kenya Sever!"); // Send a welcome message
 });
-
-// Routes
+// UseRoutes
+app.use("/sellerApplication", sellerApplicationRoutes);
 app.use("/sellerOrder", sellerOrderRoutes);
 app.use("/writer", writerRoutes);
 app.use("/product", productRoutes);

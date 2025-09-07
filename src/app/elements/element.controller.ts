@@ -116,7 +116,7 @@ export const elementById = async (req: Request, res: Response) => {
         }
         if (sec.selectionType === "preOrder") {
           const products = await Product.find({
-            orderType: "Pre Order",
+            orderType: "Pre_Order",
           }).limit(sec.postLimit || 10);
           sectionCopy.preOrder = products;
         }

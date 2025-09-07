@@ -139,9 +139,9 @@ export const logInByCredentials = async (req: Request, res: Response) => {
     }
 
     /* -------- 4. এক্সেস কন্ট্রোল (ঐচ্ছিক) ---------- */
-    if (user.isUser === false) {
-      return res.status(403).json({ message: "User is blocked" });
-    }
+    // if (user.isUser === false) {
+    //   return res.status(403).json({ message: "User is blocked" });
+    // }
 
     /* -------- 5. রিফ্রেশ‑টোকেন কুকি সেট ---------- */
     const refreshToken = setRefreshTokenCookie(res, user);
@@ -223,17 +223,45 @@ export const checkUser_Email = async (req: Request, res: Response) => {
     data: req.user, // User object retrieved from middleware
   });
 };
-export const allUserForAdmin = async (req: Request, res: Response) => {
-  const users = await User.find()
-    .sort({ createdAt: -1 })
-    .select(
-      "name slug img image email phone  companyName isSeller isUser commission role createdAt"
-    );
 
-  return res.status(200).json({
-    users,
-    message: "Users fetched successfully",
-  });
+export const allUserForAdmin = async (req: Request, res: Response) => {
+  try {
+    const { role, search = "", page = 1, limit = 10 } = req.query;
+
+    // Build the query object
+    const query: any = {};
+    if (role && role !== "all") {
+      query.role = role;
+    }
+    if (search) {
+      query.name = { $regex: search, $options: "i" }; // case-insensitive search
+    }
+
+    const pageNumber = Number(page) || 1;
+    const itemsPerPage = Number(limit) || 10;
+    const skip = (pageNumber - 1) * itemsPerPage;
+
+    // Fetch users with pagination & filters
+    const users = await User.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(itemsPerPage)
+      .select(
+        "name slug img image email phone companyName isSeller isUser commission role createdAt"
+      );
+
+    // Get total count for pagination
+    const total = await User.countDocuments(query);
+
+    return res.status(200).json({
+      users,
+      total,
+      message: "Users fetched successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch users" });
+  }
 };
 
 export const getSingleUser = async (req: Request, res: Response) => {
@@ -264,6 +292,32 @@ export const getSingleUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     return res.status(500).json({
       success: false,
+      message: "An error occurred while fetching the user",
+      error: error.message,
+    });
+  }
+};
+export const getUserByIdForAdmin = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.userId;
+
+    if (!userId) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
+    const item = await User.findById(userId);
+    console.log(item);
+    if (!item) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json(item);
+  } catch (error: any) {
+    return res.status(500).json({
       message: "An error occurred while fetching the user",
       error: error.message,
     });

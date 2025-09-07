@@ -69,8 +69,8 @@ const ProductSchema = new mongoose_1.Schema({
     // O
     orderType: {
         type: String,
-        enum: ["Buy Now", "Pre Order"],
-        default: "Buy Now",
+        enum: ["Buy_Now", "Pre_Order"],
+        default: "Buy_Now",
     },
     // P
     productType: { type: String },

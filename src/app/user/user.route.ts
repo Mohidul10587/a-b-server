@@ -32,6 +32,7 @@ import {
   singleForEditForSellerSettings,
   getAllSellerForFilterPage,
   updateSellerCommission,
+  getUserByIdForAdmin,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -41,8 +42,9 @@ import { verifyAdminToken, verifyStuffToken } from "./middlewares";
 const router = express.Router();
 
 //=================== For user ===================
-
 router.get("/singleUser/:userId", getSingleUser);
+router.get("/getUserByIdForAdmin/:userId", getUserByIdForAdmin);
+
 router.get("/getSingleUserBySlug/:userSlug", getSingleUserBySlug);
 router.get("/getSingleUserById/:id", getSingleUserById);
 router.get("/sellerStatus/:userSlug", getStatus);
@@ -50,7 +52,7 @@ router.get("/singleForEditPage/:id", verifyUserToken, singleForEditPage);
 router.get("/getSummaryOfActivity", verifyUserToken, getSummaryOfActivity);
 router.put("/update/:id", verifyUserToken, update);
 
-//=================== For user authentication ===================
+//================For user authentication ===================
 router.get("/getAuthenticatedUser", getAuthenticatedUser);
 router.post("/signUpByCredentials", signUpByCredentials);
 router.post("/logInByCredentials", logInByCredentials);
