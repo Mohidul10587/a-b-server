@@ -198,21 +198,34 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
   }
 };
 
-export const setRefreshToken = (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
-  if (!refreshToken) {
-    return res.status(400).json({ message: "No token provided" });
+export const setCookie = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken, userId } = req.body;
+
+    if (!refreshToken) {
+      return res.status(400).json({ message: "No token provided" });
+    }
+
+    // Save cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none", // allow cross-site
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    });
+
+    // 🔑 Fetch user from DB by ID
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json(user);
+  } catch (error) {
+    console.error("Error setting cookie:", error);
+    return res.status(500).json({ message: "Server error" });
   }
-
-  //  ⚠️  Make sure your API is served from https://bikroy.96s.info
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "none", // cross‑site cookie
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-  });
-
-  return res.json({ message: "Cookie set" });
 };
 
 // Route to check user authentication

@@ -24,7 +24,7 @@ import {
   updatePassword,
   googleUpsertUser,
   logInByCredentials,
-  setRefreshToken,
+  setCookie,
   allUserForAdmin,
   updateSellerStatus,
   updateUserPassword,
@@ -56,7 +56,7 @@ router.get("/getAuthenticatedUser", getAuthenticatedUser);
 router.post("/signUpByCredentials", signUpByCredentials);
 router.post("/logInByCredentials", logInByCredentials);
 router.post("/googleUpsertUser", googleUpsertUser);
-router.post("/setCookie", setRefreshToken);
+router.post("/setCookie", setCookie);
 router.post("/logout", logOut);
 
 //===================== For Admin=====================
