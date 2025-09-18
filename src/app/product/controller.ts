@@ -22,6 +22,7 @@ export const create = async (req: Request, res: Response): Promise<void> => {
     });
   } catch (error: any) {
     // Send error message if there was an issue
+    console.log(error);
     res.status(500).json({
       message: "Failed to create.",
       error: error.message,

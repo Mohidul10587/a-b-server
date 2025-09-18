@@ -11,7 +11,6 @@ export interface IUser extends Document {
   name: string;
   slug: string;
   isSeller: boolean;
-  isUser: boolean;
   birthday: string;
   gender: string;
   address: string;
@@ -53,7 +52,6 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
     isSeller: { type: Boolean, default: false },
-    isUser: { type: Boolean, default: true },
     birthday: { type: String, default: "" },
     gender: { type: String, default: "" },
     address: { type: String, default: "" },

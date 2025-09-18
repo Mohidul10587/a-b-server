@@ -27,7 +27,6 @@ import {
   setRefreshToken,
   allUserForAdmin,
   updateSellerStatus,
-  updateUserStatus,
   updateUserPassword,
   singleForEditForSellerSettings,
   getAllSellerForFilterPage,
@@ -72,11 +71,6 @@ router.patch(
   "/updateSellerStatusOfUser/:userId",
   verifyAdminToken,
   updateSellerStatus
-);
-router.patch(
-  "/updateUserStatusOfUser/:userId",
-  verifyAdminToken,
-  updateUserStatus
 );
 
 router.patch(
