@@ -34,9 +34,7 @@ const verifyTokenByRoles = (allowedRoles) => {
             }
             try {
                 const user = yield user_model_1.default.findById(decoded.userId);
-                if (!user ||
-                    user.isUser === false ||
-                    !allowedRoles.includes(user.role)) {
+                if (!user || !allowedRoles.includes(user.role)) {
                     return res.status(403).json({ message: "Access denied" });
                 }
                 req.user = user;

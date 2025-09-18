@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateUserStatus = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setRefreshToken = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setCookie = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -184,21 +184,32 @@ const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.googleUpsertUser = googleUpsertUser;
-const setRefreshToken = (req, res) => {
-    const { refreshToken } = req.body;
-    if (!refreshToken) {
-        return res.status(400).json({ message: "No token provided" });
+const setCookie = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { refreshToken, userId } = req.body;
+        if (!refreshToken) {
+            return res.status(400).json({ message: "No token provided" });
+        }
+        // Save cookie
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none", // allow cross-site
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        });
+        // 🔑 Fetch user from DB by ID
+        const user = yield user_model_1.default.findById(userId).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.json(user);
     }
-    //  ⚠️  Make sure your API is served from https://bikroy.96s.info
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "none", // cross‑site cookie
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
-    return res.json({ message: "Cookie set" });
-};
-exports.setRefreshToken = setRefreshToken;
+    catch (error) {
+        console.error("Error setting cookie:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+});
+exports.setCookie = setCookie;
 // Route to check user authentication
 const checkUser_Email = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.status(200).json({
@@ -443,7 +454,7 @@ const getStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 message: "User ID is required",
             });
         }
-        const user = yield user_model_1.default.findOne({ slug: userSlug }).select("isSeller isUser");
+        const user = yield user_model_1.default.findOne({ slug: userSlug }).select("isSeller");
         return res.status(200).json({
             success: true,
             user: user,
@@ -817,30 +828,6 @@ const updateSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.updateSellerStatus = updateSellerStatus;
-// Update the status of a PageElement by ID
-const updateUserStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params; // Make sure the ID is being passed correctly
-    const { isUser } = req.body;
-    try {
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { isUser }, // Ensure 'status' is the correct field
-        { new: true } // Return the updated document
-        );
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({
-            message: "User status updated successfully",
-            data: updatedUser,
-        });
-    }
-    catch (error) {
-        res.status(500).json({
-            message: "Error updating User status",
-            error: error.message,
-        });
-    }
-});
-exports.updateUserStatus = updateUserStatus;
 // Update the status of a PageElement by ID
 const updateUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params; // Make sure the ID is being passed correctly

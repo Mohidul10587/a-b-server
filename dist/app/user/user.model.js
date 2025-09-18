@@ -53,7 +53,6 @@ const UserSchema = new mongoose_1.Schema({
     name: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
     isSeller: { type: Boolean, default: false },
-    isUser: { type: Boolean, default: true },
     birthday: { type: String, default: "" },
     gender: { type: String, default: "" },
     address: { type: String, default: "" },

@@ -25,14 +25,13 @@ router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
 router.post("/logInByCredentials", user_controller_1.logInByCredentials);
 router.post("/googleUpsertUser", user_controller_1.googleUpsertUser);
-router.post("/setCookie", user_controller_1.setRefreshToken);
+router.post("/setCookie", user_controller_1.setCookie);
 router.post("/logout", user_controller_1.logOut);
 //===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", user_controller_1.getAllSellerForFilterPage);
 router.get("/allUserForAdmin", user_controller_1.allUserForAdmin);
 router.get("/singleForEditForSellerSettings/:id", user_controller_1.singleForEditForSellerSettings);
 router.patch("/updateSellerStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerStatus);
-router.patch("/updateUserStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserStatus);
 router.patch("/updateUserPassword/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserPassword);
 router.patch("/updateSellerCommission/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerCommission);
 router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id", 

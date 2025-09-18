@@ -88,7 +88,6 @@ const registerAdmin = (name, email, password, image, slug) => __awaiter(void 0, 
             password: hashedPassword,
             image,
             role: "admin",
-            isUser: true,
             isSeller: true,
             authProvider: "email",
         });
