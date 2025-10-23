@@ -57,6 +57,7 @@ app.use(
       "http://localhost:3000",
       "http://localhost:3001",
       "https://book7.vercel.app",
+      "https://www.notebookprokash.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
