@@ -31,4 +31,5 @@ router.delete("/:productId", middlewares_1.verifyAdminToken, controller_1.delete
 router.put("/update/:id", middlewares_1.verifySellerAndAdminToken, controller_1.update);
 router.patch("/updateStatus/:id", middlewares_1.verifySellerAndAdminToken, controller_1.updateStatus);
 router.get("/getAllSlugsForSitemap", (0, reusableControllers_1.getAllSlugsForSitemap)(model_1.default));
+router.delete("/delete/:id", middlewares_1.verifyAdminToken, (0, reusableControllers_1.deleteById)(model_1.default));
 exports.default = router;
