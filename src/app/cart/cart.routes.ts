@@ -10,6 +10,8 @@ import {
   getUserCartQuantity,
 } from "./cart.controller";
 import { verifyUserToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import Cart from "./cart.model";
 
 const router = express.Router();
 
@@ -22,4 +24,5 @@ router.get("/getUserCartQuantity/:userId", getUserCartQuantity);
 
 router.delete("/removeItemFromCart", verifyUserToken, removeItemFromCart);
 router.patch("/update-isChecked", updateIsChecked);
+router.delete("/delete/:id", deleteById(Cart));
 export default router;

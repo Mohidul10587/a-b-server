@@ -6,6 +6,8 @@ import {
   update,
 } from "./subcategory.controller";
 import { verifyAdminToken } from "../user/middlewares";
+import Subcategory from "./subcategory.model";
+import { deleteById } from "../shared/reusableControllers";
 
 const router = Router();
 
@@ -20,5 +22,6 @@ router.get(
 );
 
 router.put("/update/:id", update);
+router.delete("/delete/:id", verifyAdminToken, deleteById(Subcategory));
 
 export default router;

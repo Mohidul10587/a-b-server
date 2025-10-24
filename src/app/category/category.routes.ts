@@ -15,6 +15,8 @@ import {
   getAllForPageBuilder,
 } from "./category.controller";
 import { verifyAdminToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import Category from "./category.model";
 
 const router = Router();
 
@@ -52,4 +54,5 @@ router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
 
 router.get("/getAllCategoryForFilterPage", getAllCategoryForFilterPage);
 router.get("/getAllForPageBuilder", getAllForPageBuilder);
+router.delete("/delete/:id", verifyAdminToken, deleteById(Category));
 export default router;

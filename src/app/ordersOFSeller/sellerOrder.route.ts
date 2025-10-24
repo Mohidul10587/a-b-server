@@ -9,6 +9,8 @@ import {
   updateOrderStatusByAdmin,
 } from "./sellerOrder.controller";
 import { verifyAdminToken, verifySellerToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import { SellerOrderModel } from "./sellerOrder.model";
 
 const router = express.Router();
 
@@ -19,5 +21,5 @@ router.post("/updateStatusByAdmin/:id", updateOrderStatusByAdmin);
 router.post("/updateStatusBySeller/:id", updateStatusBySeller);
 
 router.get("/getSingleOrder/:id", getOrderById);
-
+router.delete("/delete/:id", verifyAdminToken, deleteById(SellerOrderModel));
 export default router;

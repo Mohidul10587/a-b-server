@@ -16,7 +16,7 @@ const BASE_URL = "https://sandbox.aamarpay.com";
 // const clientSideUrl = "http://localhost:3000";
 
 const redirectUrl = "https://a-b-server.vercel.app";
-const clientSideUrl = "https://book7.vercel.app";
+const clientSideUrl = "https://www.notebookprokash.com";
 
 // Initialize Payment Route
 router.post(

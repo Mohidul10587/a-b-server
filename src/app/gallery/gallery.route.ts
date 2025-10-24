@@ -9,6 +9,8 @@ import {
 } from "./gallery.controller";
 
 import { verifyAdminToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import Gallery from "./gallery.model";
 
 const router = express.Router();
 
@@ -19,5 +21,5 @@ router.get("/all", getAll);
 router.get("/:id", getOne);
 router.put("/:id", update);
 router.delete("/:id", remove);
-
+router.delete("/delete/:id", deleteById(Gallery));
 export default router;

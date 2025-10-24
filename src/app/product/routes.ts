@@ -20,7 +20,10 @@ import {
 } from "./controller";
 
 import Product from "./model";
-import { getAllSlugsForSitemap } from "../shared/reusableControllers";
+import {
+  deleteById,
+  getAllSlugsForSitemap,
+} from "../shared/reusableControllers";
 import {
   verifyAdminToken,
   verifySellerAndAdminToken,
@@ -62,4 +65,6 @@ router.delete("/:productId", verifyAdminToken, deleteProduct);
 router.put("/update/:id", verifySellerAndAdminToken, update);
 router.patch("/updateStatus/:id", verifySellerAndAdminToken, updateStatus);
 router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
+
+router.delete("/delete/:id", verifyAdminToken, deleteById(Product));
 export default router;

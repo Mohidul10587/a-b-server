@@ -13,6 +13,8 @@ import {
 } from "./writer.controller";
 
 import { verifyAdminToken } from "../user/middlewares";
+import { deleteById } from "../shared/reusableControllers";
+import Writer from "./writer.model";
 
 const router = Router();
 
@@ -32,5 +34,6 @@ router.get("/singleWriterBySlug/:slug", getWriterBySlug);
 
 router.get("/singleWriter/:id", getWriteById);
 router.get("/getAllForPageBuilder", getAllForPageBuilder);
+router.delete("/delete/:id", verifyAdminToken, deleteById(Writer));
 
 export default router;
