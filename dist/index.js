@@ -52,6 +52,7 @@ app.use((0, cors_1.default)({
         "http://localhost:3000",
         "http://localhost:3001",
         "https://book7.vercel.app",
+        "https://www.notebookprokash.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
