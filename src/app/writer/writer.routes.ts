@@ -5,7 +5,7 @@ import {
   getAllBrands,
   getWriterBySlug,
   getWriteById,
-  singleWriterForWriterEditPage,
+  singleForEditPage,
   update,
   getAllForPageBuilder,
 
@@ -21,9 +21,9 @@ const router = Router();
 router.post("/create", verifyAdminToken, create);
 // Route to get all writer IDs
 router.get(
-  "/singleWriterForWriterEditPage/:id",
+  "/singleForEditPage/:id",
 
-  singleWriterForWriterEditPage
+  singleForEditPage
 );
 
 router.put("/update/:id", verifyAdminToken, update);

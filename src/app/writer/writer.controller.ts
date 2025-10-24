@@ -25,17 +25,11 @@ export const create = async (req: Request, res: Response) => {
 };
 
 // Get single
-export const singleWriterForWriterEditPage = async (
-  req: Request,
-  res: Response
-) => {
+export const singleForEditPage = async (req: Request, res: Response) => {
   try {
     const item = await Writer.findOne({ _id: req.params.id });
 
-    res.status(200).json({
-      message: "Fetched successfully!",
-      respondedData: item,
-    });
+    res.status(200).json(item);
   } catch (error: any) {
     console.error(error);
 
