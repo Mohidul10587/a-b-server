@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllForPageBuilder = exports.update = exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.singleWriterForWriterEditPage = exports.create = void 0;
+exports.getAllForPageBuilder = exports.update = exports.getWriteById = exports.getWriterBySlug = exports.getAllBrands = exports.singleForEditPage = exports.create = void 0;
 const writer_model_1 = __importDefault(require("./writer.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,13 +34,10 @@ const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.create = create;
 // Get single
-const singleWriterForWriterEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const singleForEditPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const item = yield writer_model_1.default.findOne({ _id: req.params.id });
-        res.status(200).json({
-            message: "Fetched successfully!",
-            respondedData: item,
-        });
+        res.status(200).json(item);
     }
     catch (error) {
         console.error(error);
@@ -50,7 +47,7 @@ const singleWriterForWriterEditPage = (req, res) => __awaiter(void 0, void 0, vo
         });
     }
 });
-exports.singleWriterForWriterEditPage = singleWriterForWriterEditPage;
+exports.singleForEditPage = singleForEditPage;
 const getAllBrands = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Fetch all brands
