@@ -269,7 +269,7 @@ export const allUserForAdmin = async (req: Request, res: Response) => {
     return res.status(200).json({
       users,
       total,
-      message: "Users fetched successfully",
+      page: pageNumber,
     });
   } catch (error) {
     console.error(error);

@@ -61,7 +61,7 @@ router.post("/logout", logOut);
 
 //===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", getAllSellerForFilterPage);
-router.get("/allUserForAdmin", allUserForAdmin);
+router.get("/allUserForAdmin", verifyAdminToken, allUserForAdmin);
 router.get(
   "/singleForEditForSellerSettings/:id",
   singleForEditForSellerSettings
