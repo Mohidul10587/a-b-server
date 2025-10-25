@@ -29,7 +29,7 @@ router.post("/setCookie", user_controller_1.setCookie);
 router.post("/logout", user_controller_1.logOut);
 //===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", user_controller_1.getAllSellerForFilterPage);
-router.get("/allUserForAdmin", user_controller_1.allUserForAdmin);
+router.get("/allUserForAdmin", middlewares_2.verifyAdminToken, user_controller_1.allUserForAdmin);
 router.get("/singleForEditForSellerSettings/:id", user_controller_1.singleForEditForSellerSettings);
 router.patch("/updateSellerStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerStatus);
 router.patch("/updateUserPassword/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserPassword);
