@@ -3,6 +3,9 @@ import Category from "./category.model";
 import { generateSlug } from "../shared/generateSLug";
 import Writer from "../writer/writer.model";
 import Publisher from "../publishers/publishers.model";
+import Subcategory from "../subcategory/subcategory.model";
+import User from "../user/user.model";
+import Suggestion from "../suggestion/suggestion.model";
 
 export const create = async (req: Request, res: Response) => {
   try {
@@ -86,24 +89,45 @@ export const allCategoriesForSubCatAddPage = async (
   }
 };
 
-// Get all
 export const allCategoryForProductAddPage = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const items = await Category.find().select("title").populate({
-      path: "subcategories",
-      select: "title",
+    // Fetch both categories and subcategories concurrently
+    const [categories, subcategories, sellers, writers, suggestions] =
+      await Promise.all([
+        Category.find().select("title").sort({ createdAt: -1 }),
+        Subcategory.find()
+          .select("title parentCategory")
+          .sort({ createdAt: -1 }),
+        User.find({ role: "seller" })
+          .sort({ createdAt: -1 })
+          .select("name image"),
+        Writer.find().select("title img").sort({ createdAt: -1 }),
+        Suggestion.find().select("title").sort({ createdAt: -1 }),
+      ]);
+
+    // Attach subcategories to their parent categories
+    const categoriesWithSubs = categories.map((category: any) => {
+      const subs = subcategories.filter(
+        (sub: any) => sub.parentCategory?.toString() === category._id.toString()
+      );
+
+      return {
+        ...category.toObject(),
+        subcategories: subs,
+      };
     });
 
     res.status(200).json({
-      message: "Fetched successfully!",
-      respondedData: items.reverse(),
+      categories: categoriesWithSubs,
+      sellers: sellers,
+      writers: writers,
+      suggestions: suggestions,
     });
   } catch (error: any) {
     console.error(error);
-
     res.status(500).json({
       message: "Failed to fetch.",
       error: error.message,

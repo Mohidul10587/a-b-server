@@ -241,39 +241,42 @@ export const allUserForAdmin = async (req: Request, res: Response) => {
   try {
     const { role, search = "", page = 1, limit = 10 } = req.query;
 
-    // Build the query object
+    // Build query object
     const query: any = {};
     if (role && role !== "all") {
       query.role = role;
     }
     if (search) {
-      query.name = { $regex: search, $options: "i" }; // case-insensitive search
+      query.name = { $regex: search, $options: "i" }; // case-insensitive
     }
 
     const pageNumber = Number(page) || 1;
     const itemsPerPage = Number(limit) || 10;
     const skip = (pageNumber - 1) * itemsPerPage;
 
-    // Fetch users with pagination & filters
-    const users = await User.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(itemsPerPage)
-      .select(
-        "name slug img image email phone companyName isSeller isUser commission role createdAt"
-      );
-
-    // Get total count for pagination
-    const total = await User.countDocuments(query);
+    // Fetch users and total count concurrently
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(itemsPerPage)
+        .select(
+          "name slug img image email phone companyName isSeller isUser commission role createdAt"
+        ),
+      User.countDocuments(query),
+    ]);
 
     return res.status(200).json({
       users,
       total,
       page: pageNumber,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
-    return res.status(500).json({ error: "Failed to fetch users" });
+    return res.status(500).json({
+      error: "Failed to fetch users",
+      message: error.message,
+    });
   }
 };
 
