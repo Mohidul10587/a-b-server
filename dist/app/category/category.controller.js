@@ -17,6 +17,9 @@ const category_model_1 = __importDefault(require("./category.model"));
 const generateSLug_1 = require("../shared/generateSLug");
 const writer_model_1 = __importDefault(require("../writer/writer.model"));
 const publishers_model_1 = __importDefault(require("../publishers/publishers.model"));
+const subcategory_model_1 = __importDefault(require("../subcategory/subcategory.model"));
+const user_model_1 = __importDefault(require("../user/user.model"));
+const suggestion_model_1 = __importDefault(require("../suggestion/suggestion.model"));
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const item = yield category_model_1.default.create(Object.assign(Object.assign({}, req.body), { slug: (0, generateSLug_1.generateSlug)(req.body.title) }));
@@ -93,16 +96,30 @@ const allCategoriesForSubCatAddPage = (req, res) => __awaiter(void 0, void 0, vo
     }
 });
 exports.allCategoriesForSubCatAddPage = allCategoriesForSubCatAddPage;
-// Get all
 const allCategoryForProductAddPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const items = yield category_model_1.default.find().select("title").populate({
-            path: "subcategories",
-            select: "title",
+        // Fetch both categories and subcategories concurrently
+        const [categories, subcategories, sellers, writers, suggestions] = yield Promise.all([
+            category_model_1.default.find().select("title").sort({ createdAt: -1 }),
+            subcategory_model_1.default.find()
+                .select("title parentCategory")
+                .sort({ createdAt: -1 }),
+            user_model_1.default.find({ role: "seller" })
+                .sort({ createdAt: -1 })
+                .select("name image"),
+            writer_model_1.default.find().select("title img").sort({ createdAt: -1 }),
+            suggestion_model_1.default.find().select("title").sort({ createdAt: -1 }),
+        ]);
+        // Attach subcategories to their parent categories
+        const categoriesWithSubs = categories.map((category) => {
+            const subs = subcategories.filter((sub) => { var _a; return ((_a = sub.parentCategory) === null || _a === void 0 ? void 0 : _a.toString()) === category._id.toString(); });
+            return Object.assign(Object.assign({}, category.toObject()), { subcategories: subs });
         });
         res.status(200).json({
-            message: "Fetched successfully!",
-            respondedData: items.reverse(),
+            categories: categoriesWithSubs,
+            sellers: sellers,
+            writers: writers,
+            suggestions: suggestions,
         });
     }
     catch (error) {

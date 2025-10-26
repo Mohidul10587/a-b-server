@@ -83,6 +83,7 @@ const ProductSchema = new mongoose_1.Schema({
     regularPrice: { type: Number },
     // S
     sellingPrice: { type: Number },
+    originalPrice: { type: Number },
     shortDescription: { type: String },
     slug: { type: String, required: true, unique: true },
     stockStatus: { type: String },

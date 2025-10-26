@@ -24,7 +24,9 @@ export interface IProduct extends Document {
   rating: number;
   regularPrice: number;
   seller: Schema.Types.ObjectId;
+
   sellingPrice: number;
+  originalPrice: number;
   shortDescription: string;
   slug: string;
 
@@ -103,6 +105,7 @@ const ProductSchema = new Schema<IProduct>(
 
     // S
     sellingPrice: { type: Number },
+    originalPrice: { type: Number },
 
     shortDescription: { type: String },
     slug: { type: String, required: true, unique: true },

@@ -222,25 +222,26 @@ exports.checkUser_Email = checkUser_Email;
 const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { role, search = "", page = 1, limit = 10 } = req.query;
-        // Build the query object
+        // Build query object
         const query = {};
         if (role && role !== "all") {
             query.role = role;
         }
         if (search) {
-            query.name = { $regex: search, $options: "i" }; // case-insensitive search
+            query.name = { $regex: search, $options: "i" }; // case-insensitive
         }
         const pageNumber = Number(page) || 1;
         const itemsPerPage = Number(limit) || 10;
         const skip = (pageNumber - 1) * itemsPerPage;
-        // Fetch users with pagination & filters
-        const users = yield user_model_1.default.find(query)
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(itemsPerPage)
-            .select("name slug img image email phone companyName isSeller isUser commission role createdAt");
-        // Get total count for pagination
-        const total = yield user_model_1.default.countDocuments(query);
+        // Fetch users and total count concurrently
+        const [users, total] = yield Promise.all([
+            user_model_1.default.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(itemsPerPage)
+                .select("name slug img image email phone companyName isSeller isUser commission role createdAt"),
+            user_model_1.default.countDocuments(query),
+        ]);
         return res.status(200).json({
             users,
             total,
@@ -249,7 +250,10 @@ const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
     catch (error) {
         console.error(error);
-        return res.status(500).json({ error: "Failed to fetch users" });
+        return res.status(500).json({
+            error: "Failed to fetch users",
+            message: error.message,
+        });
     }
 });
 exports.allUserForAdmin = allUserForAdmin;
