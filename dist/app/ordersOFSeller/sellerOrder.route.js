@@ -9,7 +9,7 @@ const middlewares_1 = require("../user/middlewares");
 const reusableControllers_1 = require("../shared/reusableControllers");
 const sellerOrder_model_1 = require("./sellerOrder.model");
 const router = express_1.default.Router();
-router.get("/getAllOrders", middlewares_1.verifySellerToken, sellerOrder_controller_1.getAllOrders);
+router.get("/getAllOrders", middlewares_1.verifySellerAndAdminToken, sellerOrder_controller_1.getAllOrders);
 router.get("/allOrdersForAdmin", middlewares_1.verifyAdminToken, sellerOrder_controller_1.getAllOrdersForAdmin);
 router.post("/updateStatusByAdmin/:id", sellerOrder_controller_1.updateOrderStatusByAdmin);
 router.post("/updateStatusBySeller/:id", sellerOrder_controller_1.updateStatusBySeller);
