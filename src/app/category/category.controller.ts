@@ -267,7 +267,10 @@ export const getAllCategoryForFilterPage = async (
       Category.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
         position: 1,
       }),
-      Subcategory.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+      Subcategory.find(
+        {},
+        { _id: 1, slug: 1, title: 1, img: 1, parentCategory: 1 }
+      ).sort({
         position: 1,
       }),
       User.find(
