@@ -980,7 +980,7 @@ export const getAllSellerForFilterPage = async (
   try {
     const sellers = await User.find(
       { role: "seller", display: true },
-      { _id: 1, slug: 1, companyName: 1, image: 1 }
+      { _id: 1, slug: 1, companyName: 1, image: 1, name: 1 }
     ).sort({ companyName: 1 }); // sort alphabetically
 
     res.status(200).json({ sellers });

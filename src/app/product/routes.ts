@@ -28,6 +28,7 @@ import {
   verifyAdminToken,
   verifySellerAndAdminToken,
 } from "../user/middlewares";
+import { filter } from "./filter";
 
 const router = express.Router();
 
@@ -50,6 +51,7 @@ router.get(
   getAllForSeriesAddPage
 );
 router.get("/writer_products_by_slug/:slug", getProductsByWriterSlug);
+router.get("/filter", filter);
 
 router.get(
   "/singleForUserFoDetailsPageBySlug/:slug",

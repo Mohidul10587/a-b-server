@@ -257,19 +257,31 @@ export const getCatsWritersPublishersForNavbar = async (
   }
 };
 // ✅ GET all categories for filter page
+// ✅ GET all categories for filter page
 export const getAllCategoryForFilterPage = async (
   req: Request,
   res: Response
 ) => {
   try {
-    const categories = await Category.find(
-      {},
-      { _id: 1, slug: 1, title: 1, img: 1 }
-    ).sort({ position: 1 }); // sort by position field
+    const [categories, subcategories, sellers, writers] = await Promise.all([
+      Category.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+        position: 1,
+      }),
+      Subcategory.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+        position: 1,
+      }),
+      User.find(
+        { role: "seller", display: true },
+        { _id: 1, slug: 1, companyName: 1, image: 1, name: 1 }
+      ).sort({ createdAt: -1 }),
+      Writer.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+        createdAt: -1,
+      }),
+    ]);
 
-    res.status(200).json({ categories });
+    res.status(200).json({ categories, subcategories, sellers, writers });
   } catch (error) {
-    console.error("Error fetching categories:", error);
+    console.error("Error fetching data:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
