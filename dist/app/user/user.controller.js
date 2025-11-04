@@ -879,7 +879,7 @@ exports.updateSellerCommission = updateSellerCommission;
 // ✅ GET all sellers for filter page
 const getAllSellerForFilterPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const sellers = yield user_model_1.default.find({ role: "seller", display: true }, { _id: 1, slug: 1, companyName: 1, image: 1 }).sort({ companyName: 1 }); // sort alphabetically
+        const sellers = yield user_model_1.default.find({ role: "seller", display: true }, { _id: 1, slug: 1, companyName: 1, image: 1, name: 1 }).sort({ companyName: 1 }); // sort alphabetically
         res.status(200).json({ sellers });
     }
     catch (error) {

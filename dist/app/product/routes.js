@@ -8,6 +8,7 @@ const controller_1 = require("./controller");
 const model_1 = __importDefault(require("./model"));
 const reusableControllers_1 = require("../shared/reusableControllers");
 const middlewares_1 = require("../user/middlewares");
+const filter_1 = require("./filter");
 const router = express_1.default.Router();
 router.post("/create", middlewares_1.verifySellerAndAdminToken, controller_1.create);
 router.get("/singleForEditPage/:id", controller_1.singleForEditPage);
@@ -22,6 +23,7 @@ router.get("/getProductsByCategorySlug/:slug", controller_1.getProductsByCategor
 router.get("/products_by_punishers_slug/:slug", controller_1.getProductsByPublishersSlug);
 router.get("/getAllForSeriesAddPage", middlewares_1.verifySellerAndAdminToken, controller_1.getAllForSeriesAddPage);
 router.get("/writer_products_by_slug/:slug", controller_1.getProductsByWriterSlug);
+router.get("/filter", filter_1.filter);
 router.get("/singleForUserFoDetailsPageBySlug/:slug", controller_1.singleForUserFoDetailsPageBySlug);
 // // Route for getting a single product by ID
 router.get("/:productId", controller_1.getSingleProduct);

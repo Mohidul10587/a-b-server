@@ -239,13 +239,25 @@ const getCatsWritersPublishersForNavbar = (req, res) => __awaiter(void 0, void 0
 });
 exports.getCatsWritersPublishersForNavbar = getCatsWritersPublishersForNavbar;
 // ✅ GET all categories for filter page
+// ✅ GET all categories for filter page
 const getAllCategoryForFilterPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const categories = yield category_model_1.default.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({ position: 1 }); // sort by position field
-        res.status(200).json({ categories });
+        const [categories, subcategories, sellers, writers] = yield Promise.all([
+            category_model_1.default.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+                position: 1,
+            }),
+            subcategory_model_1.default.find({}, { _id: 1, slug: 1, title: 1, img: 1, parentCategory: 1 }).sort({
+                position: 1,
+            }),
+            user_model_1.default.find({ role: "seller", display: true }, { _id: 1, slug: 1, companyName: 1, image: 1, name: 1 }).sort({ createdAt: -1 }),
+            writer_model_1.default.find({}, { _id: 1, slug: 1, title: 1, img: 1 }).sort({
+                createdAt: -1,
+            }),
+        ]);
+        res.status(200).json({ categories, subcategories, sellers, writers });
     }
     catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error("Error fetching data:", error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });

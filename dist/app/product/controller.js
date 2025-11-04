@@ -75,6 +75,11 @@ const singleForUserFoDetailsPageBySlug = (req, res) => __awaiter(void 0, void 0,
             select: "title img slug", // Include only the 'name' field of the brand
         })
             .populate({
+            path: "seller",
+            model: "User",
+            select: "name image slug", // Include only the 'name' field of the brand
+        })
+            .populate({
             path: "suggestion",
             model: "Suggestion",
             populate: {
@@ -92,6 +97,11 @@ const singleForUserFoDetailsPageBySlug = (req, res) => __awaiter(void 0, void 0,
             .populate({
             path: "category",
             model: "Category",
+            select: "title slug", // Include only the 'title' field of the category
+        })
+            .populate({
+            path: "subcategory",
+            model: "Subcategory",
             select: "title slug", // Include only the 'title' field of the category
         });
         if (!product) {
