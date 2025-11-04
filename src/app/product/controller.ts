@@ -68,6 +68,11 @@ export const singleForUserFoDetailsPageBySlug = async (
         select: "title img slug", // Include only the 'name' field of the brand
       })
       .populate({
+        path: "seller",
+        model: "User",
+        select: "name image slug", // Include only the 'name' field of the brand
+      })
+      .populate({
         path: "suggestion",
         model: "Suggestion",
         populate: {
@@ -85,6 +90,11 @@ export const singleForUserFoDetailsPageBySlug = async (
       .populate({
         path: "category",
         model: "Category",
+        select: "title slug", // Include only the 'title' field of the category
+      })
+      .populate({
+        path: "subcategory",
+        model: "Subcategory",
         select: "title slug", // Include only the 'title' field of the category
       });
 
