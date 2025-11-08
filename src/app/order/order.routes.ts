@@ -5,6 +5,9 @@ import {
   allForAdmin,
   getSingleOrders,
   updateOrderStatus,
+  allDeliveredOrderForAdmin,
+  allPendingOrderForAdmin,
+  allCancelledOrderForAdmin,
 } from "./order.controller";
 import { verifyUserToken } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -17,6 +20,10 @@ router.post("/create", create);
 
 // Get all orders
 router.get("/allForAdmin", allForAdmin);
+router.get("/allDeliveredOrderForAdmin", allDeliveredOrderForAdmin);
+router.get("/allCancelledOrderForAdmin", allCancelledOrderForAdmin);
+router.get("/allPendingOrderForAdmin", allPendingOrderForAdmin);
+
 router.get("/getSingleOrder/:id", getSingleOrders);
 
 // Update order status
