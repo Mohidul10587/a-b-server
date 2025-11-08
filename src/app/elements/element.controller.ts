@@ -145,9 +145,9 @@ export const elementById = async (req: Request, res: Response) => {
             .limit(sec.postLimit || 10);
           sectionCopy.bestSellingBooks = products;
         }
-        if (sec.selectionType === "bestSellingAuthors") {
+        if (sec.selectionType === "bestSellingWriters") {
           const writers = await Writer.find().limit(sec.postLimit || 10);
-          sectionCopy.bestSellingAuthors = writers;
+          sectionCopy.bestSellingWriters = writers;
         }
         if (sec.selectionType === "bestSellingPublications") {
           const publications = await User.find({ role: "seller" })
