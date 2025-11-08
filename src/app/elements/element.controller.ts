@@ -101,29 +101,48 @@ export const elementById = async (req: Request, res: Response) => {
         if (sec.selectionType === "subcategory" && sec.subcategory) {
           const products = await Product.find({
             subcategory: sec.subcategory,
-          }).limit(sec.postLimit || 10);
+          })
+            .select(
+              "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
+            )
+            .limit(sec.postLimit || 10);
           sectionCopy.subcategory = products;
         }
         if (sec.selectionType === "writer" && sec.writer) {
           const products = await Product.find({
             writer: sec.writer,
-          }).limit(sec.postLimit || 10);
+          })
+            .select(
+              "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
+            )
+            .limit(sec.postLimit || 10);
           sectionCopy.writer = products;
         }
         if (sec.selectionType === "latest") {
           const products = await Product.find()
             .sort({ createdAt: -1 })
+            .select(
+              "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
+            )
             .limit(sec.postLimit || 10);
           sectionCopy.latest = products;
         }
         if (sec.selectionType === "preOrder") {
           const products = await Product.find({
             orderType: "Pre_Order",
-          }).limit(sec.postLimit || 10);
+          })
+            .select(
+              "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
+            )
+            .limit(sec.postLimit || 10);
           sectionCopy.preOrder = products;
         }
         if (sec.selectionType === "bestSellingBooks") {
-          const products = await Product.find().limit(sec.postLimit || 10);
+          const products = await Product.find()
+            .select(
+              "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
+            )
+            .limit(sec.postLimit || 10);
           sectionCopy.bestSellingBooks = products;
         }
         if (sec.selectionType === "bestSellingAuthors") {
@@ -131,9 +150,9 @@ export const elementById = async (req: Request, res: Response) => {
           sectionCopy.bestSellingAuthors = writers;
         }
         if (sec.selectionType === "bestSellingPublications") {
-          const publications = await User.find({ role: "seller" }).limit(
-            sec.postLimit || 10
-          );
+          const publications = await User.find({ role: "seller" })
+            .select("image name slug companyName")
+            .limit(sec.postLimit || 10);
           sectionCopy.bestSellingPublications = publications;
         }
         return sectionCopy;

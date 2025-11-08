@@ -16,6 +16,8 @@ exports.allForIndexPageByTargetedPageAndId = exports.update = exports.updatePage
 const element_model_1 = require("./element.model"); // Your Mongoose model
 const model_1 = __importDefault(require("../product/model"));
 const banner_model_1 = __importDefault(require("../banner/banner.model"));
+const writer_model_1 = __importDefault(require("../writer/writer.model"));
+const user_model_1 = __importDefault(require("../user/user.model"));
 // Helper function to upload images to Cloudinary using promises
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -99,26 +101,49 @@ const elementById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             if (sec.selectionType === "subcategory" && sec.subcategory) {
                 const products = yield model_1.default.find({
                     subcategory: sec.subcategory,
-                }).limit(sec.postLimit || 10);
+                })
+                    .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
+                    .limit(sec.postLimit || 10);
                 sectionCopy.subcategory = products;
             }
             if (sec.selectionType === "writer" && sec.writer) {
                 const products = yield model_1.default.find({
                     writer: sec.writer,
-                }).limit(sec.postLimit || 10);
+                })
+                    .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
+                    .limit(sec.postLimit || 10);
                 sectionCopy.writer = products;
             }
             if (sec.selectionType === "latest") {
                 const products = yield model_1.default.find()
                     .sort({ createdAt: -1 })
+                    .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
                 sectionCopy.latest = products;
             }
             if (sec.selectionType === "preOrder") {
                 const products = yield model_1.default.find({
                     orderType: "Pre_Order",
-                }).limit(sec.postLimit || 10);
+                })
+                    .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
+                    .limit(sec.postLimit || 10);
                 sectionCopy.preOrder = products;
+            }
+            if (sec.selectionType === "bestSellingBooks") {
+                const products = yield model_1.default.find()
+                    .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
+                    .limit(sec.postLimit || 10);
+                sectionCopy.bestSellingBooks = products;
+            }
+            if (sec.selectionType === "bestSellingAuthors") {
+                const writers = yield writer_model_1.default.find().limit(sec.postLimit || 10);
+                sectionCopy.bestSellingAuthors = writers;
+            }
+            if (sec.selectionType === "bestSellingPublications") {
+                const publications = yield user_model_1.default.find({ role: "seller" })
+                    .select("image name slug companyName")
+                    .limit(sec.postLimit || 10);
+                sectionCopy.bestSellingPublications = publications;
             }
             return sectionCopy;
         })));
