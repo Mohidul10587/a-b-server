@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { PageElements } from "./element.model"; // Your Mongoose model
 import Product from "../product/model";
 import Banner from "../banner/banner.model";
+import Writer from "../writer/writer.model";
+import User from "../user/user.model";
 
 // Helper function to upload images to Cloudinary using promises
 
@@ -120,7 +122,20 @@ export const elementById = async (req: Request, res: Response) => {
           }).limit(sec.postLimit || 10);
           sectionCopy.preOrder = products;
         }
-
+        if (sec.selectionType === "bestSellingBooks") {
+          const products = await Product.find().limit(sec.postLimit || 10);
+          sectionCopy.bestSellingBooks = products;
+        }
+        if (sec.selectionType === "bestSellingAuthors") {
+          const writers = await Writer.find().limit(sec.postLimit || 10);
+          sectionCopy.bestSellingAuthors = writers;
+        }
+        if (sec.selectionType === "bestSellingPublications") {
+          const publications = await User.find({ role: "seller" }).limit(
+            sec.postLimit || 10
+          );
+          sectionCopy.bestSellingPublications = publications;
+        }
         return sectionCopy;
       })
     );

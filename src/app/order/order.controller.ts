@@ -95,13 +95,70 @@ export const create = async (req: Request, res: Response) => {
   }
 };
 
+const fetchOrders = async (
+  status: string | null,
+  page: number,
+  limit: number,
+  sortBy: "createdAt" | "updatedAt"
+) => {
+  const query: any = {};
+  if (status) query.status = status;
+
+  const orders = await Order.find(query)
+    .select(
+      "deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart"
+    )
+    .sort({ [sortBy]: -1 })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  const totalOrders = await Order.countDocuments(query);
+
+  const updatedOrders = orders.map((order) => ({
+    customersName: order.deliveryInfo.name,
+    address: order.deliveryInfo.address,
+    phone: order.deliveryInfo.phone,
+    paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
+    paymentMethod: order.paymentMethod,
+    _id: order._id,
+    firstProduct: order.cart[0],
+    status: order.status,
+  }));
+
+  return { updatedOrders, totalOrders };
+};
+
+// Get pending orders
+export const allPendingOrderForAdmin = async (req: Request, res: Response) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    const { updatedOrders, totalOrders } = await fetchOrders(
+      "Pending",
+      page,
+      limit,
+      "createdAt"
+    );
+
+    res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch pending orders.", error });
+  }
+};
+
 // Get all orders (with counts)
 export const allForAdmin = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
 
-    const { updatedOrders, totalOrders } = await fetchOrders(null, page, limit);
+    const { updatedOrders, totalOrders } = await fetchOrders(
+      "Pending",
+      page,
+      limit,
+      "createdAt"
+    );
 
     const [
       categoriesCount,
@@ -150,7 +207,8 @@ export const allDeliveredOrderForAdmin = async (
     const { updatedOrders, totalOrders } = await fetchOrders(
       "Delivered",
       page,
-      limit
+      limit,
+      "updatedAt"
     );
 
     res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
@@ -173,7 +231,8 @@ export const allCancelledOrderForAdmin = async (
     const { updatedOrders, totalOrders } = await fetchOrders(
       "Cancelled",
       page,
-      limit
+      limit,
+      "updatedAt"
     );
 
     res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
@@ -181,24 +240,6 @@ export const allCancelledOrderForAdmin = async (
     res
       .status(500)
       .json({ message: "Failed to fetch cancelled orders.", error });
-  }
-};
-
-// Get pending orders
-export const allPendingOrderForAdmin = async (req: Request, res: Response) => {
-  try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
-
-    const { updatedOrders, totalOrders } = await fetchOrders(
-      "Pending",
-      page,
-      limit
-    );
-
-    res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch pending orders.", error });
   }
 };
 
@@ -233,35 +274,4 @@ export const getSingleOrders = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch order.", error });
   }
-};
-const fetchOrders = async (
-  status: string | null,
-  page: number,
-  limit: number
-) => {
-  const query: any = {};
-  if (status) query.status = status;
-
-  const orders = await Order.find(query)
-    .select(
-      "deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart"
-    )
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(limit);
-
-  const totalOrders = await Order.countDocuments(query);
-
-  const updatedOrders = orders.map((order) => ({
-    customersName: order.deliveryInfo.name,
-    address: order.deliveryInfo.address,
-    phone: order.deliveryInfo.phone,
-    paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
-    paymentMethod: order.paymentMethod,
-    _id: order._id,
-    firstProduct: order.cart[0],
-    status: order.status,
-  }));
-
-  return { updatedOrders, totalOrders };
 };
