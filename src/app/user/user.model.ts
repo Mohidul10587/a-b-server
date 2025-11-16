@@ -30,6 +30,7 @@ export interface IUser extends Document {
   firstContactPersonPhone: string;
   secondContactPersonName: string;
   secondContactPersonPhone: string;
+  enabledByAdmin: boolean;
 }
 
 // === Mongoose Schema ===
@@ -61,8 +62,7 @@ const UserSchema = new Schema<IUser>(
     whatsapp: { type: String, default: "" },
     coverImg: { type: String, default: "" },
     image: { type: String, default: "" },
-
-    display: { type: Boolean, default: true },
+    enabledByAdmin: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     commission: { type: Number, default: 0 },
     // ✅ New fields in schema

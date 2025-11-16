@@ -200,6 +200,7 @@ export const getAllForSeriesAddPage = async (
     // Build filter dynamically
     const filter: any = {
       display: true,
+      enabledByAdmin: true,
     };
 
     if (category) filter.category = category;
@@ -455,7 +456,7 @@ export const allForIndexPage = async (
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
     const searchText = req.query.search as string;
-    const displayFilter = req.query.display as string; // e.g., 'true' or 'false'
+    const displayFilter = req.query.display as string;
 
     const skip = (page - 1) * limit;
 

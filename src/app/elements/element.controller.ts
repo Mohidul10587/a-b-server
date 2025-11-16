@@ -92,15 +92,19 @@ export const elementById = async (req: Request, res: Response) => {
         }
 
         if (sec.selectionType === "category" && sec.category) {
-          const products = await Product.find({ category: sec.category }).limit(
-            sec.postLimit || 10
-          );
+          const products = await Product.find({
+            category: sec.category,
+            display: true,
+            enabledByAdmin: true,
+          }).limit(sec.postLimit || 10);
           sectionCopy.category = products;
         }
 
         if (sec.selectionType === "subcategory" && sec.subcategory) {
           const products = await Product.find({
             subcategory: sec.subcategory,
+            display: true,
+            enabledByAdmin: true,
           })
             .select(
               "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
@@ -111,6 +115,8 @@ export const elementById = async (req: Request, res: Response) => {
         if (sec.selectionType === "writer" && sec.writer) {
           const products = await Product.find({
             writer: sec.writer,
+            display: true,
+            enabledByAdmin: true,
           })
             .select(
               "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
@@ -119,7 +125,10 @@ export const elementById = async (req: Request, res: Response) => {
           sectionCopy.writer = products;
         }
         if (sec.selectionType === "latest") {
-          const products = await Product.find()
+          const products = await Product.find({
+            display: true,
+            enabledByAdmin: true,
+          })
             .sort({ createdAt: -1 })
             .select(
               "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
@@ -130,6 +139,8 @@ export const elementById = async (req: Request, res: Response) => {
         if (sec.selectionType === "preOrder") {
           const products = await Product.find({
             orderType: "Pre_Order",
+            display: true,
+            enabledByAdmin: true,
           })
             .select(
               "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
@@ -138,7 +149,10 @@ export const elementById = async (req: Request, res: Response) => {
           sectionCopy.preOrder = products;
         }
         if (sec.selectionType === "bestSellingBooks") {
-          const products = await Product.find()
+          const products = await Product.find({
+            display: true,
+            enabledByAdmin: true,
+          })
             .select(
               "slug img title existingQnt seller sellingPrice regularPrice category stockStatus"
             )

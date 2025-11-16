@@ -20,16 +20,12 @@ export interface IProduct extends Document {
   numberOfPage: number;
   orderType: "Buy_Now" | "Pre_Order";
   productType: string;
-
   rating: number;
   regularPrice: number;
   seller: Schema.Types.ObjectId;
-
   sellingPrice: number;
-
   shortDescription: string;
   slug: string;
-
   stockStatus: string;
   subcategory: Schema.Types.ObjectId;
   subTitle: string;
@@ -40,11 +36,13 @@ export interface IProduct extends Document {
   translator: string;
   writer: Schema.Types.ObjectId;
   youtubeVideo: string[];
+  enabledByAdmin: boolean;
 }
 
 // Schema
 const ProductSchema = new Schema<IProduct>(
   {
+    enabledByAdmin: { type: Boolean, default: true },
     // A
     attachedImgs: { type: [String], default: [] },
 
