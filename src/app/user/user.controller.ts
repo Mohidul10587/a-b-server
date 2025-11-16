@@ -919,7 +919,7 @@ export const promoteUserToSellerByAdmin = async (
     });
 
     return res.json({
-      message: `Application ${status} successfully`,
+      message: `Application approved successfully`,
       application,
     });
   } catch (error: any) {

@@ -20,6 +20,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const setToken_1 = require("../shared/setToken");
 const order_model_1 = __importDefault(require("../order/order.model"));
 const model_1 = __importDefault(require("../product/model"));
+const model_2 = require("../sellerApplication/model");
 dotenv_1.default.config();
 // controllers/authController.ts
 const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -800,22 +801,41 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
 exports.updatePassword = updatePassword;
 // Update the status of a PageElement by ID
 const promoteUserToSellerByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params;
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
     try {
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { role: "seller", isEnabledByAdmin: true }, { new: true });
-        if (!updatedUser) {
-            return res.status(404).json({ message: "User not found" });
+        const { id } = req.params;
+        // Find application
+        const application = yield model_2.SellerApplication.findById(id).populate("user");
+        if (!application) {
+            return res.status(404).json({ message: "Application not found" });
         }
-        res.status(200).json({
-            message: "User successfully promoted to a seller",
-            data: updatedUser,
+        application.status = "approved";
+        yield application.save();
+        // ✅ If approved, update user with application details
+        //@ts-ignore
+        yield user_model_1.default.findByIdAndUpdate(application.user._id, {
+            role: "seller",
+            isEnabledByAdmin: true,
+            companyName: application.companyName,
+            companyEmail: application.companyEmail,
+            companyPhone: application.companyPhone,
+            whatsapp: application.whatsapp,
+            coverImg: application.coverImg,
+            image: application.image,
+            firstContactPersonName: application.firstContactPersonName,
+            firstContactPersonPhone: application.firstContactPersonPhone,
+            secondContactPersonName: application.secondContactPersonName,
+            secondContactPersonPhone: application.secondContactPersonPhone,
+        });
+        return res.json({
+            message: `Application approved successfully`,
+            application,
         });
     }
     catch (error) {
-        res.status(500).json({
-            message: "Error updating User status",
-            error: error.message,
-        });
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
 });
 exports.promoteUserToSellerByAdmin = promoteUserToSellerByAdmin;
