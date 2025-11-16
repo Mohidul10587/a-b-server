@@ -842,6 +842,7 @@ exports.promoteUserToSellerByAdmin = promoteUserToSellerByAdmin;
 const enabledOrDisableSellerByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { sellerId } = req.params;
     const { isEnabledByAdmin } = req.body;
+    console.log(isEnabledByAdmin, sellerId);
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {

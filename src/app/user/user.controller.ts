@@ -936,7 +936,7 @@ export const enabledOrDisableSellerByAdmin = async (
 ) => {
   const { sellerId } = req.params;
   const { isEnabledByAdmin } = req.body;
-
+  console.log(isEnabledByAdmin, sellerId);
   const session = await mongoose.startSession();
   session.startTransaction();
 
