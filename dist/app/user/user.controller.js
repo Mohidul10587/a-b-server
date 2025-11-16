@@ -804,9 +804,9 @@ const promoteUserToSellerByAdmin = (req, res) => __awaiter(void 0, void 0, void 
     const session = yield mongoose_1.default.startSession();
     session.startTransaction();
     try {
-        const { id } = req.params;
+        const { applicationId } = req.params;
         // Find application
-        const application = yield model_2.SellerApplication.findById(id).populate("user");
+        const application = yield model_2.SellerApplication.findById(applicationId).populate("user");
         if (!application) {
             return res.status(404).json({ message: "Application not found" });
         }

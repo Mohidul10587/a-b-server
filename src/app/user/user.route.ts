@@ -69,7 +69,7 @@ router.get(
 );
 
 router.patch(
-  "/promoteUserToSellerByAdmin/:userId",
+  "/promoteUserToSellerByAdmin/:applicationId",
   verifyAdminToken,
   promoteUserToSellerByAdmin
 );

@@ -891,9 +891,11 @@ export const promoteUserToSellerByAdmin = async (
   session.startTransaction();
 
   try {
-    const { id } = req.params;
+    const { applicationId } = req.params;
     // Find application
-    const application = await SellerApplication.findById(id).populate("user");
+    const application = await SellerApplication.findById(
+      applicationId
+    ).populate("user");
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
