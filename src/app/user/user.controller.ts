@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import { setRefreshTokenCookie } from "../shared/setToken";
 import Order from "../order/order.model";
 import Product from "../product/model";
+import { SellerApplication } from "../sellerApplication/model";
 declare module "express" {
   interface Request {
     user?: IUser; // Adjust the type based on your User model
@@ -886,26 +887,55 @@ export const promoteUserToSellerByAdmin = async (
   req: Request,
   res: Response
 ) => {
-  const { userId } = req.params;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
   try {
+    const { userId } = req.params;
+    const { applicationId } = req.body;
+
+    // 1. Update User
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { role: "seller", isEnabledByAdmin: true },
-      { new: true }
+      { new: true, session }
     );
 
     if (!updatedUser) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({
-      message: "User successfully promoted to a seller",
-      data: updatedUser,
+    // 2. Update Seller Application
+    const updatedApplication = await SellerApplication.findByIdAndUpdate(
+      applicationId,
+      { status: "approved" },
+      { new: true, session }
+    );
+
+    // If application not found → rollback
+    if (!updatedApplication) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "Application not found" });
+    }
+
+    // 3. Commit Transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      message: "User successfully promoted to seller",
+      data: { updatedUser, updatedApplication },
     });
   } catch (error: any) {
-    res.status(500).json({
-      message: "Error updating User status",
+    // If any error → rollback
+    await session.abortTransaction();
+    session.endSession();
+
+    return res.status(500).json({
+      message: "Transaction failed",
       error: error.message,
     });
   }
