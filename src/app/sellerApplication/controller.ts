@@ -148,7 +148,7 @@ export const updateSellerApplicationStatus = async (
       // @ts-ignore
       await User.findByIdAndUpdate(application.user._id, {
         role: "seller",
-        isSeller: true,
+        isEnabledByAdmin: true,
         companyName: application.companyName,
         companyEmail: application.companyEmail,
         companyPhone: application.companyPhone,

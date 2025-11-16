@@ -36,13 +36,13 @@ export interface IProduct extends Document {
   translator: string;
   writer: Schema.Types.ObjectId;
   youtubeVideo: string[];
-  enabledByAdmin: boolean;
+  isEnabledByAdmin: boolean;
 }
 
 // Schema
 const ProductSchema = new Schema<IProduct>(
   {
-    enabledByAdmin: { type: Boolean, default: true },
+    isEnabledByAdmin: { type: Boolean, default: true },
     // A
     attachedImgs: { type: [String], default: [] },
 

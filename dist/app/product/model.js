@@ -36,6 +36,7 @@ const mongoose_1 = __importStar(require("mongoose"));
 const isObjectId_1 = require("../shared/isObjectId");
 // Schema
 const ProductSchema = new mongoose_1.Schema({
+    isEnabledByAdmin: { type: Boolean, default: true },
     // A
     attachedImgs: { type: [String], default: [] },
     // B

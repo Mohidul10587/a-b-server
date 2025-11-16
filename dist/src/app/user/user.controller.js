@@ -87,7 +87,7 @@ const createUser = (req, res) =>
       const newUser = yield user_model_1.default.create({
         name,
         email,
-        isSeller: false,
+        isEnabledByAdmin: false,
         slug: slug !== null && slug !== void 0 ? slug : "my-slug",
         image,
       });
@@ -129,7 +129,7 @@ const signUp = (req, res) =>
         name,
         email,
         slug,
-        isSeller: sellerDefaultStatus,
+        isEnabledByAdmin: sellerDefaultStatus,
         password: hashedPassword,
       });
       setRefreshTokenCookie(res, newUser);
@@ -303,7 +303,7 @@ const getStatus = (req, res) =>
       }
       const user = yield user_model_1.default
         .findOne({ slug: userSlug })
-        .select("isSeller isUser");
+        .select("isEnabledByAdmin isUser");
       return res.status(200).json({
         success: true,
         user: user,

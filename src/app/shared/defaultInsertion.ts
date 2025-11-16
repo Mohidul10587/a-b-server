@@ -87,7 +87,7 @@ export const registerAdmin = async (
       password: hashedPassword,
       image,
       role: "admin",
-      isSeller: true,
+      isEnabledByAdmin: true,
       authProvider: "email",
     });
 

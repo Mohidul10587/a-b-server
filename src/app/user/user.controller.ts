@@ -261,7 +261,7 @@ export const allUserForAdmin = async (req: Request, res: Response) => {
         .skip(skip)
         .limit(itemsPerPage)
         .select(
-          "name slug img image email phone companyName isSeller isUser commission role createdAt"
+          "name slug img image email phone companyName isEnabledByAdmin isUser commission role createdAt"
         ),
       User.countDocuments(query),
     ]);
@@ -503,7 +503,9 @@ export const getStatus = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findOne({ slug: userSlug }).select("isSeller");
+    const user = await User.findOne({ slug: userSlug }).select(
+      "isEnabledByAdmin"
+    );
 
     return res.status(200).json({
       success: true,
@@ -880,38 +882,81 @@ export const updatePassword = async (req: Request, res: Response) => {
 };
 
 // Update the status of a PageElement by ID
-export const updateSellerStatus = async (req: Request, res: Response) => {
-  const { userId } = req.params; // Make sure the ID is being passed correctly
-  const { role } = req.body;
+export const promoteUserToSellerByAdmin = async (
+  req: Request,
+  res: Response
+) => {
+  const { userId } = req.params;
 
   try {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { role }, // Ensure 'status' is the correct field
-      { new: true } // Return the updated document
+      { role: "seller", isEnabledByAdmin: true },
+      { new: true }
     );
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
     }
-    const updatedSellerId = updatedUser._id;
-    const status = updatedUser.isSeller;
 
-    try {
-      const result = await Product.updateMany(
-        { seller: updatedSellerId }, // Filter: match seller ID
-        { $set: { display: status } } // Update: set updated timestamp
-      );
-    } catch (error) {
-      console.error("Error updating products:", error);
-    }
     res.status(200).json({
-      message: "User status updated successfully",
+      message: "User successfully promoted to a seller",
       data: updatedUser,
     });
   } catch (error: any) {
     res.status(500).json({
       message: "Error updating User status",
+      error: error.message,
+    });
+  }
+};
+
+export const enabledOrDisableSellerByAdmin = async (
+  req: Request,
+  res: Response
+) => {
+  const { sellerId } = req.params;
+  const { isEnabledByAdmin } = req.body;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // 1️⃣ Update User
+    const updatedSeller = await User.findByIdAndUpdate(
+      sellerId,
+      { isEnabledByAdmin },
+      { new: true, session }
+    );
+
+    if (!updatedSeller) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // 2️⃣ Update all products of this seller
+    await Product.updateMany(
+      { seller: sellerId },
+      { $set: { isEnabledByAdmin } },
+      { session }
+    );
+
+    // 3️⃣ Commit transaction (everything saved)
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      message: "User + Products updated successfully",
+      data: updatedSeller,
+    });
+  } catch (error: any) {
+    // ❌ If error happens anywhere → rollback
+    await session.abortTransaction();
+    session.endSession();
+
+    return res.status(500).json({
+      message: "Transaction failed. Nothing was updated.",
       error: error.message,
     });
   }

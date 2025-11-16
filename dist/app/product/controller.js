@@ -194,6 +194,7 @@ const getAllForSeriesAddPage = (req, res) => __awaiter(void 0, void 0, void 0, f
         // Build filter dynamically
         const filter = {
             display: true,
+            isEnabledByAdmin: true,
         };
         if (category)
             filter.category = category;
@@ -401,7 +402,7 @@ const allForIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const searchText = req.query.search;
-        const displayFilter = req.query.display; // e.g., 'true' or 'false'
+        const displayFilter = req.query.display;
         const skip = (page - 1) * limit;
         let query = {};
         let displayTrueQuery = { display: true };

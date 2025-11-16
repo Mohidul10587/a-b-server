@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.updateSellerStatus = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setCookie = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.enabledOrDisableSellerByAdmin = exports.promoteUserToSellerByAdmin = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setCookie = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -239,7 +239,7 @@ const allUserForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function
                 .sort({ createdAt: -1 })
                 .skip(skip)
                 .limit(itemsPerPage)
-                .select("name slug img image email phone companyName isSeller isUser commission role createdAt"),
+                .select("name slug img image email phone companyName isEnabledByAdmin isUser commission role createdAt"),
             user_model_1.default.countDocuments(query),
         ]);
         return res.status(200).json({
@@ -458,7 +458,7 @@ const getStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 message: "User ID is required",
             });
         }
-        const user = yield user_model_1.default.findOne({ slug: userSlug }).select("isSeller");
+        const user = yield user_model_1.default.findOne({ slug: userSlug }).select("isEnabledByAdmin");
         return res.status(200).json({
             success: true,
             user: user,
@@ -799,28 +799,15 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
 });
 exports.updatePassword = updatePassword;
 // Update the status of a PageElement by ID
-const updateSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { userId } = req.params; // Make sure the ID is being passed correctly
-    const { role } = req.body;
+const promoteUserToSellerByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.params;
     try {
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { role }, // Ensure 'status' is the correct field
-        { new: true } // Return the updated document
-        );
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, { role: "seller", isEnabledByAdmin: true }, { new: true });
         if (!updatedUser) {
             return res.status(404).json({ message: "User not found" });
         }
-        const updatedSellerId = updatedUser._id;
-        const status = updatedUser.isSeller;
-        try {
-            const result = yield model_1.default.updateMany({ seller: updatedSellerId }, // Filter: match seller ID
-            { $set: { display: status } } // Update: set updated timestamp
-            );
-        }
-        catch (error) {
-            console.error("Error updating products:", error);
-        }
         res.status(200).json({
-            message: "User status updated successfully",
+            message: "User successfully promoted to a seller",
             data: updatedUser,
         });
     }
@@ -831,7 +818,41 @@ const updateSellerStatus = (req, res) => __awaiter(void 0, void 0, void 0, funct
         });
     }
 });
-exports.updateSellerStatus = updateSellerStatus;
+exports.promoteUserToSellerByAdmin = promoteUserToSellerByAdmin;
+const enabledOrDisableSellerByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { sellerId } = req.params;
+    const { isEnabledByAdmin } = req.body;
+    const session = yield mongoose_1.default.startSession();
+    session.startTransaction();
+    try {
+        // 1️⃣ Update User
+        const updatedSeller = yield user_model_1.default.findByIdAndUpdate(sellerId, { isEnabledByAdmin }, { new: true, session });
+        if (!updatedSeller) {
+            yield session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: "User not found" });
+        }
+        // 2️⃣ Update all products of this seller
+        yield model_1.default.updateMany({ seller: sellerId }, { $set: { isEnabledByAdmin } }, { session });
+        // 3️⃣ Commit transaction (everything saved)
+        yield session.commitTransaction();
+        session.endSession();
+        return res.status(200).json({
+            message: "User + Products updated successfully",
+            data: updatedSeller,
+        });
+    }
+    catch (error) {
+        // ❌ If error happens anywhere → rollback
+        yield session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({
+            message: "Transaction failed. Nothing was updated.",
+            error: error.message,
+        });
+    }
+});
+exports.enabledOrDisableSellerByAdmin = enabledOrDisableSellerByAdmin;
 // Update the status of a PageElement by ID
 const updateUserPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { userId } = req.params; // Make sure the ID is being passed correctly

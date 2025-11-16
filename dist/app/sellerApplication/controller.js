@@ -153,7 +153,7 @@ const updateSellerApplicationStatus = (req, res) => __awaiter(void 0, void 0, vo
             // @ts-ignore
             yield user_model_1.default.findByIdAndUpdate(application.user._id, {
                 role: "seller",
-                isSeller: true,
+                isEnabledByAdmin: true,
                 companyName: application.companyName,
                 companyEmail: application.companyEmail,
                 companyPhone: application.companyPhone,

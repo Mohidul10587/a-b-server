@@ -200,7 +200,7 @@ export const getAllForSeriesAddPage = async (
     // Build filter dynamically
     const filter: any = {
       display: true,
-      enabledByAdmin: true,
+      isEnabledByAdmin: true,
     };
 
     if (category) filter.category = category;

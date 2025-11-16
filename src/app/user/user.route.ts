@@ -26,12 +26,13 @@ import {
   logInByCredentials,
   setCookie,
   allUserForAdmin,
-  updateSellerStatus,
+  promoteUserToSellerByAdmin,
   updateUserPassword,
   singleForEditForSellerSettings,
   getAllSellerForFilterPage,
   updateSellerCommission,
   getUserByIdForAdmin,
+  enabledOrDisableSellerByAdmin,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -68,11 +69,15 @@ router.get(
 );
 
 router.patch(
-  "/updateSellerStatusOfUser/:userId",
+  "/promoteUserToSellerByAdmin/:userId",
   verifyAdminToken,
-  updateSellerStatus
+  promoteUserToSellerByAdmin
 );
-
+router.patch(
+  "/enabledOrDisableSellerByAdmin/:sellerId",
+  verifyAdminToken,
+  enabledOrDisableSellerByAdmin
+);
 router.patch(
   "/updateUserPassword/:userId",
   verifyAdminToken,

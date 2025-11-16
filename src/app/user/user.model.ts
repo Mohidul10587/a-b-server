@@ -10,7 +10,6 @@ export interface IUser extends Document {
   role: "user" | "admin" | "seller" | "customerManager";
   name: string;
   slug: string;
-  isSeller: boolean;
   birthday: string;
   gender: string;
   address: string;
@@ -30,7 +29,7 @@ export interface IUser extends Document {
   firstContactPersonPhone: string;
   secondContactPersonName: string;
   secondContactPersonPhone: string;
-  enabledByAdmin: boolean;
+  isEnabledByAdmin: boolean;
 }
 
 // === Mongoose Schema ===
@@ -52,7 +51,7 @@ const UserSchema = new Schema<IUser>(
     },
     name: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
-    isSeller: { type: Boolean, default: false },
+    isEnabledByAdmin: { type: Boolean, default: false },
     birthday: { type: String, default: "" },
     gender: { type: String, default: "" },
     address: { type: String, default: "" },
@@ -62,7 +61,6 @@ const UserSchema = new Schema<IUser>(
     whatsapp: { type: String, default: "" },
     coverImg: { type: String, default: "" },
     image: { type: String, default: "" },
-    enabledByAdmin: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     commission: { type: Number, default: 0 },
     // ✅ New fields in schema

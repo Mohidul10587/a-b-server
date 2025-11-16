@@ -52,7 +52,7 @@ const UserSchema = new mongoose_1.Schema({
     },
     name: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
-    isSeller: { type: Boolean, default: false },
+    isEnabledByAdmin: { type: Boolean, default: false },
     birthday: { type: String, default: "" },
     gender: { type: String, default: "" },
     address: { type: String, default: "" },
@@ -62,7 +62,6 @@ const UserSchema = new mongoose_1.Schema({
     whatsapp: { type: String, default: "" },
     coverImg: { type: String, default: "" },
     image: { type: String, default: "" },
-    display: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     commission: { type: Number, default: 0 },
     // ✅ New fields in schema

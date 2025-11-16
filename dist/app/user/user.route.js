@@ -31,7 +31,8 @@ router.post("/logout", user_controller_1.logOut);
 router.get("/getAllSellerForFilterPage", user_controller_1.getAllSellerForFilterPage);
 router.get("/allUserForAdmin", middlewares_2.verifyAdminToken, user_controller_1.allUserForAdmin);
 router.get("/singleForEditForSellerSettings/:id", user_controller_1.singleForEditForSellerSettings);
-router.patch("/updateSellerStatusOfUser/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerStatus);
+router.patch("/promoteUserToSellerByAdmin/:userId", middlewares_2.verifyAdminToken, user_controller_1.promoteUserToSellerByAdmin);
+router.patch("/enabledOrDisableSellerByAdmin/:sellerId", middlewares_2.verifyAdminToken, user_controller_1.enabledOrDisableSellerByAdmin);
 router.patch("/updateUserPassword/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserPassword);
 router.patch("/updateSellerCommission/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerCommission);
 router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id", 

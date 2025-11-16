@@ -95,12 +95,18 @@ const elementById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
                 sectionCopy.banner = banner || null;
             }
             if (sec.selectionType === "category" && sec.category) {
-                const products = yield model_1.default.find({ category: sec.category }).limit(sec.postLimit || 10);
+                const products = yield model_1.default.find({
+                    category: sec.category,
+                    display: true,
+                    isEnabledByAdmin: true,
+                }).limit(sec.postLimit || 10);
                 sectionCopy.category = products;
             }
             if (sec.selectionType === "subcategory" && sec.subcategory) {
                 const products = yield model_1.default.find({
                     subcategory: sec.subcategory,
+                    display: true,
+                    isEnabledByAdmin: true,
                 })
                     .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
@@ -109,13 +115,18 @@ const elementById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             if (sec.selectionType === "writer" && sec.writer) {
                 const products = yield model_1.default.find({
                     writer: sec.writer,
+                    display: true,
+                    isEnabledByAdmin: true,
                 })
                     .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
                 sectionCopy.writer = products;
             }
             if (sec.selectionType === "latest") {
-                const products = yield model_1.default.find()
+                const products = yield model_1.default.find({
+                    display: true,
+                    isEnabledByAdmin: true,
+                })
                     .sort({ createdAt: -1 })
                     .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
@@ -124,13 +135,18 @@ const elementById = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             if (sec.selectionType === "preOrder") {
                 const products = yield model_1.default.find({
                     orderType: "Pre_Order",
+                    display: true,
+                    isEnabledByAdmin: true,
                 })
                     .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
                 sectionCopy.preOrder = products;
             }
             if (sec.selectionType === "bestSellingBooks") {
-                const products = yield model_1.default.find()
+                const products = yield model_1.default.find({
+                    display: true,
+                    isEnabledByAdmin: true,
+                })
                     .select("slug img title existingQnt seller sellingPrice regularPrice category stockStatus")
                     .limit(sec.postLimit || 10);
                 sectionCopy.bestSellingBooks = products;
