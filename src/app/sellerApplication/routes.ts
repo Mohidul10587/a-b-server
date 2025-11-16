@@ -7,7 +7,7 @@ import {
   allForUserIndexPage,
   singleForUserForDetailsPageBySlug,
   allSlugsForUserIndexPage,
-  updateSellerApplicationStatus,
+  rejectSellerApplicationByAdmin,
 } from "./controller";
 import { verifyAdminToken, verifyUserToken } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -24,10 +24,10 @@ const router = Router();
 router.post("/create", verifyUserToken, create);
 router.get("/allForAdminIndexPage", verifyAdminToken, allForAdminIndexPage);
 router.get("/singleForAdmin/:id", verifyAdminToken, singleForAdmin);
-router.put(
-  "/updateSellerApplicationStatus/:id",
+router.patch(
+  "/rejectSellerApplicationByAdmin/:id",
   verifyAdminToken,
-  updateSellerApplicationStatus
+  rejectSellerApplicationByAdmin
 );
 // router.put("/update/:id", verifyAdminToken, update);
 // router.delete("/delete/:id", verifyAdminToken, deleteById(SellerApplication));

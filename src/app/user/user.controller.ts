@@ -891,53 +891,40 @@ export const promoteUserToSellerByAdmin = async (
   session.startTransaction();
 
   try {
-    const { userId } = req.params;
-    const { applicationId } = req.body;
-
-    // 1. Update User
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { role: "seller", isEnabledByAdmin: true },
-      { new: true, session }
-    );
-
-    if (!updatedUser) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // 2. Update Seller Application
-    const updatedApplication = await SellerApplication.findByIdAndUpdate(
-      applicationId,
-      { status: "approved" },
-      { new: true, session }
-    );
-
-    // If application not found → rollback
-    if (!updatedApplication) {
-      await session.abortTransaction();
-      session.endSession();
+    const { id } = req.params;
+    // Find application
+    const application = await SellerApplication.findById(id).populate("user");
+    if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
 
-    // 3. Commit Transaction
-    await session.commitTransaction();
-    session.endSession();
+    application.status = "approved";
+    await application.save();
 
-    return res.status(200).json({
-      message: "User successfully promoted to seller",
-      data: { updatedUser, updatedApplication },
+    // ✅ If approved, update user with application details
+    //@ts-ignore
+    await User.findByIdAndUpdate(application.user._id, {
+      role: "seller",
+      isEnabledByAdmin: true,
+      companyName: application.companyName,
+      companyEmail: application.companyEmail,
+      companyPhone: application.companyPhone,
+      whatsapp: application.whatsapp,
+      coverImg: application.coverImg,
+      image: application.image,
+      firstContactPersonName: application.firstContactPersonName,
+      firstContactPersonPhone: application.firstContactPersonPhone,
+      secondContactPersonName: application.secondContactPersonName,
+      secondContactPersonPhone: application.secondContactPersonPhone,
+    });
+
+    return res.json({
+      message: `Application ${status} successfully`,
+      application,
     });
   } catch (error: any) {
-    // If any error → rollback
-    await session.abortTransaction();
-    session.endSession();
-
-    return res.status(500).json({
-      message: "Transaction failed",
-      error: error.message,
-    });
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 

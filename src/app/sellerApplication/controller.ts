@@ -122,48 +122,23 @@ export const singleForUserForDetailsPageBySlug = async (
   }
 };
 
-export const updateSellerApplicationStatus = async (
+export const rejectSellerApplicationByAdmin = async (
   req: Request,
   res: Response
 ) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-
-    if (!["pending", "approved", "rejected"].includes(status)) {
-      return res.status(400).json({ message: "Invalid status" });
-    }
 
     // Find application
-    const application = await Model.findById(id).populate("user");
+    const application = await Model.findById(id);
     if (!application) {
       return res.status(404).json({ message: "Application not found" });
     }
-
-    application.status = status;
+    application.status = "rejected";
     await application.save();
 
-    // ✅ If approved, update user with application details
-    if (status === "approved" && application.user) {
-      // @ts-ignore
-      await User.findByIdAndUpdate(application.user._id, {
-        role: "seller",
-        isEnabledByAdmin: true,
-        companyName: application.companyName,
-        companyEmail: application.companyEmail,
-        companyPhone: application.companyPhone,
-        whatsapp: application.whatsapp,
-        coverImg: application.coverImg,
-        image: application.image,
-        firstContactPersonName: application.firstContactPersonName,
-        firstContactPersonPhone: application.firstContactPersonPhone,
-        secondContactPersonName: application.secondContactPersonName,
-        secondContactPersonPhone: application.secondContactPersonPhone,
-      });
-    }
-
     return res.json({
-      message: `Application ${status} successfully`,
+      message: `Application rejected successfully`,
       application,
     });
   } catch (error: any) {
