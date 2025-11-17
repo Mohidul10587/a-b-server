@@ -16,6 +16,13 @@ export interface ISellerInfo {
   commission: number;
 }
 
+export interface IPersonalInfo {
+  image: string;
+  birthday: string;
+  gender: string;
+  address: string;
+}
+
 export interface IUser extends Document {
   email: string;
   phone: string;
@@ -30,9 +37,8 @@ export interface IUser extends Document {
   address: string;
   lastLoginAt: Date;
   isEnabledByAdmin: boolean;
-  // New nested seller info
   sellerInfo: ISellerInfo;
-
+  personalInfo: IPersonalInfo;
   comparePassword?: (inputPassword: string) => Promise<boolean>;
 }
 
@@ -54,7 +60,15 @@ const SellerInfoSchema = new Schema<ISellerInfo>(
   },
   { _id: false }
 );
-
+const PersonalInfoSchema = new Schema<IPersonalInfo>(
+  {
+    image: String,
+    birthday: String,
+    gender: String,
+    address: String,
+  },
+  { _id: false }
+);
 const UserSchema = new Schema<IUser>(
   {
     email: { type: String, unique: true, sparse: true },
@@ -67,14 +81,10 @@ const UserSchema = new Schema<IUser>(
       default: "user",
     },
     name: { type: String, default: "" },
-    image: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
-    birthday: { type: String, default: "" },
-    gender: { type: String, default: "" },
-    address: { type: String, default: "" },
     lastLoginAt: { type: Date },
     isEnabledByAdmin: { type: Boolean, default: false },
-    // Nested seller info
+    personalInfo: { type: PersonalInfoSchema, default: {} },
     sellerInfo: { type: SellerInfoSchema, default: {} },
   },
   { timestamps: true }
