@@ -292,7 +292,7 @@ export const getSingleUser = async (req: Request, res: Response) => {
       });
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("name personalInfo");
 
     if (!user) {
       return res.status(404).json({
@@ -301,11 +301,7 @@ export const getSingleUser = async (req: Request, res: Response) => {
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      user: user,
-      message: "User fetched successfully",
-    });
+    return res.status(200).json(user);
   } catch (error: any) {
     return res.status(500).json({
       success: false,
@@ -596,31 +592,33 @@ export const getSingleUserForAddToCartComponent = async (
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUserPersonalInfo = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
-    const { name, address, password, image } = req.body;
-
-    const hashedPassword = password
-      ? await bcrypt.hash(password, 10)
-      : undefined;
+    const { name, address, image, birthday, gender } = req.body;
 
     // Build the update object dynamically
     const updateData: any = {
       name,
       address,
       image,
+      birthday,
+      gender,
     };
-
-    if (password) {
-      updateData.password = hashedPassword;
-    }
 
     // Update user
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      updateData,
-      { new: true, runValidators: true } // Run validators for unique fields
+      {
+        name,
+        personalInfo: {
+          image,
+          birthday,
+          gender,
+          address,
+        },
+      },
+      { new: true, runValidators: true }
     );
 
     if (!updatedUser) {

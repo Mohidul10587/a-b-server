@@ -3,7 +3,6 @@ import express from "express";
 import {
   checkUser_Email,
   getSingleUser,
-  updateUser,
   logOut,
   allOrdersOfUser,
   getSingleUserBySlug,
@@ -33,6 +32,7 @@ import {
   updateSellerCommission,
   getUserByIdForAdmin,
   enabledOrDisableSellerByAdmin,
+  updateUserPersonalInfo,
 } from "./user.controller";
 import { verifyUserToken } from "./middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -113,7 +113,11 @@ router.get(
   "/getSingleUserForAddToCartComponent/:id",
   getSingleUserForAddToCartComponent
 );
-router.post("/updateUserInfo/:userId", verifyUserToken, updateUser);
+router.patch(
+  "/updateUserPersonalInfo/:userId",
+  verifyUserToken,
+  updateUserPersonalInfo
+);
 router.patch("/updateStatus/:id", verifyAdminToken, updateStatus);
 router.patch("/updatePassword/:id", verifyAdminToken, updatePassword);
 router.delete("/delete/:id", verifyAdminToken, deleteById(User));

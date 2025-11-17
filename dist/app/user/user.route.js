@@ -46,7 +46,7 @@ router.get("/allForAdminIndexPage", middlewares_2.verifyAdminToken, user_control
 router.get("/allStuffForAdminIndexPage", middlewares_2.verifyAdminToken, user_controller_1.allStuffForAdminIndexPage);
 router.get("/getContactInfoOfSingleUserBySlug/:userSlug", user_controller_1.getContactInfoOfSingleUserBySlug);
 router.get("/getSingleUserForAddToCartComponent/:id", user_controller_1.getSingleUserForAddToCartComponent);
-router.post("/updateUserInfo/:userId", middlewares_1.verifyUserToken, user_controller_1.updateUser);
+router.patch("/updateUserPersonalInfo/:userId", middlewares_1.verifyUserToken, user_controller_1.updateUserPersonalInfo);
 router.patch("/updateStatus/:id", middlewares_2.verifyAdminToken, user_controller_1.updateStatus);
 router.patch("/updatePassword/:id", middlewares_2.verifyAdminToken, user_controller_1.updatePassword);
 router.delete("/delete/:id", middlewares_2.verifyAdminToken, (0, reusableControllers_1.deleteById)(user_model_1.default));

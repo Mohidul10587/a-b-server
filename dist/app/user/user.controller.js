@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.enabledOrDisableSellerByAdmin = exports.promoteUserToSellerByAdmin = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUser = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setCookie = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
+exports.getAllSellerForFilterPage = exports.updateSellerCommission = exports.updateUserPassword = exports.enabledOrDisableSellerByAdmin = exports.promoteUserToSellerByAdmin = exports.updatePassword = exports.updateStatus = exports.allStuffForAdminIndexPage = exports.allForAdminIndexPage = exports.update = exports.getSummaryOfActivity = exports.singleForEditPage = exports.getAuthenticatedUser = exports.getSingleOrder = exports.allOrdersOfUser = exports.logOut = exports.updateUserPersonalInfo = exports.getSingleUserForAddToCartComponent = exports.getContactInfoOfSingleUserBySlug = exports.getStatus = exports.getDetailsOFSingleUserForAdminCustomerDetailsComponent = exports.singleForEditForSellerSettings = exports.getSingleUserById = exports.getSingleUserBySlug = exports.getUserByIdForAdmin = exports.getSingleUser = exports.allUserForAdmin = exports.checkUser_Email = exports.setCookie = exports.googleUpsertUser = exports.logInByCredentials = exports.signUpByCredentials = void 0;
 const user_model_1 = __importDefault(require("./user.model"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const dotenv_1 = __importDefault(require("dotenv"));
@@ -267,18 +267,14 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 message: "User ID is required",
             });
         }
-        const user = yield user_model_1.default.findById(userId);
+        const user = yield user_model_1.default.findById(userId).select("name personalInfo");
         if (!user) {
             return res.status(404).json({
                 success: false,
                 message: "User not found",
             });
         }
-        return res.status(200).json({
-            success: true,
-            user: user,
-            message: "User fetched successfully",
-        });
+        return res.status(200).json(user);
     }
     catch (error) {
         return res.status(500).json({
@@ -535,25 +531,28 @@ const getSingleUserForAddToCartComponent = (req, res) => __awaiter(void 0, void 
     }
 });
 exports.getSingleUserForAddToCartComponent = getSingleUserForAddToCartComponent;
-const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUserPersonalInfo = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userId = req.params.userId;
-        const { name, address, password, image } = req.body;
-        const hashedPassword = password
-            ? yield bcryptjs_1.default.hash(password, 10)
-            : undefined;
+        const { name, address, image, birthday, gender } = req.body;
         // Build the update object dynamically
         const updateData = {
             name,
             address,
             image,
+            birthday,
+            gender,
         };
-        if (password) {
-            updateData.password = hashedPassword;
-        }
         // Update user
-        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, updateData, { new: true, runValidators: true } // Run validators for unique fields
-        );
+        const updatedUser = yield user_model_1.default.findByIdAndUpdate(userId, {
+            name,
+            personalInfo: {
+                image,
+                birthday,
+                gender,
+                address,
+            },
+        }, { new: true, runValidators: true });
         if (!updatedUser) {
             return res.status(404).json({
                 success: false,
@@ -575,7 +574,7 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-exports.updateUser = updateUser;
+exports.updateUserPersonalInfo = updateUserPersonalInfo;
 const logOut = (req, res) => {
     res.clearCookie("refreshToken", {
         path: "/", // Ensure this matches the path where the cookie was set
