@@ -50,7 +50,7 @@ const SellerInfoSchema = new Schema<ISellerInfo>(
     firstContactPersonPhone: { type: String },
     secondContactPersonName: { type: String },
     secondContactPersonPhone: { type: String },
-    commission: { type: Number, default: 0 },
+    commission: { type: Number },
   },
   { _id: false }
 );
