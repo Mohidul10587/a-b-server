@@ -52,14 +52,33 @@ const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.update = update;
 const allForAdminIndexPage = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const items = yield model_1.SellerApplication.find()
+        // Pagination params
+        const { page = 1, limit = 20, status, } = req.query;
+        const skip = (Number(page) - 1) * Number(limit);
+        // ---------- FILTER ----------
+        const filter = {};
+        if (status) {
+            filter.status = status; // Filter by enum status
+        }
+        // ---------- QUERY ----------
+        const items = yield model_1.SellerApplication.find(filter)
             .populate("user", "name username email phone image")
-            .sort({ createdAt: -1 });
-        res.status(200).json(items);
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(Number(limit));
+        const totalItems = yield model_1.SellerApplication.countDocuments(filter);
+        return res.status(200).json({
+            success: true,
+            page: Number(page),
+            limit: Number(limit),
+            totalItems,
+            totalPages: Math.ceil(totalItems / Number(limit)),
+            items,
+        });
     }
     catch (error) {
         console.error(error);
-        res.status(500).json({
+        return res.status(500).json({
             message: "Failed to fetch SellerApplications.",
             error: error.message,
         });
