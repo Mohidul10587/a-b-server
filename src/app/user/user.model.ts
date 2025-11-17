@@ -39,17 +39,17 @@ export interface IUser extends Document {
 // === Mongoose Schema ===
 const SellerInfoSchema = new Schema<ISellerInfo>(
   {
-    companyName: { type: String, default: "" },
-    companyEmail: { type: String, default: "" },
-    companyPhone: { type: String, default: "" },
-    companyFacebook: { type: String, default: "" },
-    companyWhatsapp: { type: String, default: "" },
-    companyCoverImg: { type: String, default: "" },
-    companyProfileImg: { type: String, default: "" },
-    firstContactPersonName: { type: String, default: "" },
-    firstContactPersonPhone: { type: String, default: "" },
-    secondContactPersonName: { type: String, default: "" },
-    secondContactPersonPhone: { type: String, default: "" },
+    companyName: { type: String },
+    companyEmail: { type: String },
+    companyPhone: { type: String },
+    companyFacebook: { type: String },
+    companyWhatsapp: { type: String },
+    companyCoverImg: { type: String },
+    companyProfileImg: { type: String },
+    firstContactPersonName: { type: String },
+    firstContactPersonPhone: { type: String },
+    secondContactPersonName: { type: String },
+    secondContactPersonPhone: { type: String },
     commission: { type: Number, default: 0 },
   },
   { _id: false }
