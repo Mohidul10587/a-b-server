@@ -1,8 +1,8 @@
 import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
-import mongoose from "mongoose"; // Import Mongoose
+import mongoose from "mongoose";
 import cors from "cors";
-import bodyParser from "body-parser"; // Import body-parser
+import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 // ImportRoutes
 import sellerApplicationRoutes from "./app/sellerApplication/routes";
