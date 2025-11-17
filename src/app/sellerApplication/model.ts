@@ -6,33 +6,33 @@ interface ISellerApplication extends Document {
   companyName: string;
   companyEmail: string;
   companyPhone: string;
+  companyFacebook: string;
+  companyWhatsapp: string;
+  companyCoverImg: string;
+  companyProfileImg?: string;
   firstContactPersonName: string;
   firstContactPersonPhone: string;
-  secondContactPersonName?: string;
-  secondContactPersonPhone?: string;
-  facebook?: string;
-  whatsapp?: string;
-  coverImg?: string;
-  image?: string;
-
+  secondContactPersonName: string;
+  secondContactPersonPhone: string;
+  commission: number;
   status: "pending" | "approved" | "rejected";
 }
 
 const SellerApplicationSchema = new Schema<ISellerApplication>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    companyName: { type: String, required: true },
-    companyEmail: { type: String, required: true },
-    companyPhone: { type: String, required: true },
-    firstContactPersonName: { type: String, required: true },
-    firstContactPersonPhone: { type: String, required: true },
+    companyName: { type: String, default: "" },
+    companyEmail: { type: String, default: "" },
+    companyPhone: { type: String, default: "" },
+    companyFacebook: { type: String, default: "" },
+    companyWhatsapp: { type: String, default: "" },
+    companyCoverImg: { type: String, default: "" },
+    companyProfileImg: { type: String, default: "" },
+    firstContactPersonName: { type: String, default: "" },
+    firstContactPersonPhone: { type: String, default: "" },
     secondContactPersonName: { type: String, default: "" },
     secondContactPersonPhone: { type: String, default: "" },
-    facebook: { type: String, default: "" },
-    whatsapp: { type: String, default: "" },
-    coverImg: { type: String, default: "" },
-    image: { type: String, default: "" },
-
+    commission: { type: Number, default: 10 },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

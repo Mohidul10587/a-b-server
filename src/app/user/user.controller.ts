@@ -908,16 +908,20 @@ export const promoteUserToSellerByAdmin = async (
     await User.findByIdAndUpdate(application.user._id, {
       role: "seller",
       isEnabledByAdmin: true,
-      companyName: application.companyName,
-      companyEmail: application.companyEmail,
-      companyPhone: application.companyPhone,
-      whatsapp: application.whatsapp,
-      coverImg: application.coverImg,
-      image: application.image,
-      firstContactPersonName: application.firstContactPersonName,
-      firstContactPersonPhone: application.firstContactPersonPhone,
-      secondContactPersonName: application.secondContactPersonName,
-      secondContactPersonPhone: application.secondContactPersonPhone,
+      sellerInfo: {
+        commission: 10,
+        companyName: application.companyName,
+        companyEmail: application.companyEmail,
+        companyPhone: application.companyPhone,
+        companyFacebook: application.companyFacebook,
+        companyWhatsapp: application.companyWhatsapp,
+        companyCoverImg: application.companyCoverImg,
+        companyProfileImg: application.companyProfileImg,
+        firstContactPersonName: application.firstContactPersonName,
+        firstContactPersonPhone: application.firstContactPersonPhone,
+        secondContactPersonName: application.secondContactPersonName,
+        secondContactPersonPhone: application.secondContactPersonPhone,
+      },
     });
 
     return res.json({
