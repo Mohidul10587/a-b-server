@@ -179,7 +179,9 @@ export const googleUpsertUser = async (req: Request, res: Response) => {
       user = await User.create({
         name,
         email,
-        image,
+        personalInfo: {
+          image,
+        },
         slug,
         role,
         authProvider: "google",

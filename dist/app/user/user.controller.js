@@ -166,7 +166,9 @@ const googleUpsertUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
             user = yield user_model_1.default.create({
                 name,
                 email,
-                image,
+                personalInfo: {
+                    image,
+                },
                 slug,
                 role,
                 authProvider: "google",
