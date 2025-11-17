@@ -49,6 +49,12 @@ const SellerInfoSchema = new mongoose_1.Schema({
     secondContactPersonPhone: { type: String },
     commission: { type: Number },
 }, { _id: false });
+const PersonalInfoSchema = new mongoose_1.Schema({
+    image: String,
+    birthday: String,
+    gender: String,
+    address: String,
+}, { _id: false });
 const UserSchema = new mongoose_1.Schema({
     email: { type: String, unique: true, sparse: true },
     phone: { type: String, unique: true, sparse: true },
@@ -60,14 +66,10 @@ const UserSchema = new mongoose_1.Schema({
         default: "user",
     },
     name: { type: String, default: "" },
-    image: { type: String, default: "" },
     slug: { type: String, unique: true, required: true },
-    birthday: { type: String, default: "" },
-    gender: { type: String, default: "" },
-    address: { type: String, default: "" },
     lastLoginAt: { type: Date },
     isEnabledByAdmin: { type: Boolean, default: false },
-    // Nested seller info
+    personalInfo: { type: PersonalInfoSchema, default: {} },
     sellerInfo: { type: SellerInfoSchema, default: {} },
 }, { timestamps: true });
 UserSchema.index({ email: 1 });
