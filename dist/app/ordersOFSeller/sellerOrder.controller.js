@@ -192,12 +192,21 @@ const updateStatusBySeller = (req, res) => __awaiter(void 0, void 0, void 0, fun
             throw new Error("Seller not found");
         }
         // 4️⃣ Calculate commissions
-        const totalCommission = updatedOrder.products.reduce((total, product) => total +
-            (product.sellingPrice * seller.commission * product.quantity) / 100, 0);
-        const remainedCommission = updatedOrder.products.reduce((total, product) => total +
-            ((100 - seller.commission) / 100) *
-                product.sellingPrice *
-                product.quantity, 0);
+        const totalCommission = updatedOrder.products.reduce((total, product) => {
+            var _a;
+            return total +
+                (product.sellingPrice *
+                    ((_a = seller.sellerInfo) === null || _a === void 0 ? void 0 : _a.commission) *
+                    product.quantity) /
+                    100;
+        }, 0);
+        const remainedCommission = updatedOrder.products.reduce((total, product) => {
+            var _a;
+            return total +
+                ((100 - ((_a = seller.sellerInfo) === null || _a === void 0 ? void 0 : _a.commission) || 10) / 100) *
+                    product.sellingPrice *
+                    product.quantity;
+        }, 0);
         const lastTnxOfAdmin = yield adminTransaction_model_1.default.findOne()
             .sort({ _id: -1 })
             .session(session);

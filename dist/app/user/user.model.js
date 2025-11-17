@@ -35,45 +35,45 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // models/User.model.ts
 const mongoose_1 = __importStar(require("mongoose"));
 // === Mongoose Schema ===
-const UserSchema = new mongoose_1.Schema({
-    username: { type: String, unique: true, sparse: true },
-    email: { type: String, unique: true, sparse: true },
-    phone: { type: String, unique: true, sparse: true },
-    gmail: { type: String, unique: true, sparse: true },
-    facebook: { type: String, unique: true, sparse: true },
-    password: {
-        type: String,
-        default: "",
-    },
-    role: {
-        type: String,
-        enum: ["user", "admin", "seller", "customerManager"],
-        default: "user",
-    },
-    name: { type: String, default: "" },
-    slug: { type: String, unique: true, required: true },
-    isEnabledByAdmin: { type: Boolean, default: false },
-    birthday: { type: String, default: "" },
-    gender: { type: String, default: "" },
-    address: { type: String, default: "" },
+const SellerInfoSchema = new mongoose_1.Schema({
     companyName: { type: String, default: "" },
     companyEmail: { type: String, default: "" },
     companyPhone: { type: String, default: "" },
-    whatsapp: { type: String, default: "" },
-    coverImg: { type: String, default: "" },
-    image: { type: String, default: "" },
-    lastLoginAt: { type: Date },
-    commission: { type: Number, default: 0 },
-    // ✅ New fields in schema
+    companyFacebook: { type: String, default: "" },
+    companyWhatsapp: { type: String, default: "" },
+    companyCoverImg: { type: String, default: "" },
+    companyProfileImg: { type: String, default: "" },
     firstContactPersonName: { type: String, default: "" },
     firstContactPersonPhone: { type: String, default: "" },
     secondContactPersonName: { type: String, default: "" },
     secondContactPersonPhone: { type: String, default: "" },
+    commission: { type: Number, default: 0 },
+}, { _id: false });
+const UserSchema = new mongoose_1.Schema({
+    email: { type: String, unique: true, sparse: true },
+    phone: { type: String, unique: true, sparse: true },
+    gmail: { type: String, unique: true, sparse: true },
+    password: { type: String, default: "" },
+    role: {
+        type: String,
+        enum: ["user", "admin", "seller", "staff"],
+        default: "user",
+    },
+    name: { type: String, default: "" },
+    image: { type: String, default: "" },
+    slug: { type: String, unique: true, required: true },
+    birthday: { type: String, default: "" },
+    gender: { type: String, default: "" },
+    address: { type: String, default: "" },
+    lastLoginAt: { type: Date },
+    isEnabledByAdmin: { type: Boolean, default: false },
+    // Nested seller info
+    sellerInfo: { type: SellerInfoSchema, default: {} },
 }, { timestamps: true });
 UserSchema.index({ email: 1 });
 UserSchema.index({ phone: 1 });
 UserSchema.index({ slug: 1 });
-// Middleware to make the slug unique if it's already taken
+// Middleware to make slug unique
 UserSchema.pre("save", function (next) {
     return __awaiter(this, void 0, void 0, function* () {
         const doc = this;
@@ -81,7 +81,6 @@ UserSchema.pre("save", function (next) {
             return next();
         let slug = doc.slug;
         let counter = 1;
-        // Check if a user with the same slug already exists
         while (yield mongoose_1.default.models.User.exists({ slug })) {
             slug = `${doc.slug}-${counter++}`;
         }

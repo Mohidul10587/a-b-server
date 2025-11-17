@@ -212,14 +212,17 @@ export const updateStatusBySeller = async (req: Request, res: Response) => {
     const totalCommission = updatedOrder.products.reduce(
       (total, product) =>
         total +
-        (product.sellingPrice * seller.commission * product.quantity) / 100,
+        (product.sellingPrice *
+          seller.sellerInfo?.commission *
+          product.quantity) /
+          100,
       0
     );
 
     const remainedCommission = updatedOrder.products.reduce(
       (total, product) =>
         total +
-        ((100 - seller.commission) / 100) *
+        ((100 - seller.sellerInfo?.commission || 10) / 100) *
           product.sellingPrice *
           product.quantity,
       0

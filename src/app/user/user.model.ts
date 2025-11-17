@@ -17,10 +17,10 @@ export interface ISellerInfo {
 }
 
 export interface IUser extends Document {
-  email?: string;
-  phone?: string;
-  gmail?: string;
-  password?: string;
+  email: string;
+  phone: string;
+  gmail: string;
+  password: string;
   role: "user" | "admin" | "seller" | "staff";
   name: string;
   image: string;
@@ -31,7 +31,7 @@ export interface IUser extends Document {
   lastLoginAt: Date;
   isEnabledByAdmin: boolean;
   // New nested seller info
-  sellerInfo?: ISellerInfo;
+  sellerInfo: ISellerInfo;
 
   comparePassword?: (inputPassword: string) => Promise<boolean>;
 }
