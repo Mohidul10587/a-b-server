@@ -104,15 +104,17 @@ const fetchOrders = async (
   const query: any = {};
   if (status) query.status = status;
 
-  const orders = await Order.find(query)
-    .select(
-      "deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart"
-    )
-    .sort({ [sortBy]: -1 })
-    .skip((page - 1) * limit)
-    .limit(limit);
-
-  const totalOrders = await Order.countDocuments(query);
+  // Run order queries parallel
+  const [orders, totalOrders] = await Promise.all([
+    Order.find(query)
+      .select(
+        "deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart createdAt"
+      )
+      .sort({ [sortBy]: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit),
+    Order.countDocuments(query),
+  ]);
 
   const updatedOrders = orders.map((order) => ({
     customersName: order.deliveryInfo.name,
@@ -121,11 +123,58 @@ const fetchOrders = async (
     paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
     paymentMethod: order.paymentMethod,
     _id: order._id,
-    firstProduct: order.cart[0],
+    firstProduct: order.cart?.[0],
     status: order.status,
   }));
 
   return { updatedOrders, totalOrders };
+};
+
+// Get latest pending orders + counts
+export const latestPendingOrdersForAdminWithCounts = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    // Run both in parallel
+    const [
+      orderData,
+      categoriesCount,
+      writersCount,
+      ordersCount,
+      productsCount,
+      sellersCount,
+      usersCount,
+    ] = await Promise.all([
+      fetchOrders("Pending", page, limit, "createdAt"),
+      Category.countDocuments(),
+      Writer.countDocuments(),
+      Order.countDocuments(),
+      Product.countDocuments(),
+      User.countDocuments({ role: "seller" }),
+      User.countDocuments(),
+    ]);
+
+    res.status(200).json({
+      orders: orderData.updatedOrders,
+      totalOrders: orderData.totalOrders,
+      page,
+      limit,
+      counts: {
+        categoriesCount,
+        writersCount,
+        ordersCount,
+        productsCount,
+        sellersCount,
+        usersCount,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch orders.", error });
+  }
 };
 
 // Get pending orders
@@ -146,9 +195,7 @@ export const allPendingOrderForAdmin = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Failed to fetch pending orders.", error });
   }
 };
-
-// Get all orders (with counts)
-export const allForAdmin = async (req: Request, res: Response) => {
+export const allOrderForAdmin = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
@@ -160,41 +207,11 @@ export const allForAdmin = async (req: Request, res: Response) => {
       "createdAt"
     );
 
-    const [
-      categoriesCount,
-      writersCount,
-      ordersCount,
-      productsCount,
-      sellersCount,
-      usersCount,
-    ] = await Promise.all([
-      Category.countDocuments(),
-      Writer.countDocuments(),
-      Order.countDocuments(),
-      Product.countDocuments(),
-      User.countDocuments({ role: "seller" }),
-      User.countDocuments(),
-    ]);
-
-    res.status(200).json({
-      orders: updatedOrders,
-      totalOrders,
-      page,
-      limit,
-      counts: {
-        categoriesCount,
-        writersCount,
-        ordersCount,
-        productsCount,
-        sellersCount,
-        usersCount,
-      },
-    });
+    res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch orders.", error });
+    res.status(500).json({ message: "Failed to fetch pending orders.", error });
   }
 };
-
 // Get delivered orders
 export const allDeliveredOrderForAdmin = async (
   req: Request,

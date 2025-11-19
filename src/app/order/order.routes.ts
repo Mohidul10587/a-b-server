@@ -2,12 +2,13 @@
 import express from "express";
 import {
   create,
-  allForAdmin,
+  latestPendingOrdersForAdminWithCounts,
   getSingleOrders,
   updateOrderStatus,
   allDeliveredOrderForAdmin,
   allPendingOrderForAdmin,
   allCancelledOrderForAdmin,
+  allOrderForAdmin,
 } from "./order.controller";
 import { verifyUserToken } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
@@ -19,10 +20,14 @@ const router = express.Router();
 router.post("/create", create);
 
 // Get all orders
-router.get("/allForAdmin", allForAdmin);
+router.get(
+  "/latestPendingOrdersForAdminWithCounts",
+  latestPendingOrdersForAdminWithCounts
+);
 router.get("/allDeliveredOrderForAdmin", allDeliveredOrderForAdmin);
 router.get("/allCancelledOrderForAdmin", allCancelledOrderForAdmin);
 router.get("/allPendingOrderForAdmin", allPendingOrderForAdmin);
+router.get("/allOrderForAdmin", allOrderForAdmin);
 
 router.get("/getSingleOrder/:id", getSingleOrders);
 
