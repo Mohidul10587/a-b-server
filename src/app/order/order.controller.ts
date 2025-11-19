@@ -154,7 +154,7 @@ export const allForAdmin = async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 10;
 
     const { updatedOrders, totalOrders } = await fetchOrders(
-      "Pending",
+      null,
       page,
       limit,
       "createdAt"
