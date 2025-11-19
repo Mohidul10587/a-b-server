@@ -24,7 +24,7 @@ interface IOrder extends Document {
   paymentMethod: string;
   paymentStatus: boolean;
   paymentTnxId: string;
-  status: string;
+  status: "Pending" | "Delivered" | "Cancelled" | "Returned";
 }
 
 const OrderSchema = new Schema<IOrder>(
@@ -50,7 +50,11 @@ const OrderSchema = new Schema<IOrder>(
     paymentMethod: { type: String, required: true },
     paymentStatus: { type: Boolean, default: false },
     paymentTnxId: { type: String, required: true },
-    status: { type: String, default: "Pending" },
+    status: {
+      type: String,
+      enum: ["Pending", "Delivered", "Cancelled", "Returned"],
+      default: "Pending",
+    },
   },
   { timestamps: true }
 );

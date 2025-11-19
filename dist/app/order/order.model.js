@@ -48,7 +48,11 @@ const OrderSchema = new mongoose_1.Schema({
     paymentMethod: { type: String, required: true },
     paymentStatus: { type: Boolean, default: false },
     paymentTnxId: { type: String, required: true },
-    status: { type: String, default: "Pending" },
+    status: {
+        type: String,
+        enum: ["Pending", "Delivered", "Cancelled", "Returned"],
+        default: "Pending",
+    },
 }, { timestamps: true });
 const Order = mongoose_1.default.model("Order", OrderSchema);
 exports.default = Order;
