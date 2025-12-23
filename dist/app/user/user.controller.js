@@ -26,7 +26,7 @@ dotenv_1.default.config();
 const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { authProvider, email, phone, slug, password, name } = req.body;
     // 1️⃣ প্রাথমিক ভ্যালিডেশন – authProvider সঠিক কি না
-    if (!["email", "phone", "slug"].includes(authProvider)) {
+    if (!["email", "phone"].includes(authProvider)) {
         return res
             .status(400)
             .json({ message: "Auth Provider must be 'email', 'phone' or 'slug'" });
@@ -44,12 +44,6 @@ const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, func
                 return res
                     .status(400)
                     .json({ message: "Provide phone for phone signup" });
-            break;
-        case "slug":
-            if (!slug)
-                return res
-                    .status(400)
-                    .json({ message: "Provide username for username signup" });
             break;
     }
     // 3️⃣ পাসওয়ার্ড চেক
@@ -79,11 +73,6 @@ const signUpByCredentials = (req, res) => __awaiter(void 0, void 0, void 0, func
                 if (yield user_model_1.default.findOne({ phone }))
                     return res.status(409).json({ message: "Phone already in use" });
                 user = yield user_model_1.default.create(Object.assign(Object.assign({}, baseData), { phone }));
-                break;
-            case "slug":
-                if (yield user_model_1.default.findOne({ slug }))
-                    return res.status(409).json({ message: "Usrname already in use" });
-                user = yield user_model_1.default.create(Object.assign(Object.assign({}, baseData), { slug }));
                 break;
         }
         // 5️⃣ রিফ্রেশ‑টোকেন কুকি সেট এবং রেসপন্স

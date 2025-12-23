@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSingleOrders = exports.updateOrderStatus = exports.allCancelledOrderForAdmin = exports.allDeliveredOrderForAdmin = exports.allForAdmin = exports.allPendingOrderForAdmin = exports.create = void 0;
+exports.getSingleOrders = exports.updateOrderStatus = exports.allCancelledOrderForAdmin = exports.allDeliveredOrderForAdmin = exports.allOrderForAdmin = exports.allPendingOrderForAdmin = exports.latestPendingOrdersForAdminWithCounts = exports.create = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const cart_model_1 = __importDefault(require("../cart/cart.model"));
 const category_model_1 = __importDefault(require("../category/category.model"));
@@ -93,44 +93,38 @@ const fetchOrders = (status, page, limit, sortBy) => __awaiter(void 0, void 0, v
     const query = {};
     if (status)
         query.status = status;
-    const orders = yield order_model_1.default.find(query)
-        .select("deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart")
-        .sort({ [sortBy]: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit);
-    const totalOrders = yield order_model_1.default.countDocuments(query);
-    const updatedOrders = orders.map((order) => ({
-        customersName: order.deliveryInfo.name,
-        address: order.deliveryInfo.address,
-        phone: order.deliveryInfo.phone,
-        paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
-        paymentMethod: order.paymentMethod,
-        _id: order._id,
-        firstProduct: order.cart[0],
-        status: order.status,
-    }));
+    // Run order queries parallel
+    const [orders, totalOrders] = yield Promise.all([
+        order_model_1.default.find(query)
+            .select("deliveryInfo.name deliveryInfo.address deliveryInfo.phone paymentStatus paymentMethod status cart createdAt")
+            .sort({ [sortBy]: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit),
+        order_model_1.default.countDocuments(query),
+    ]);
+    const updatedOrders = orders.map((order) => {
+        var _a;
+        return ({
+            customersName: order.deliveryInfo.name,
+            address: order.deliveryInfo.address,
+            phone: order.deliveryInfo.phone,
+            paymentStatus: order.paymentStatus ? "Paid" : "Unpaid",
+            paymentMethod: order.paymentMethod,
+            _id: order._id,
+            firstProduct: (_a = order.cart) === null || _a === void 0 ? void 0 : _a[0],
+            status: order.status,
+        });
+    });
     return { updatedOrders, totalOrders };
 });
-// Get pending orders
-const allPendingOrderForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Get latest pending orders + counts
+const latestPendingOrdersForAdminWithCounts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
-        const { updatedOrders, totalOrders } = yield fetchOrders("Pending", page, limit, "createdAt");
-        res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
-    }
-    catch (error) {
-        res.status(500).json({ message: "Failed to fetch pending orders.", error });
-    }
-});
-exports.allPendingOrderForAdmin = allPendingOrderForAdmin;
-// Get all orders (with counts)
-const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
-        const { updatedOrders, totalOrders } = yield fetchOrders("Pending", page, limit, "createdAt");
-        const [categoriesCount, writersCount, ordersCount, productsCount, sellersCount, usersCount,] = yield Promise.all([
+        // Run both in parallel
+        const [orderData, categoriesCount, writersCount, ordersCount, productsCount, sellersCount, usersCount,] = yield Promise.all([
+            fetchOrders("Pending", page, limit, "createdAt"),
             category_model_1.default.countDocuments(),
             writer_model_1.default.countDocuments(),
             order_model_1.default.countDocuments(),
@@ -139,8 +133,8 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             user_model_1.default.countDocuments(),
         ]);
         res.status(200).json({
-            orders: updatedOrders,
-            totalOrders,
+            orders: orderData.updatedOrders,
+            totalOrders: orderData.totalOrders,
             page,
             limit,
             counts: {
@@ -157,7 +151,32 @@ const allForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         res.status(500).json({ message: "Failed to fetch orders.", error });
     }
 });
-exports.allForAdmin = allForAdmin;
+exports.latestPendingOrdersForAdminWithCounts = latestPendingOrdersForAdminWithCounts;
+// Get pending orders
+const allPendingOrderForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const { updatedOrders, totalOrders } = yield fetchOrders("Pending", page, limit, "createdAt");
+        res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Failed to fetch pending orders.", error });
+    }
+});
+exports.allPendingOrderForAdmin = allPendingOrderForAdmin;
+const allOrderForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const { updatedOrders, totalOrders } = yield fetchOrders(null, page, limit, "createdAt");
+        res.status(200).json({ orders: updatedOrders, totalOrders, page, limit });
+    }
+    catch (error) {
+        res.status(500).json({ message: "Failed to fetch pending orders.", error });
+    }
+});
+exports.allOrderForAdmin = allOrderForAdmin;
 // Get delivered orders
 const allDeliveredOrderForAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

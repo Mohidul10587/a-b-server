@@ -12,10 +12,11 @@ const router = express_1.default.Router();
 // Create a new order
 router.post("/create", order_controller_1.create);
 // Get all orders
-router.get("/allForAdmin", order_controller_1.allForAdmin);
+router.get("/latestPendingOrdersForAdminWithCounts", order_controller_1.latestPendingOrdersForAdminWithCounts);
 router.get("/allDeliveredOrderForAdmin", order_controller_1.allDeliveredOrderForAdmin);
 router.get("/allCancelledOrderForAdmin", order_controller_1.allCancelledOrderForAdmin);
 router.get("/allPendingOrderForAdmin", order_controller_1.allPendingOrderForAdmin);
+router.get("/allOrderForAdmin", order_controller_1.allOrderForAdmin);
 router.get("/getSingleOrder/:id", order_controller_1.getSingleOrders);
 // Update order status
 router.patch("/updateOrderStatus/:id", order_controller_1.updateOrderStatus);
