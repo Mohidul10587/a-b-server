@@ -20,7 +20,7 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
   const { authProvider, email, phone, slug, password, name } = req.body;
 
   // 1️⃣ প্রাথমিক ভ্যালিডেশন – authProvider সঠিক কি না
-  if (!["email", "phone", "slug"].includes(authProvider)) {
+  if (!["email", "phone"].includes(authProvider)) {
     return res
       .status(400)
       .json({ message: "Auth Provider must be 'email', 'phone' or 'slug'" });
@@ -40,13 +40,6 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
         return res
           .status(400)
           .json({ message: "Provide phone for phone signup" });
-      break;
-
-    case "slug":
-      if (!slug)
-        return res
-          .status(400)
-          .json({ message: "Provide username for username signup" });
       break;
   }
 
@@ -83,13 +76,6 @@ export const signUpByCredentials = async (req: Request, res: Response) => {
           return res.status(409).json({ message: "Phone already in use" });
 
         user = await User.create({ ...baseData, phone });
-        break;
-
-      case "slug":
-        if (await User.findOne({ slug }))
-          return res.status(409).json({ message: "Usrname already in use" });
-
-        user = await User.create({ ...baseData, slug });
         break;
     }
 
