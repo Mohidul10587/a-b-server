@@ -24,10 +24,7 @@ import {
   deleteById,
   getAllSlugsForSitemap,
 } from "../shared/reusableControllers";
-import {
-  verifyAdminToken,
-  verifySellerAndAdminToken,
-} from "../user/middlewares";
+import { verAdminTkn, verifySellerAndAdminToken } from "../user/middlewares";
 import { filter } from "./filter";
 
 const router = express.Router();
@@ -61,12 +58,12 @@ router.get(
 router.get("/:productId", getSingleProduct);
 
 // // Route for deleting a product by ID
-router.delete("/:productId", verifyAdminToken, deleteProduct);
+router.delete("/:productId", verAdminTkn, deleteProduct);
 
 // // Route for updating a product by ID
 router.put("/update/:id", verifySellerAndAdminToken, update);
 router.patch("/updateStatus/:id", verifySellerAndAdminToken, updateStatus);
 router.get("/getAllSlugsForSitemap", getAllSlugsForSitemap(Product));
 
-router.delete("/delete/:id", verifyAdminToken, deleteById(Product));
+router.delete("/delete/:id", verAdminTkn, deleteById(Product));
 export default router;

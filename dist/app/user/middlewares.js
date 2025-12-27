@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifySellerAndAdminToken = exports.verifyCustomerManagerAndAdminToken = exports.verifyCustomerManagerToken = exports.verifySellerToken = exports.verifyAdminToken = exports.verifyUserToken = exports.verifyStuffToken = void 0;
+exports.verifySellerAndAdminToken = exports.verifyCustomerManagerAndAdminToken = exports.verifyCustomerManagerToken = exports.verifySellerToken = exports.verAdminTkn = exports.verUserTkn = exports.verifyStuffToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const user_model_1 = __importDefault(require("./user.model"));
@@ -56,13 +56,13 @@ exports.verifyStuffToken = verifyTokenByRoles([
     "customerManager",
 ]);
 // ✅ Middleware for individual roles
-exports.verifyUserToken = verifyTokenByRoles([
+exports.verUserTkn = verifyTokenByRoles([
     "admin",
     "seller",
     "customerManager",
     "user",
 ]);
-exports.verifyAdminToken = verifyTokenByRoles(["admin"]);
+exports.verAdminTkn = verifyTokenByRoles(["admin"]);
 exports.verifySellerToken = verifyTokenByRoles(["seller"]);
 exports.verifyCustomerManagerToken = verifyTokenByRoles([
     "customerManager",

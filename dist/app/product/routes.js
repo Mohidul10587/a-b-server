@@ -28,10 +28,10 @@ router.get("/singleForUserFoDetailsPageBySlug/:slug", controller_1.singleForUser
 // // Route for getting a single product by ID
 router.get("/:productId", controller_1.getSingleProduct);
 // // Route for deleting a product by ID
-router.delete("/:productId", middlewares_1.verifyAdminToken, controller_1.deleteProduct);
+router.delete("/:productId", middlewares_1.verAdminTkn, controller_1.deleteProduct);
 // // Route for updating a product by ID
 router.put("/update/:id", middlewares_1.verifySellerAndAdminToken, controller_1.update);
 router.patch("/updateStatus/:id", middlewares_1.verifySellerAndAdminToken, controller_1.updateStatus);
 router.get("/getAllSlugsForSitemap", (0, reusableControllers_1.getAllSlugsForSitemap)(model_1.default));
-router.delete("/delete/:id", middlewares_1.verifyAdminToken, (0, reusableControllers_1.deleteById)(model_1.default));
+router.delete("/delete/:id", middlewares_1.verAdminTkn, (0, reusableControllers_1.deleteById)(model_1.default));
 exports.default = router;

@@ -7,9 +7,9 @@ import {
   allForUserIndexPage,
   singleForUserForDetailsPageBySlug,
   allSlugsForUserIndexPage,
-  rejectSellerApplicationByAdmin,
+  rejectApplicationByAdmin,
 } from "./controller";
-import { verifyAdminToken, verifyUserToken } from "../user/middlewares";
+import { verAdminTkn, verUserTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import { SellerApplication } from "./model";
 
@@ -21,15 +21,15 @@ const router = Router();
 // router.get("/singleForUserForDetailsPageBySlug/:slug", singleForUserForDetailsPageBySlug);
 
 //====================== For Admin =====================
-router.post("/create", verifyUserToken, create);
-router.get("/allForAdminIndexPage", verifyAdminToken, allForAdminIndexPage);
-router.get("/singleForAdmin/:id", verifyAdminToken, singleForAdmin);
+router.post("/create", verUserTkn, create);
+router.get("/allForAdminIndexPage", verAdminTkn, allForAdminIndexPage);
+router.get("/singleForAdmin/:id", verAdminTkn, singleForAdmin);
 router.patch(
-  "/rejectSellerApplicationByAdmin/:id",
-  verifyAdminToken,
-  rejectSellerApplicationByAdmin
+  "/rejectApplicationByAdmin/:id",
+  verAdminTkn,
+  rejectApplicationByAdmin
 );
-// router.put("/update/:id", verifyAdminToken, update);
-// router.delete("/delete/:id", verifyAdminToken, deleteById(SellerApplication));
+// router.put("/update/:id", verAdminTkn, update);
+router.delete("/delete/:id", verAdminTkn, deleteById(SellerApplication));
 
 export default router;

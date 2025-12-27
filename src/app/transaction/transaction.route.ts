@@ -4,12 +4,12 @@ import {
   getSellerTransactions,
   deleteTransaction,
 } from "./transaction.controller";
-import { verifySellerToken, verifyUserToken } from "../user/middlewares";
+import { verifySellerToken, verUserTkn } from "../user/middlewares";
 
 const router = express.Router();
 
 // Route to create a new transaction
-router.post("/", verifyUserToken, createTransaction);
+router.post("/", verUserTkn, createTransaction);
 
 // Route to get all transactions for the authenticated seller
 router.get(
@@ -19,6 +19,6 @@ router.get(
 );
 
 // Route to delete a transaction
-router.delete("/:id", verifyUserToken, deleteTransaction);
+router.delete("/:id", verUserTkn, deleteTransaction);
 
 export default router;

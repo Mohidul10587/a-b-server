@@ -5,22 +5,18 @@ import {
   getWishlist,
   clearWishlist,
 } from "./wishlist.controller";
-import { verifyUserToken } from "../user/middlewares";
+import { verUserTkn } from "../user/middlewares";
 
 const router = express.Router();
 
 // Route to add a product to the wishlist
-router.post("/addToWishlist", verifyUserToken, addToWishlist);
+router.post("/addToWishlist", verUserTkn, addToWishlist);
 
 // Route to remove a product from the wishlist
-router.delete(
-  "/deleteSingle/:productId",
-  verifyUserToken,
-  deleteSingleFromWishlist
-);
-router.delete("/deleteAll", verifyUserToken, clearWishlist);
+router.delete("/deleteSingle/:productId", verUserTkn, deleteSingleFromWishlist);
+router.delete("/deleteAll", verUserTkn, clearWishlist);
 
 // Route to get the user's wishlist
-router.get("/getWishlist", verifyUserToken, getWishlist);
+router.get("/getWishlist", verUserTkn, getWishlist);
 
 export default router;

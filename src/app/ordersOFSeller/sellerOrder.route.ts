@@ -9,7 +9,7 @@ import {
   updateOrderStatusByAdmin,
 } from "./sellerOrder.controller";
 import {
-  verifyAdminToken,
+  verAdminTkn,
   verifySellerAndAdminToken,
   verifySellerToken,
 } from "../user/middlewares";
@@ -19,11 +19,11 @@ import { SellerOrderModel } from "./sellerOrder.model";
 const router = express.Router();
 
 router.get("/getAllOrders", verifySellerAndAdminToken, getAllOrders);
-router.get("/allOrdersForAdmin", verifyAdminToken, getAllOrdersForAdmin);
+router.get("/allOrdersForAdmin", verAdminTkn, getAllOrdersForAdmin);
 
 router.post("/updateStatusByAdmin/:id", updateOrderStatusByAdmin);
 router.post("/updateStatusBySeller/:id", updateStatusBySeller);
 
 router.get("/getSingleOrder/:id", getOrderById);
-router.delete("/delete/:id", verifyAdminToken, deleteById(SellerOrderModel));
+router.delete("/delete/:id", verAdminTkn, deleteById(SellerOrderModel));
 export default router;

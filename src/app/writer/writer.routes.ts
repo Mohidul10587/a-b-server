@@ -12,13 +12,13 @@ import {
   // getAllBrandIds,
 } from "./writer.controller";
 
-import { verifyAdminToken } from "../user/middlewares";
+import { verAdminTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import Writer from "./writer.model";
 
 const router = Router();
 
-router.post("/create", verifyAdminToken, create);
+router.post("/create", verAdminTkn, create);
 // Route to get all writer IDs
 router.get(
   "/singleForEditPage/:id",
@@ -26,7 +26,7 @@ router.get(
   singleForEditPage
 );
 
-router.put("/update/:id", verifyAdminToken, update);
+router.put("/update/:id", verAdminTkn, update);
 
 router.get("/all", getAllBrands);
 
@@ -34,6 +34,6 @@ router.get("/singleWriterBySlug/:slug", getWriterBySlug);
 
 router.get("/singleWriter/:id", getWriteById);
 router.get("/getAllForPageBuilder", getAllForPageBuilder);
-router.delete("/delete/:id", verifyAdminToken, deleteById(Writer));
+router.delete("/delete/:id", verAdminTkn, deleteById(Writer));
 
 export default router;

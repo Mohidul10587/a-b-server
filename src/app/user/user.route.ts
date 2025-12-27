@@ -34,10 +34,10 @@ import {
   enabledOrDisableSellerByAdmin,
   updateUserPersonalInfo,
 } from "./user.controller";
-import { verifyUserToken } from "./middlewares";
+import { verUserTkn } from "./middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import User from "./user.model";
-import { verifyAdminToken, verifyStuffToken } from "./middlewares";
+import { verAdminTkn, verifyStuffToken } from "./middlewares";
 
 const router = express.Router();
 
@@ -48,9 +48,9 @@ router.get("/getUserByIdForAdmin/:userId", getUserByIdForAdmin);
 router.get("/getSingleUserBySlug/:userSlug", getSingleUserBySlug);
 router.get("/getSingleUserById/:id", getSingleUserById);
 router.get("/sellerStatus/:userSlug", getStatus);
-router.get("/singleForEditPage/:id", verifyUserToken, singleForEditPage);
-router.get("/getSummaryOfActivity", verifyUserToken, getSummaryOfActivity);
-router.put("/update/:id", verifyUserToken, update);
+router.get("/singleForEditPage/:id", verUserTkn, singleForEditPage);
+router.get("/getSummaryOfActivity", verUserTkn, getSummaryOfActivity);
+router.put("/update/:id", verUserTkn, update);
 
 //================For user authentication ===================
 router.get("/getAuthenticatedUser", getAuthenticatedUser);
@@ -62,7 +62,7 @@ router.post("/logout", logOut);
 
 //===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", getAllSellerForFilterPage);
-router.get("/allUserForAdmin", verifyAdminToken, allUserForAdmin);
+router.get("/allUserForAdmin", verAdminTkn, allUserForAdmin);
 router.get(
   "/singleForEditForSellerSettings/:id",
   singleForEditForSellerSettings
@@ -70,38 +70,34 @@ router.get(
 
 router.patch(
   "/promoteUserToSellerByAdmin/:applicationId",
-  verifyAdminToken,
+  verAdminTkn,
   promoteUserToSellerByAdmin
 );
 router.patch(
   "/enabledOrDisableSellerByAdmin/:sellerId",
-  verifyAdminToken,
+  verAdminTkn,
   enabledOrDisableSellerByAdmin
 );
-router.patch(
-  "/updateUserPassword/:userId",
-  verifyAdminToken,
-  updateUserPassword
-);
+router.patch("/updateUserPassword/:userId", verAdminTkn, updateUserPassword);
 router.patch(
   "/updateSellerCommission/:userId",
-  verifyAdminToken,
+  verAdminTkn,
   updateSellerCommission
 );
 router.get(
   "/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id",
-  // verifyAdminToken,
+  // verAdminTkn,
   getDetailsOFSingleUserForAdminCustomerDetailsComponent
 );
 
-router.get("/check-user-email", verifyUserToken, checkUser_Email);
+router.get("/check-user-email", verUserTkn, checkUser_Email);
 router.get("/checkStuff", verifyStuffToken, checkUser_Email);
-router.get("/allOrdersOfUser", verifyUserToken, allOrdersOfUser);
-router.get("/getSingleOrder/:id", verifyUserToken, getSingleOrder);
-router.get("/allForAdminIndexPage", verifyAdminToken, allForAdminIndexPage);
+router.get("/allOrdersOfUser", verUserTkn, allOrdersOfUser);
+router.get("/getSingleOrder/:id", verUserTkn, getSingleOrder);
+router.get("/allForAdminIndexPage", verAdminTkn, allForAdminIndexPage);
 router.get(
   "/allStuffForAdminIndexPage",
-  verifyAdminToken,
+  verAdminTkn,
   allStuffForAdminIndexPage
 );
 
@@ -115,11 +111,11 @@ router.get(
 );
 router.patch(
   "/updateUserPersonalInfo/:userId",
-  verifyUserToken,
+  verUserTkn,
   updateUserPersonalInfo
 );
-router.patch("/updateStatus/:id", verifyAdminToken, updateStatus);
-router.patch("/updatePassword/:id", verifyAdminToken, updatePassword);
-router.delete("/delete/:id", verifyAdminToken, deleteById(User));
+router.patch("/updateStatus/:id", verAdminTkn, updateStatus);
+router.patch("/updatePassword/:id", verAdminTkn, updatePassword);
+router.delete("/delete/:id", verAdminTkn, deleteById(User));
 
 export default router;

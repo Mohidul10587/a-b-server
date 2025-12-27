@@ -5,7 +5,7 @@ import {
   singleForEditPage,
   update,
 } from "./subcategory.controller";
-import { verifyAdminToken } from "../user/middlewares";
+import { verAdminTkn } from "../user/middlewares";
 import Subcategory from "./subcategory.model";
 import { deleteById } from "../shared/reusableControllers";
 
@@ -13,7 +13,7 @@ const router = Router();
 
 // Route to create a new category
 router.post("/create", create);
-router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
+router.get("/singleForEditPage/:id", verAdminTkn, singleForEditPage);
 
 router.get(
   "/allSubcategoriesForAdminSubCatIndexPage",
@@ -22,6 +22,6 @@ router.get(
 );
 
 router.put("/update/:id", update);
-router.delete("/delete/:id", verifyAdminToken, deleteById(Subcategory));
+router.delete("/delete/:id", verAdminTkn, deleteById(Subcategory));
 
 export default router;

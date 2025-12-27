@@ -28,7 +28,7 @@ const BASE_URL = "https://sandbox.aamarpay.com";
 const redirectUrl = "https://a-b-server.vercel.app";
 const clientSideUrl = "https://www.notebookprokash.com";
 // Initialize Payment Route
-router.post("/initialize-payment", middlewares_1.verifyUserToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/initialize-payment", middlewares_1.verUserTkn, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { amount, transactionId, name, email, phone, orderInfoForStore } = req.body;
     const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;

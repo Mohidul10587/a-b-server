@@ -11,8 +11,8 @@ const reusableControllers_1 = require("../shared/reusableControllers");
 const router = (0, express_1.Router)();
 // Route to create a new category
 router.post("/create", subcategory_controller_1.create);
-router.get("/singleForEditPage/:id", middlewares_1.verifyAdminToken, subcategory_controller_1.singleForEditPage);
+router.get("/singleForEditPage/:id", middlewares_1.verAdminTkn, subcategory_controller_1.singleForEditPage);
 router.get("/allSubcategoriesForAdminSubCatIndexPage", subcategory_controller_1.allSubcategoriesForAdminSubCatIndexPage);
 router.put("/update/:id", subcategory_controller_1.update);
-router.delete("/delete/:id", middlewares_1.verifyAdminToken, (0, reusableControllers_1.deleteById)(subcategory_model_1.default));
+router.delete("/delete/:id", middlewares_1.verAdminTkn, (0, reusableControllers_1.deleteById)(subcategory_model_1.default));
 exports.default = router;

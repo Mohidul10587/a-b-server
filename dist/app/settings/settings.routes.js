@@ -7,5 +7,5 @@ const router = (0, express_1.Router)();
 router.get("/", settings_controller_1.getSettings);
 router.get("/getPrivacyPoliciesOfSettings", settings_controller_1.getPrivacyPoliciesOfSettings);
 router.put("/updateSellerDefaultStatus/:id", settings_controller_1.updateDefaultSellerStatus);
-router.put("/update/:id", middlewares_1.verifyAdminToken, settings_controller_1.update);
+router.put("/update/:id", middlewares_1.verAdminTkn, settings_controller_1.update);
 exports.default = router;

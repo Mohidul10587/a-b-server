@@ -7,7 +7,7 @@ import {
   updateDefaultSellerStatus,
   update,
 } from "./settings.controller";
-import { verifyAdminToken } from "../user/middlewares";
+import { verAdminTkn } from "../user/middlewares";
 
 const router = Router();
 
@@ -16,6 +16,6 @@ router.get("/getPrivacyPoliciesOfSettings", getPrivacyPoliciesOfSettings);
 
 router.put("/updateSellerDefaultStatus/:id", updateDefaultSellerStatus);
 
-router.put("/update/:id", verifyAdminToken, update);
+router.put("/update/:id", verAdminTkn, update);
 
 export default router;

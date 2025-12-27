@@ -14,15 +14,15 @@ import {
   getAllCategoryForFilterPage,
   getAllForPageBuilder,
 } from "./category.controller";
-import { verifyAdminToken } from "../user/middlewares";
+import { verAdminTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import Category from "./category.model";
 
 const router = Router();
 
 //Admin routes
-router.post("/create", verifyAdminToken, create);
-router.get("/singleForEditPage/:id", verifyAdminToken, singleForEditPage);
+router.post("/create", verAdminTkn, create);
+router.get("/singleForEditPage/:id", verAdminTkn, singleForEditPage);
 router.get(
   "/allCategoriesForSubCatAddPage",
 
@@ -44,7 +44,7 @@ router.get(
   "/getCatsWritersPublishersForNavbar",
   getCatsWritersPublishersForNavbar
 );
-router.put("/update/:id", verifyAdminToken, update);
+router.put("/update/:id", verAdminTkn, update);
 
 // common routes
 
@@ -54,5 +54,5 @@ router.get("/getAllCategoriesForCatMainPage", getAllCategoriesForCatMainPage);
 
 router.get("/getAllCategoryForFilterPage", getAllCategoryForFilterPage);
 router.get("/getAllForPageBuilder", getAllForPageBuilder);
-router.delete("/delete/:id", verifyAdminToken, deleteById(Category));
+router.delete("/delete/:id", verAdminTkn, deleteById(Category));
 export default router;

@@ -10,7 +10,7 @@ import {
   allCancelledOrderForAdmin,
   allOrderForAdmin,
 } from "./order.controller";
-import { verifyUserToken } from "../user/middlewares";
+import { verUserTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import Order from "./order.model";
 

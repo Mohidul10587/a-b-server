@@ -9,7 +9,7 @@ import {
   updateIsChecked,
   getUserCartQuantity,
 } from "./cart.controller";
-import { verifyUserToken } from "../user/middlewares";
+import { verUserTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import Cart from "./cart.model";
 
@@ -17,12 +17,12 @@ const router = express.Router();
 
 router.post("/create", createOrUpdate);
 router.post("/addSingleItemToCart", addSingleItemToCart);
-router.post("/updateProductQntInDb", verifyUserToken, updateProductQntInDb);
+router.post("/updateProductQntInDb", verUserTkn, updateProductQntInDb);
 
 router.get("/getUserCart/:userId", getUserCart);
 router.get("/getUserCartQuantity/:userId", getUserCartQuantity);
 
-router.delete("/removeItemFromCart", verifyUserToken, removeItemFromCart);
+router.delete("/removeItemFromCart", verUserTkn, removeItemFromCart);
 router.patch("/update-isChecked", updateIsChecked);
 router.delete("/delete/:id", deleteById(Cart));
 export default router;

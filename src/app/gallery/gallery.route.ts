@@ -8,7 +8,7 @@ import {
   // searchGallery,
 } from "./gallery.controller";
 
-import { verifyAdminToken } from "../user/middlewares";
+import { verAdminTkn } from "../user/middlewares";
 import { deleteById } from "../shared/reusableControllers";
 import Gallery from "./gallery.model";
 

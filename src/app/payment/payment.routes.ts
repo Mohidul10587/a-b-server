@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import axios from "axios";
 import Order from "../order/order.model";
 import Cart from "../cart/cart.model";
-import { verifyUserToken } from "../user/middlewares";
+import { verUserTkn } from "../user/middlewares";
 import mongoose from "mongoose";
 
 const router = express.Router();
@@ -21,7 +21,7 @@ const clientSideUrl = "https://www.notebookprokash.com";
 // Initialize Payment Route
 router.post(
   "/initialize-payment",
-  verifyUserToken,
+  verUserTkn,
   async (req: Request, res: Response) => {
     const { amount, transactionId, name, email, phone, orderInfoForStore } =
       req.body;

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rejectSellerApplicationByAdmin = exports.singleForUserForDetailsPageBySlug = exports.allSlugsForUserIndexPage = exports.allForUserIndexPage = exports.singleForAdmin = exports.allForAdminIndexPage = exports.update = exports.create = void 0;
+exports.rejectApplicationByAdmin = exports.singleForUserForDetailsPageBySlug = exports.allSlugsForUserIndexPage = exports.allForUserIndexPage = exports.singleForAdmin = exports.allForAdminIndexPage = exports.update = exports.create = void 0;
 const model_1 = require("./model");
 //===================== Admin Controllers =====================
 const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -149,7 +149,7 @@ const singleForUserForDetailsPageBySlug = (req, res) => __awaiter(void 0, void 0
     }
 });
 exports.singleForUserForDetailsPageBySlug = singleForUserForDetailsPageBySlug;
-const rejectSellerApplicationByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const rejectApplicationByAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { id } = req.params;
         // Find application
@@ -169,4 +169,4 @@ const rejectSellerApplicationByAdmin = (req, res) => __awaiter(void 0, void 0, v
         res.status(500).json({ message: "Internal server error" });
     }
 });
-exports.rejectSellerApplicationByAdmin = rejectSellerApplicationByAdmin;
+exports.rejectApplicationByAdmin = rejectApplicationByAdmin;

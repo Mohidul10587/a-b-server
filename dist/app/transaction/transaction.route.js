@@ -8,9 +8,9 @@ const transaction_controller_1 = require("./transaction.controller");
 const middlewares_1 = require("../user/middlewares");
 const router = express_1.default.Router();
 // Route to create a new transaction
-router.post("/", middlewares_1.verifyUserToken, transaction_controller_1.createTransaction);
+router.post("/", middlewares_1.verUserTkn, transaction_controller_1.createTransaction);
 // Route to get all transactions for the authenticated seller
 router.get("/getAllSellerTransaction", middlewares_1.verifySellerToken, transaction_controller_1.getSellerTransactions);
 // Route to delete a transaction
-router.delete("/:id", middlewares_1.verifyUserToken, transaction_controller_1.deleteTransaction);
+router.delete("/:id", middlewares_1.verUserTkn, transaction_controller_1.deleteTransaction);
 exports.default = router;

@@ -17,9 +17,9 @@ router.get("/getUserByIdForAdmin/:userId", user_controller_1.getUserByIdForAdmin
 router.get("/getSingleUserBySlug/:userSlug", user_controller_1.getSingleUserBySlug);
 router.get("/getSingleUserById/:id", user_controller_1.getSingleUserById);
 router.get("/sellerStatus/:userSlug", user_controller_1.getStatus);
-router.get("/singleForEditPage/:id", middlewares_1.verifyUserToken, user_controller_1.singleForEditPage);
-router.get("/getSummaryOfActivity", middlewares_1.verifyUserToken, user_controller_1.getSummaryOfActivity);
-router.put("/update/:id", middlewares_1.verifyUserToken, user_controller_1.update);
+router.get("/singleForEditPage/:id", middlewares_1.verUserTkn, user_controller_1.singleForEditPage);
+router.get("/getSummaryOfActivity", middlewares_1.verUserTkn, user_controller_1.getSummaryOfActivity);
+router.put("/update/:id", middlewares_1.verUserTkn, user_controller_1.update);
 //================For user authentication ===================
 router.get("/getAuthenticatedUser", user_controller_1.getAuthenticatedUser);
 router.post("/signUpByCredentials", user_controller_1.signUpByCredentials);
@@ -29,25 +29,25 @@ router.post("/setCookie", user_controller_1.setCookie);
 router.post("/logout", user_controller_1.logOut);
 //===================== For Admin=====================
 router.get("/getAllSellerForFilterPage", user_controller_1.getAllSellerForFilterPage);
-router.get("/allUserForAdmin", middlewares_2.verifyAdminToken, user_controller_1.allUserForAdmin);
+router.get("/allUserForAdmin", middlewares_2.verAdminTkn, user_controller_1.allUserForAdmin);
 router.get("/singleForEditForSellerSettings/:id", user_controller_1.singleForEditForSellerSettings);
-router.patch("/promoteUserToSellerByAdmin/:applicationId", middlewares_2.verifyAdminToken, user_controller_1.promoteUserToSellerByAdmin);
-router.patch("/enabledOrDisableSellerByAdmin/:sellerId", middlewares_2.verifyAdminToken, user_controller_1.enabledOrDisableSellerByAdmin);
-router.patch("/updateUserPassword/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateUserPassword);
-router.patch("/updateSellerCommission/:userId", middlewares_2.verifyAdminToken, user_controller_1.updateSellerCommission);
+router.patch("/promoteUserToSellerByAdmin/:applicationId", middlewares_2.verAdminTkn, user_controller_1.promoteUserToSellerByAdmin);
+router.patch("/enabledOrDisableSellerByAdmin/:sellerId", middlewares_2.verAdminTkn, user_controller_1.enabledOrDisableSellerByAdmin);
+router.patch("/updateUserPassword/:userId", middlewares_2.verAdminTkn, user_controller_1.updateUserPassword);
+router.patch("/updateSellerCommission/:userId", middlewares_2.verAdminTkn, user_controller_1.updateSellerCommission);
 router.get("/getDetailsOFSingleUserForAdminCustomerDetailsComponent/:id", 
-// verifyAdminToken,
+// verAdminTkn,
 user_controller_1.getDetailsOFSingleUserForAdminCustomerDetailsComponent);
-router.get("/check-user-email", middlewares_1.verifyUserToken, user_controller_1.checkUser_Email);
+router.get("/check-user-email", middlewares_1.verUserTkn, user_controller_1.checkUser_Email);
 router.get("/checkStuff", middlewares_2.verifyStuffToken, user_controller_1.checkUser_Email);
-router.get("/allOrdersOfUser", middlewares_1.verifyUserToken, user_controller_1.allOrdersOfUser);
-router.get("/getSingleOrder/:id", middlewares_1.verifyUserToken, user_controller_1.getSingleOrder);
-router.get("/allForAdminIndexPage", middlewares_2.verifyAdminToken, user_controller_1.allForAdminIndexPage);
-router.get("/allStuffForAdminIndexPage", middlewares_2.verifyAdminToken, user_controller_1.allStuffForAdminIndexPage);
+router.get("/allOrdersOfUser", middlewares_1.verUserTkn, user_controller_1.allOrdersOfUser);
+router.get("/getSingleOrder/:id", middlewares_1.verUserTkn, user_controller_1.getSingleOrder);
+router.get("/allForAdminIndexPage", middlewares_2.verAdminTkn, user_controller_1.allForAdminIndexPage);
+router.get("/allStuffForAdminIndexPage", middlewares_2.verAdminTkn, user_controller_1.allStuffForAdminIndexPage);
 router.get("/getContactInfoOfSingleUserBySlug/:userSlug", user_controller_1.getContactInfoOfSingleUserBySlug);
 router.get("/getSingleUserForAddToCartComponent/:id", user_controller_1.getSingleUserForAddToCartComponent);
-router.patch("/updateUserPersonalInfo/:userId", middlewares_1.verifyUserToken, user_controller_1.updateUserPersonalInfo);
-router.patch("/updateStatus/:id", middlewares_2.verifyAdminToken, user_controller_1.updateStatus);
-router.patch("/updatePassword/:id", middlewares_2.verifyAdminToken, user_controller_1.updatePassword);
-router.delete("/delete/:id", middlewares_2.verifyAdminToken, (0, reusableControllers_1.deleteById)(user_model_1.default));
+router.patch("/updateUserPersonalInfo/:userId", middlewares_1.verUserTkn, user_controller_1.updateUserPersonalInfo);
+router.patch("/updateStatus/:id", middlewares_2.verAdminTkn, user_controller_1.updateStatus);
+router.patch("/updatePassword/:id", middlewares_2.verAdminTkn, user_controller_1.updatePassword);
+router.delete("/delete/:id", middlewares_2.verAdminTkn, (0, reusableControllers_1.deleteById)(user_model_1.default));
 exports.default = router;

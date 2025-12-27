@@ -56,13 +56,13 @@ export const verifyStuffToken = verifyTokenByRoles([
 ]);
 
 // ✅ Middleware for individual roles
-export const verifyUserToken = verifyTokenByRoles([
+export const verUserTkn = verifyTokenByRoles([
   "admin",
   "seller",
   "customerManager",
   "user",
 ]);
-export const verifyAdminToken = verifyTokenByRoles(["admin"]);
+export const verAdminTkn = verifyTokenByRoles(["admin"]);
 export const verifySellerToken = verifyTokenByRoles(["seller"]);
 export const verifyCustomerManagerToken = verifyTokenByRoles([
   "customerManager",
