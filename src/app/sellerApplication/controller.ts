@@ -155,7 +155,7 @@ export const singleForUserForDetailsPageBySlug = async (
   }
 };
 
-export const rejectApplicationByAdmin = async (req: Request, res: Response) => {
+export const rejectByAdmin = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
